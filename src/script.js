@@ -206,17 +206,34 @@ document.addEventListener('DOMContentLoaded', () => {
     const glitchSound = document.getElementById('glitch-sound');
     const transitionSound = document.getElementById('transition-sound');
     
-    // Initialize skip button
+    // Initialize buttons
+    const startButton = document.getElementById('start-button');
     const skipButton = document.getElementById('skip-button');
     skipButton.addEventListener('click', skipToPhase3);
+    
+    // Setup start button
+    startButton.addEventListener('click', () => {
+        // Hide start screen
+        const startScreen = document.getElementById('start-screen');
+        gsap.to(startScreen, { 
+            duration: 0.5, 
+            opacity: 0, 
+            onComplete: () => {
+                startScreen.classList.add('hidden');
+                // Show phase 1
+                const phase1 = document.getElementById('phase1');
+                phase1.classList.remove('hidden');
+                gsap.set(phase1, { opacity: 1 });
+                // Start the experience
+                startPhase1();
+            } 
+        });
+    });
     
     // Init phases
     const phase1 = document.getElementById('phase1');
     const phase2 = document.getElementById('phase2');
     const phase3 = document.getElementById('phase3');
-    
-    // Start the sequence
-    startPhase1();
     
     // -------------- PHASE 1: CREDITS SEQUENCE --------------
     function startPhase1() {
@@ -274,23 +291,47 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // 3. Add Enter the Void style special layouts
-        const enterTheVoidScreens = [
-            { name: "BUF COMPAGNIE", color: "#FF6600", category: "company", layout: "company" },
+        // 3. Updated special layouts
+        const enterTheVibeScreens = [
             { name: "ENTER", color: "#FF6600", category: "title", layout: "title" },
-            { name: "THE VOID", color: "#FF6600", category: "title", layout: "title" },
+            { name: "THE", color: "#FF6600", category: "title", layout: "title" },
+            { name: "VIBE", color: "#FF6600", category: "title", layout: "title" },
+            
+            // Japanese style bilingual layout
+            { 
+                name: "テクノロジー パイオニア\n原田 洋祐 • YOSUKE HARADA\n島田 都良 • FUMIYOSHI SHIMADA\nデジタル アーティスト\n見寄 修蔵 • SHUZO MIYORI\n武田 祥 • SHO TAKEDA", 
+                color: "#FF6600", 
+                category: "credits", 
+                layout: "bilingual",
+                language: "japanese"
+            },
+            
+            // Chinese style bilingual layout
+            { 
+                name: "技术先驱\n李 明亮 • LI MINGLIANG\n王 芳 • WANG FANG\n数字艺术家\n张 伟 • ZHANG WEI\n刘 洋 • LIU YANG", 
+                color: "#FF6600", 
+                category: "credits", 
+                layout: "bilingual",
+                language: "chinese"
+            },
+            
+            // Russian style bilingual layout
+            { 
+                name: "ТЕХНОЛОГИЧЕСКИЕ ПИОНЕРЫ\nИВАНОВ СЕРГЕЙ • SERGEY IVANOV\nСМИРНОВА АННА • ANNA SMIRNOVA\nЦИФРОВЫЕ ХУДОЖНИКИ\nПЕТРОВ ДМИТРИЙ • DMITRY PETROV\nВОЛКОВА МАРИЯ • MARIA VOLKOVA", 
+                color: "#FF6600", 
+                category: "credits", 
+                layout: "bilingual",
+                language: "russian"
+            },
+            
+            // Hierarchical layout with roles and names
             { 
                 name: "POST PRODUCTION SUPERVISORS\nOLIVIER THERY-LAPINEY\nSUSANA ANTUNES\nASSISTED BY\nYANNICK BOUVEROT\nPRODUCTION ASSISTANT\nROMAIN RICHARD", 
                 color: "#FF6600", 
                 category: "credits", 
                 layout: "hierarchical" 
             },
-            { 
-                name: "LOCATION CO-ORDINATORS\n島田 都良 • FUMIYOSHI SHIMADA\n原田 洋祐 • YOSUKE HARADA\nUNIT CO-ORDINATORS\n見寄 修蔵 • SHUZO MIYORI\n武田 祥 • SHO TAKEDA", 
-                color: "#FF6600", 
-                category: "credits", 
-                layout: "bilingual" 
-            },
+            
             { 
                 name: "Nicoletta\nMASSONE", 
                 color: "#FF00FF", 
@@ -311,7 +352,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let allScreens = [
             ...singleNameScreens,
             ...packeryScreens,
-            ...enterTheVoidScreens
+            ...enterTheVibeScreens
         ];
         
         // If we still don't have 20 screens, add more packery groups
@@ -322,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Shuffle but keep Enter the Void screens at the end
+        // Shuffle but keep Enter the Vibe screens at the end
         const regularScreens = allScreens.filter(screen => 
             !Array.isArray(screen) && !screen.layout);
         const packeryGroupScreens = allScreens.filter(screen => 
@@ -332,11 +373,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const shuffledRegular = shuffleArray([...regularScreens]);
         const shuffledPackery = shuffleArray([...packeryGroupScreens]);
         
-        // Final sequence with Enter the Void screens at the end
+        // Final sequence with Enter the Vibe screens at the end
         const finalSequence = [
             ...shuffledRegular,
             ...shuffledPackery,
-            ...enterTheVoidScreens
+            ...enterTheVibeScreens
         ];
         
         console.log(`Prepared ${finalSequence.length} credit screens`);
@@ -419,8 +460,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const descEl = document.createElement('div');
             descEl.classList.add('credit-description');
             descEl.textContent = credit.description;
-            descEl.style.top = '60%';
+            descEl.style.top = '40%'; // Position above the name
             
+            // Add description first, before the name
             singleCreditContainer.appendChild(descEl);
         }
         
@@ -438,10 +480,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if (credit.category === 'creative') creditEl.classList.add('flicker');
                 else if (credit.category === 'artist') creditEl.classList.add('electric');
                 else if (credit.category === 'writer') creditEl.classList.add('flicker');
-                else if (credit.category === 'hacker') creditEl.classList.add('glitch');
+                else if (credit.category === 'hacker') creditEl.classList.add('flicker');
                 else if (credit.category === 'special') {
-                    creditEl.classList.add('glitch');
-                    creditEl.classList.add('electric');
+                    creditEl.classList.add('flicker');
                 }
                 
                 // Play sound
@@ -457,21 +498,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 ease: "power1.in" 
             }, "+=1.5");
             
-        // If there's a description, animate it too
+        // No animation for description - set it with default opacity
         if (credit.description) {
             const descEl = singleCreditContainer.querySelector('.credit-description');
-            timeline
-                .fromTo(descEl,
-                    { opacity: 0, y: 20 },
-                    { opacity: 1, y: 0, duration: 0.5, ease: "power1.out" },
-                    "-=0.5"
-                )
-                .to(descEl, { 
-                    opacity: 0, 
-                    y: -20, 
-                    duration: 0.4, 
-                    ease: "power1.in" 
-                }, "-=0.4");
+            gsap.set(descEl, { opacity: 1 });
         }
         
         return timeline;
@@ -505,28 +535,43 @@ document.addEventListener('DOMContentLoaded', () => {
             
             creditsContainer.appendChild(creditEl);
             
-            // Add animation to timeline
+            // Add description if available
+            if (credit.description) {
+                const descEl = document.createElement('div');
+                descEl.classList.add('credit-description', 'packery-description');
+                descEl.textContent = credit.description;
+                
+                // Position the description above the name
+                descEl.style.left = `${item.x}px`;
+                descEl.style.top = `${item.y - 30}px`;
+                descEl.style.width = `${item.width}px`;
+                
+                creditsContainer.appendChild(descEl);
+                
+                // Set description opacity (no animation)
+                gsap.set(descEl, { opacity: 1 });
+            }
+            
+            // Add all animations at once instead of staggering
             timeline.fromTo(creditEl,
                 { opacity: 0, scale: 0.8 },
-                { opacity: 1, scale: 1, duration: 0.4, ease: "power1.out" },
-                i * 0.1
+                { opacity: 1, scale: 1, duration: 0.6, ease: "power1.out" }
             );
             
-            // Add effect based on category with delay
+            // Add effect based on category
             timeline.add(() => {
                 if (credit.category === 'tech') creditEl.classList.add('electric');
                 else if (credit.category === 'creative') creditEl.classList.add('flicker');
                 else if (credit.category === 'artist') creditEl.classList.add('electric');
                 else if (credit.category === 'writer') creditEl.classList.add('flicker');
-                else if (credit.category === 'hacker') creditEl.classList.add('glitch');
+                else if (credit.category === 'hacker') creditEl.classList.add('flicker');
                 
                 // Remove effect after 1.5s
                 gsap.delayedCall(1.5, () => {
                     creditEl.classList.remove('electric');
                     creditEl.classList.remove('flicker');
-                    creditEl.classList.remove('glitch');
                 });
-            }, `-=0.3`);
+            });
         });
         
         // Play glitch sound
@@ -537,14 +582,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }, null, 0);
         
-        // After all credits are shown, keep them for a while, then fade out
+        // After all credits are shown, keep them for a while, then fade out together (no stagger)
         timeline.to('.credits-container .credit', {
             opacity: 0,
             scale: 0.8,
-            stagger: 0.05,
-            duration: 0.3,
+            duration: 0.4,
             ease: "power1.in"
-        }, `+=${Math.min(2.5, credits.length * 0.3)}`);
+        }, `+=2.5`);
         
         return timeline;
     }
@@ -893,7 +937,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // New function to handle special Enter the Void style layouts
+    // Function to handle special layouts
     function showSpecialLayoutCredit(timeline, credit) {
         const creditsContainer = document.querySelector('.credits-container');
         const singleCreditContainer = document.querySelector('.single-credit-container');
@@ -902,31 +946,8 @@ document.addEventListener('DOMContentLoaded', () => {
         creditsContainer.innerHTML = '';
         singleCreditContainer.innerHTML = '';
         
-        if (credit.layout === "company") {
-            // Company layout (like "BUF COMPAGNIE")
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit', 'single', 'company');
-            creditEl.textContent = credit.name;
-            creditEl.style.color = credit.color;
-            creditEl.style.fontSize = 'clamp(5rem, 15vw, 14rem)';
-            creditEl.style.fontWeight = 'bold';
-            
-            singleCreditContainer.appendChild(creditEl);
-            
-            timeline
-                .fromTo(creditEl,
-                    { opacity: 0, scale: 0.9 },
-                    { opacity: 1, scale: 1, duration: 0.6, ease: "power1.out" }
-                )
-                .to(creditEl, { 
-                    opacity: 0, 
-                    scale: 0.9, 
-                    duration: 0.4, 
-                    ease: "power1.in" 
-                }, "+=2");
-        }
-        else if (credit.layout === "title") {
-            // Title layout (like "ENTER")
+        if (credit.layout === "title") {
+            // Title layout (like "ENTER", "THE", "VIBE")
             const creditEl = document.createElement('div');
             creditEl.classList.add('credit', 'single', 'title');
             creditEl.textContent = credit.name;
@@ -941,6 +962,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     { opacity: 0, scale: 0.9 },
                     { opacity: 1, scale: 1, duration: 0.6, ease: "power1.out" }
                 )
+                .add(() => {
+                    // Add flicker effect
+                    creditEl.classList.add('flicker');
+                })
                 .to(creditEl, { 
                     opacity: 0, 
                     scale: 0.9, 
@@ -958,7 +983,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let htmlContent = '';
             
             lines.forEach((line, index) => {
-                // Every even line is a role (orange), every odd line is a name (white)
+                // Every even line is a role (colored), every odd line is a name (white)
                 const isRole = index % 2 === 0;
                 const textColor = isRole ? credit.color : 'white';
                 htmlContent += `<div style="color: ${textColor}; margin-bottom: 10px; font-size: ${isRole ? '1.8rem' : '2.5rem'}">${line}</div>`;
@@ -971,17 +996,29 @@ document.addEventListener('DOMContentLoaded', () => {
             
             timeline
                 .fromTo(creditEl,
-                    { opacity: 0 },
-                    { opacity: 1, duration: 0.6, ease: "power1.out" }
+                    { opacity: 0, scale: 0.9 },
+                    { opacity: 1, scale: 1, duration: 0.6, ease: "power1.out" }
                 )
+                .add(() => {
+                    // Add glow effect to text
+                    const roleElements = creditEl.querySelectorAll('div');
+                    roleElements.forEach(el => {
+                        if (el.style.color === credit.color) {
+                            el.classList.add('electric');
+                        } else {
+                            el.classList.add('flicker');
+                        }
+                    });
+                })
                 .to(creditEl, { 
                     opacity: 0, 
+                    scale: 0.9, 
                     duration: 0.4, 
                     ease: "power1.in" 
                 }, "+=3");
         }
         else if (credit.layout === "bilingual") {
-            // Bilingual layout with Japanese + English
+            // Bilingual layout with Japanese/Chinese/Russian + English
             const creditEl = document.createElement('div');
             creditEl.classList.add('credit', 'bilingual');
             
@@ -989,22 +1026,32 @@ document.addEventListener('DOMContentLoaded', () => {
             const lines = credit.name.split('\n');
             let htmlContent = '';
             
+            // Apply specific font for each language
+            let fontFamily = 'sans-serif';
+            if (credit.language === 'japanese') {
+                fontFamily = "'Noto Sans JP', sans-serif";
+            } else if (credit.language === 'chinese') {
+                fontFamily = "'Noto Sans SC', sans-serif";
+            } else if (credit.language === 'russian') {
+                fontFamily = "'Noto Sans', sans-serif";
+            }
+            
             lines.forEach((line, index) => {
-                // Every even line is a header (orange), others are names
+                // Every even line is a header (colored), others are names
                 const isHeader = index % 3 === 0;
                 const hasDot = line.includes('•');
                 
                 if (isHeader) {
-                    htmlContent += `<div style="color: ${credit.color}; margin-bottom: 10px; font-size: 1.8rem">${line}</div>`;
+                    htmlContent += `<div style="color: ${credit.color}; margin-bottom: 10px; font-size: 1.8rem; font-family: ${fontFamily};">${line}</div>`;
                 } else if (hasDot) {
-                    const [japanese, english] = line.split('•');
+                    const [foreign, english] = line.split('•');
                     htmlContent += `<div style="color: white; margin-bottom: 10px; font-size: 2.2rem">
-                        <span style="font-family: 'Noto Sans JP', sans-serif;">${japanese.trim()}</span>
-                        <span style="color: red; margin: 0 10px;">•</span>
+                        <span style="font-family: ${fontFamily};">${foreign.trim()}</span>
+                        <span style="color: ${credit.color}; margin: 0 10px;">•</span>
                         <span>${english.trim()}</span>
                     </div>`;
                 } else {
-                    htmlContent += `<div style="color: white; margin-bottom: 10px; font-size: 2.2rem">${line}</div>`;
+                    htmlContent += `<div style="color: white; margin-bottom: 10px; font-size: 2.2rem; font-family: ${fontFamily};">${line}</div>`;
                 }
             });
             
@@ -1015,11 +1062,19 @@ document.addEventListener('DOMContentLoaded', () => {
             
             timeline
                 .fromTo(creditEl,
-                    { opacity: 0 },
-                    { opacity: 1, duration: 0.6, ease: "power1.out" }
+                    { opacity: 0, scale: 0.9 },
+                    { opacity: 1, scale: 1, duration: 0.6, ease: "power1.out" }
                 )
+                .add(() => {
+                    // Add glow effect to headers
+                    const headerElements = creditEl.querySelectorAll(`div[style*="color: ${credit.color}"]`);
+                    headerElements.forEach(el => {
+                        el.classList.add('electric');
+                    });
+                })
                 .to(creditEl, { 
                     opacity: 0, 
+                    scale: 0.9, 
                     duration: 0.4, 
                     ease: "power1.in" 
                 }, "+=3");
@@ -1047,6 +1102,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div style="font-size: 5rem;">${lastName}</div>
                 `;
                 creditEl.style.color = credit.color;
+                creditEl.classList.add('flicker');
             }
             
             creditEl.style.textAlign = 'center';
