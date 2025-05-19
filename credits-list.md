@@ -1,0 +1,300 @@
+# ENTER THE VIBE - Credits List
+
+## Technology Pioneers
+- ALAN TURING - Computer Science Father
+- GRACE HOPPER - Compiler Pioneer
+- JOHN McCARTHY - AI Pioneer
+- MARVIN MINSKY - Neural Network Pioneer
+- MARGARET HAMILTON - Apollo Software Director
+- JOHN VON NEUMANN - Computer Architecture Pioneer
+- ADA LOVELACE - First Programmer
+- DOUGLAS ENGELBART - Interactive Computing Pioneer
+- TIM BERNERS-LEE - World Wide Web Inventor
+- RICHARD STALLMAN - Free Software Movement
+- LINUS TORVALDS - Linux Creator
+- DONALD KNUTH - Algorithms Pioneer
+- BARBARA LISKOV - Programming Language Pioneer
+- EDSGER DIJKSTRA - Computer Science Pioneer
+- GEOFFREY HINTON - Deep Learning Pioneer
+- YANN LECUN - Convolutional Networks Pioneer
+- YOSHUA BENGIO - Deep Learning Pioneer
+- ANDREW NG - AI Education Pioneer
+- IAN GOODFELLOW - GAN Inventor
+- DEMIS HASSABIS - DeepMind Founder
+- ANDREJ KARPATHY - AI Visionary
+- SAM ALTMAN - OpenAI CEO
+- DARIO AMODEI - Constitutional AI Pioneer
+- JOHN CARMACK - Game Engine Pioneer
+- ILYA SUTSKEVER - Transformer Architecture Pioneer
+- JENSEN HUANG - NVIDIA Founder
+- CHRIS LATTNER - LLVM & Swift Creator
+- BRENDAN EICH - JavaScript Creator
+- GUIDO VAN ROSSUM - Python Creator
+- NATALIE SILVANOVICH - Security Researcher
+- KATIE BOUMAN - Black Hole Imaging Pioneer
+- MEREDITH WHITTAKER - AI Ethics Pioneer
+- TIMNIT GEBRU - AI Ethics Researcher
+- JOY BUOLAMWINI - Algorithmic Bias Researcher
+- KYUNGHYUN CHO - Neural Translation Pioneer
+- ORIOL VINYALS - DeepMind Research Director
+- FRANCESCA ROSSI - AI Ethics Researcher
+- ROMAN YAMPOLSKIY - AI Safety Researcher
+- MIRA MURATI - OpenAI CTO
+- JEFF DEAN - Google AI Lead
+- MIGUEL WATTSON - Collaborative Intelligence
+- KATHY SIERRA - Learning Experience Pioneer
+- NATCHA ENGTRAKUL - Compiler Expert
+- SVEN BERGMANN - Blockchain Pioneer
+- CLAUDE SHANNON - Information Theory Father
+- SEYMOUR PAPERT - Educational Computing Pioneer
+- SHIGERU MIYAMOTO - Game Design Legend
+- IVAN SUTHERLAND - Computer Graphics Pioneer
+- VINTON CERF - Internet Protocol Co-designer
+- BOB KAHN - TCP/IP Co-creator
+- TED NELSON - Hypertext Visionary
+- JANE SAMMET - Programming Language Pioneer
+- LYNN CONWAY - VLSI Design Pioneer
+- LARRY PAGE - Google Co-founder
+- SERGEY BRIN - Google Co-founder
+- STEVE WOZNIAK - Apple Co-founder
+- STEVE JOBS - Apple Visionary
+- BILL GATES - Microsoft Founder
+- MARK DEAN - PC Architecture Pioneer
+- PIERRE OMIDYAR - eBay Founder
+- SHAFI GOLDWASSER - Cryptography Pioneer
+- SILVIO MICALI - Cryptocurrency Pioneer
+- RAY KURZWEIL - Futurist & AI Pioneer
+- JARON LANIER - VR Pioneer
+- FRAN ALLEN - Compiler Optimization Pioneer
+- MURRAY CAMPBELL - Chess AI Pioneer
+- DONALD DAVIES - Packet Switching Inventor
+- MARISSA MAYER - Yahoo CEO & Google Pioneer
+- MITCHELL BAKER - Mozilla Foundation Chair
+- HOWARD RHEINGOLD - Virtual Community Pioneer
+- ANITA BORG - Women in Tech Advocate
+- SALLY RIDE - First American Woman in Space
+- MAE JEMISON - First Black Woman in Space
+- HEDY LAMARR - Frequency Hopping Co-inventor
+- ANNIE EASLEY - NASA Computer Scientist
+- KAREN SPÄRCK JONES - NLP Pioneer
+- ADELE GOLDBERG - Smalltalk Pioneer
+- CAROL SHAW - First Female Game Designer
+- DONNA DUBINSKY - Palm Computing Founder
+- MICHAEL DELL - Dell Computers Founder
+- JIMMY WALES - Wikipedia Founder
+- ELIZABETH FEINLER - DNS Pioneer
+- KEN THOMPSON - Unix Co-creator
+- DENNIS RITCHIE - C Language Creator
+- BRIAN KERNIGHAN - Unix Pioneer
+- BJARNE STROUSTRUP - C++ Creator
+- LARRY WALL - Perl Creator
+- JAMES GOSLING - Java Creator
+- ANDERS HEJLSBERG - C# Creator
+- YUKIHIRO MATSUMOTO - Ruby Creator
+- JOHN RESIG - jQuery Creator
+- RASMUS LERDORF - PHP Creator
+- DHH - Ruby on Rails Creator
+- SATOSHI NAKAMOTO - Bitcoin Creator
+- VITALIK BUTERIN - Ethereum Creator
+- SOPHIE WILSON - ARM Architecture Designer
+- JOHN MCAFEE - McAfee Antivirus Founder
+- PHIL ZIMMERMANN - PGP Creator
+- WHITFIELD DIFFIE - Public Key Cryptography Pioneer
+- MARTIN HELLMAN - Cryptography Pioneer
+
+## Digital Artists & Designers
+- NAM JUNE PAIK - Video Art Pioneer
+- STELARC - Cybernetic Performance Artist
+- LAURIE ANDERSON - Digital Music Pioneer
+- ZACH LIEBERMAN - Creative Coding Pioneer
+- CASEY REAS - Processing Co-creator
+- BEN FRY - Data Visualization Pioneer
+- JOHN MAEDA - Computational Design Pioneer
+- JOSHUA DAVIS - Generative Artist
+- REFIK ANADOL - AI Art Pioneer
+- SOUGWEN CHUNG - Human-Robot Art Collaborator
+- TEAMLAB - Interactive Art Collective
+- MEMO AKTEN - AI Art Pioneer
+- MARIO KLINGEMANN - Neural Art Pioneer
+- HELENA SARIN - GAN Art Pioneer
+- SOPHIA CRESPO - Artificial Nature Artist
+- SCOTT DRAVES - Fractal Flame Algorithm Creator
+- GOLAN LEVIN - Interactive Art Pioneer
+- ZACH BLAS - Critical Digital Art
+- HEATHER DEWEY-HAGBORG - Bio-digital Artist
+- RHIZOME - Digital Art Organization
+- MARIUS WATZ - Generative Art Pioneer
+- LAUREN LEE MCCARTHY - p5.js Creator
+- CAMILLE UTTERBACK - Interactive Installation Artist
+- RAFAEL LOZANO-HEMMER - Electronic Artist
+- DAITO MANABE - Digital Performance Artist
+- ULF LANGHEINRICH - Digital Audiovisual Artist
+- RYOJI IKEDA - Data-Visualization Artist
+- CARSTEN NICOLAI - Digital Minimalist
+- RYOICHI KUROKAWA - Audiovisual Artist
+- OLAFUR ELIASSON - Light & Space Digital Artist
+- DANIEL ROZIN - Interactive Mirror Artist
+- THEO JANSEN - Kinetic Sculpture Artist
+- JENNY HOLZER - LED Text Art Pioneer
+- DAVID ROKEBY - Interactive Systems Artist
+- ANN HAMILTON - Digital Installation Artist
+- BILL VIOLA - Video Art Pioneer
+- JAMES TURRELL - Light Art Pioneer
+- KYLE MCDONALD - Code Artist
+- JULIAN OLIVER - Critical Engineer
+- EVAN ROTH - Digital Culture Artist
+- NERI OXMAN - Material Ecology Pioneer
+- IRIS VAN HERPEN - 3D-Printed Fashion Pioneer
+- KARIM RASHID - Digital Product Design Pioneer
+- RES - Digital Media Artist
+- ROSA MENKMAN - Glitch Art Pioneer
+- CORY ARCANGEL - Digital Art Hacker
+- TABOR ROBAK - Digital Environments Artist
+- RAFAËL ROZENDAAL - Website Artist
+- LIA - Software & Net Art Pioneer
+- OLIA LIALINA - Net.Art Pioneer
+- JODI - Net.Art Collective
+- VVVV - Collective of Digital Installation Artists
+
+## Writers & Theorists
+- WILLIAM GIBSON - Cyberpunk Pioneer
+- NEAL STEPHENSON - Cyberpunk & Post-Cyberpunk
+- BRUCE STERLING - Cyberpunk Author
+- PAT CADIGAN - Cyberpunk Author
+- DONNA HARAWAY - Cyborg Manifesto Author
+- SHERRY TURKLE - Technological Self Theorist
+- KATHERINE HAYLES - Posthumanism Theorist
+- MARSHALL MCLUHAN - Media Theorist
+- JEAN BAUDRILLARD - Simulation Theorist
+- VILÉM FLUSSER - Media Philosopher
+- WENDY HUI KYONG CHUN - New Media Theorist
+- MATTHEW FULLER - Software Studies Pioneer
+- GEERT LOVINK - Net Critic
+- LANA WACHOWSKI - The Matrix Co-creator
+- LILLY WACHOWSKI - The Matrix Co-creator
+- ARTHUR C. CLARKE - Sci-Fi Visionary
+- ISAAC ASIMOV - Robot Ethics Pioneer
+- OCTAVIA BUTLER - Afrofuturist Pioneer
+- TED CHIANG - Conceptual Sci-Fi Master
+- PHILIP K. DICK - Reality-Questioning Sci-Fi
+- CORY DOCTOROW - Digital Rights Advocate
+- CHARLIE BROOKER - Black Mirror Creator
+- URSULA K. LE GUIN - Sci-Fi Visionary
+- SAMUEL R. DELANY - Sci-Fi Theorist
+- KEN LIU - Cyberpunk & AI Fiction
+- MARTHA WELLS - AI Fiction
+- ANNALEE NEWITZ - Tech & Future Writer
+- RAMEZ NAAM - Transhuman Fiction
+- HANNU RAJANIEMI - Quantum Fiction
+- VERNOR VINGE - Technological Singularity
+- GREG EGAN - Hard Sci-Fi Programmer
+- CHARLES STROSS - Singularity Fiction
+- MADELINE ASHBY - Robot Fiction
+- JAMES BRIDLE - New Dark Age Author
+- JEANETTE WINTERSON - AR/VR Fiction
+- RICHARD POWERS - AI & Consciousness Fiction
+- DAVID BRIN - Uplift Universe Creator
+- DANIEL SUAREZ - Daemon Author
+- STANISŁAW LEM - Solaris Author
+- DOUGLAS ADAMS - Hitchhiker's Guide Author
+- RUDY RUCKER - Cyberpunk Pioneer
+
+## Hackers & Security Researchers
+- KEVIN MITNICK - Famous Hacker
+- RICHARD STALLMAN - Free Software Hacker
+- LINUS TORVALDS - Linux Hacker
+- JOHN DRAPER (CAPTAIN CRUNCH) - Phone Phreaking Pioneer
+- DAN KAMINSKY - DNS Security Researcher
+- PEITER "MUDGE" ZATKO - L0pht Hacker
+- KATIE MOUSSOURIS - Bug Bounty Pioneer
+- BRUCE SCHNEIER - Security Expert
+- STEVEN LEVY - Hacker Culture Chronicler
+- MARK ABENE (PHIBER OPTIK) - Hacker
+- KEVIN POULSEN - Hacker Turned Journalist
+- ROBERT MORRIS - Morris Worm Creator
+- AARON SWARTZ - Internet Activist
+- JOANNA RUTKOWSKA - Virtualization Security
+- MOXIE MARLINSPIKE - Signal Creator
+- TAVIS ORMANDY - Zero-Day Researcher
+- EDWARD SNOWDEN - NSA Whistleblower
+- JULIAN ASSANGE - WikiLeaks Founder
+- CHELSEA MANNING - Military Whistleblower
+- JEN EASTERLY - CISA Director
+- MIKKO HYPPÖNEN - Security Researcher
+- MARCUS HUTCHINS - WannaCry Stopper
+- WEI DAI - Cryptocurrency Pioneer
+- CHRIS SOGHOIAN - Privacy Technologist
+- CHARLIE MILLER - Car Hacking Pioneer
+- HALVAR FLAKE - Reverse Engineering Expert
+- MATT BLAZE - Cryptography Researcher
+- SAMY KAMKAR - MySpace Worm Creator
+- HD MOORE - Metasploit Creator
+- RAFAEL SCHEEL - Smart TV Security Expert
+- DAN GEER - Security Visionary
+- DINO DAI ZOVI - Mobile Security Pioneer
+- PARISA TABRIZ - Security Princess
+- KEREN ELAZARI - Security Researcher
+- JAYA BALOO - CISO & Security Expert
+- JAYSON STREET - Social Engineering Expert
+- SPACE ROGUE - L0pht Member
+- BARNABY JACK - ATM Hacker
+- KARL KOCH - KGB Hacker
+- CHRIS WYSOPAL - Veracode Founder
+- JEREMY HAMMOND - LulzSec Hacker
+- MATTHEW GREEN - Cryptography Expert
+- GABRIELLA COLEMAN - Hacker Culture Anthropologist
+- LOYD BLANKENSHIP (THE MENTOR) - Hacker Manifesto Author
+- GEORGE HOTZ - iPhone Jailbreaker
+- JEFF MOSS (DARK TANGENT) - DEFCON & Black Hat Founder
+- VAN JACOBSON - TCP/IP Developer
+- TSUTOMU SHIMOMURA - Tracked Kevin Mitnick
+- SUSAN LANDAU - Privacy & Surveillance Expert
+- RUNA SANDVIK - Security Journalist
+- SOLAR DESIGNER - OpenWall Project Leader
+
+## Film & Music Pioneers
+- KRAFTWERK - Electronic Music Pioneers
+- BRIAN ENO - Ambient Pioneer
+- VANGELIS - Electronic Film Score Pioneer
+- APHEX TWIN - IDM Pioneer
+- DAFT PUNK - Electronic Music Pioneers
+- WENDY CARLOS - Electronic Music Pioneer
+- LAURIE SPIEGEL - Computer Music Pioneer
+- SUZANNE CIANI - Synthesizer Pioneer
+- BJÖRK - Digital Music Innovator
+- RIDLEY SCOTT - Blade Runner Director
+- JAMES CAMERON - Avatar & Terminator Director
+- DAVID CRONENBERG - Body Horror Pioneer
+- CHRIS CUNNINGHAM - Digital Music Video Pioneer
+- MICHEL GONDRY - Visual Effects Innovator
+- STANLEY KUBRICK - 2001 Director
+- GEORGE LUCAS - Star Wars Creator
+- STEVE REICH - Process Music Pioneer
+- RYUICHI SAKAMOTO - Electronic Composer
+- GIORGIO MORODER - Electronic Dance Pioneer
+- JEAN-MICHEL JARRE - Electronic Music Pioneer
+- YELLOW MAGIC ORCHESTRA - Electronic Music Pioneers
+- TANGERINE DREAM - Electronic Music Pioneers
+- HOLLY HERNDON - AI Music Pioneer
+- BURIAL - Post-Dubstep Pioneer
+- FLYING LOTUS - Electronic Music Innovator
+- ONEOHTRIX POINT NEVER - Digital Sound Art
+- AMON TOBIN - Sound Design Pioneer
+- THE CHEMICAL BROTHERS - Electronic Music Pioneers
+- AUTECHRE - Generative Music Pioneers
+- DENIS VILLENEUVE - Arrival & Blade Runner 2049 Director
+- CHRISTOPHER NOLAN - Inception Director
+- TAKASHI MIIKE - Cyberpunk Film Director
+- SHINYA TSUKAMOTO - Tetsuo Director
+- ALEX GARLAND - Ex Machina Director
+- STEVEN SPIELBERG - A.I. & Ready Player One Director
+- SPIKE JONZE - Her Director
+- DARREN ARONOFSKY - Pi Director
+- MAMORU OSHII - Ghost in the Shell Director
+- KATSUHIRO OTOMO - Akira Creator
+- SATOSHI KON - Paprika Director
+- MASAKI YUASA - Mind Game Director
+- GASPAR NOÉ - Enter the Void Director
+
+## Directed by
+- GHOST IN THE MACHINE 

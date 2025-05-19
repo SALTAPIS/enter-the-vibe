@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENTER THE VIBE</title>
+    
+    <!-- Base Font Anton from Fontshare -->
+    <link href="https://api.fontshare.com/v2/css?f[]=anton@400&display=swap" rel="stylesheet">
+    
+    <!-- Additional Fontshare Display Fonts for random variation -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,400,700,500,600,300&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400,900,100,300,200,600&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,300,400&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@700,500,400,300&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@800,900,300,400,600,700,500&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=melodrama@700,500,400&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=tanker@900,700,400&display=swap" rel="stylesheet">
+    
+    <!-- Inter font for descriptions -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
+    
+    <!-- Noto Sans Japanese for Japanese text -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Sound effects -->
+    <audio id="main-sound" src="/Enter-the-Void.mp3" preload="auto"></audio>
+    <audio id="glitch-sound" src="/sounds/glitch-sound.mp3" preload="auto"></audio>
+    <audio id="transition-sound" src="/sounds/transition-sound.mp3" preload="auto"></audio>
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="skip-container">
+        <button id="skip-button">SKIP</button>
+    </div>
+    
+    <!-- Phase 1: Optimized Credits Sequence -->
+    <div id="phase1" class="phase">
+        <div class="cursor"></div>
+        <div class="credits-container">
+            <!-- Credits will be dynamically inserted here -->
+        </div>
+        <div class="single-credit-container">
+            <!-- Single focused credits will appear here -->
+        </div>
+    </div>
+    
+    <!-- Phase 2: Main Title (Enter the Void style) -->
+    <div id="phase2" class="phase hidden">
+        <div class="title-container">
+            <div class="title-word" id="title-enter">ENTER</div>
+            <div class="title-word" id="title-the">THE</div>
+            <div class="title-word" id="title-vibe">VIBE</div>
+        </div>
+    </div>
+    
+    <!-- Phase 3: Digital Landscape -->
+    <div id="phase3" class="phase hidden">
+        <div class="particles-container"></div>
+        <div class="digital-landscape">
+            <div class="grid"></div>
+            <div class="sun"></div>
+            <div class="vibe-coding">
+                <span class="letter font-anton">V</span>
+                <span class="letter font-anton">I</span>
+                <span class="letter font-anton">B</span>
+                <span class="letter font-anton">E</span>
+                <span class="letter space">&nbsp;</span>
+                <span class="letter font-anton">C</span>
+                <span class="letter font-anton">O</span>
+                <span class="letter font-anton">D</span>
+                <span class="letter font-anton">I</span>
+                <span class="letter font-anton">N</span>
+                <span class="letter font-anton">G</span>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module" src="script.js"></script>
+</body>
+</html> 

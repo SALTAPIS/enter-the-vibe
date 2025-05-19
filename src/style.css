@@ -1,0 +1,531 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --neon-pink: #FF10F0;
+    --neon-blue: #00FFFF;
+    --neon-green: #39FF14;
+    --neon-yellow: #FFFF00;
+    --neon-orange: #FF6600;
+    --neon-purple: #8A2BE2;
+    --dark-bg: #000000;
+    --grid-color: rgba(0, 255, 255, 0.3);
+    --horizon-color: #ff00ff;
+    --sun-color: #ff6600;
+}
+
+body {
+    font-family: 'Anton', sans-serif;
+    background-color: var(--dark-bg);
+    color: white;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+    position: relative;
+}
+
+/* -------------- PHASE CONTAINERS -------------- */
+.phase {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* -------------- PHASE 1: CREDITS SEQUENCE -------------- */
+.phase1 {
+    background-color: var(--dark-bg);
+}
+
+.credits-container {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.single-credit-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.credit {
+    font-family: 'Anton', sans-serif;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: absolute;
+    transform-origin: center;
+    letter-spacing: 1px;
+    white-space: nowrap;
+}
+
+/* Enter the Void special layouts */
+.credit.company,
+.credit.title {
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+}
+
+.credit.hierarchical,
+.credit.bilingual,
+.credit.firstname-lastname {
+    position: relative;
+    width: 80%;
+    max-width: 800px;
+    white-space: normal;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.credit.hierarchical > div,
+.credit.bilingual > div {
+    width: 100%;
+}
+
+.credit.white {
+    color: white;
+}
+
+.credit.colored {
+    /* Color is set inline via JavaScript */
+}
+
+.credit.single {
+    font-size: clamp(4rem, 10vw, 12rem);
+    text-shadow: 0 0 20px currentColor;
+    letter-spacing: 4px;
+}
+
+.credit.has-description {
+    margin-bottom: 5px;
+}
+
+.credit-description {
+    font-family: 'Inter', sans-serif;
+    font-weight: bold;
+    font-size: clamp(0.7rem, 2vw, 1.2rem);
+    opacity: 0.8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 5px;
+    position: absolute;
+    text-align: center;
+    max-width: 80%;
+}
+
+/* Display Font Classes */
+.font-anton {
+    font-family: 'Anton', sans-serif;
+    letter-spacing: 2px;
+}
+
+.font-clash-display {
+    font-family: 'Clash Display', sans-serif;
+    font-weight: 700;
+}
+
+.font-cabinet-grotesk {
+    font-family: 'Cabinet Grotesk', sans-serif;
+    font-weight: 800;
+}
+
+.font-satoshi {
+    font-family: 'Satoshi', sans-serif;
+    font-weight: 900;
+}
+
+.font-general-sans {
+    font-family: 'General Sans', sans-serif;
+    font-weight: 700;
+}
+
+.font-switzer {
+    font-family: 'Switzer', sans-serif;
+    font-weight: 800;
+}
+
+.font-melodrama {
+    font-family: 'Melodrama', serif;
+    font-weight: 700;
+}
+
+.font-tanker {
+    font-family: 'Tanker', sans-serif;
+    font-weight: 900;
+}
+
+/* Layout Classes */
+.credit-group {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: auto;
+}
+
+.multi-layout {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+}
+
+.cursor {
+    position: absolute;
+    width: 20px;
+    height: 30px;
+    background-color: var(--neon-green);
+    z-index: 10;
+}
+
+/* -------------- PHASE 2: MAIN TITLE -------------- */
+.phase2 {
+    background-color: var(--dark-bg);
+}
+
+.title-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+}
+
+.title-word {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(4rem, 15vw, 12rem);
+    letter-spacing: 10px;
+    text-transform: uppercase;
+    opacity: 0;
+    position: relative;
+    margin: 10px 0;
+    text-align: center;
+}
+
+#title-enter {
+    color: var(--neon-blue);
+}
+
+#title-the {
+    color: var(--neon-pink);
+}
+
+#title-vibe {
+    color: var(--neon-yellow);
+}
+
+/* -------------- PHASE 3: DIGITAL LANDSCAPE -------------- */
+.phase3 {
+    background: linear-gradient(180deg, #000000 0%, #0a0a2a 100%);
+    perspective: 1000px;
+}
+
+.digital-landscape {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    perspective: 1000px;
+    overflow: hidden;
+}
+
+.grid {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(transparent 0%, var(--grid-color) 100%);
+    background-size: 50px 50px;
+    background-image:
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    transform: none;
+}
+
+.horizon {
+    position: absolute;
+    bottom: 30%;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--horizon-color);
+    box-shadow: 0 0 20px 5px var(--horizon-color);
+}
+
+.sun {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: linear-gradient(to right, var(--neon-pink), var(--neon-blue));
+    filter: blur(10px);
+    top: 30%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    box-shadow: 0 0 100px 20px rgba(255, 16, 240, 0.7);
+}
+
+.mountains {
+    position: absolute;
+    bottom: 30%;
+    left: 0;
+    width: 100%;
+    height: 15%;
+    background-image: 
+        linear-gradient(135deg, transparent 0%, transparent 50%, #220033 50%, #220033 100%),
+        linear-gradient(225deg, transparent 0%, transparent 50%, #220033 50%, #220033 100%);
+    background-size: 100px 100px;
+    background-position: 0 0, 50px 0;
+    opacity: 0.7;
+}
+
+.particles-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 5;
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.vibe-coding {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    opacity: 0;
+    z-index: 100;
+}
+
+/* -------------- COMMON EFFECT CLASSES -------------- */
+
+/* Glitch effects */
+.glitch {
+    animation: glitch 0.3s infinite;
+}
+
+.flicker {
+    animation: flicker 0.5s infinite;
+}
+
+.electric {
+    animation: electric 0.3s infinite;
+    text-shadow: 0 0 20px currentColor;
+}
+
+/* Keyframes Animations */
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+        opacity: 1;
+    }
+    20% {
+        transform: translate(-5px, 5px);
+        opacity: 0.9;
+    }
+    40% {
+        transform: translate(5px, -5px);
+        opacity: 1;
+    }
+    60% {
+        transform: translate(-5px, -5px);
+        opacity: 0.9;
+    }
+    80% {
+        transform: translate(5px, 5px);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes flicker {
+    0% {
+        opacity: 1;
+    }
+    25% {
+        opacity: 0.8;
+    }
+    50% {
+        opacity: 1;
+    }
+    60% {
+        opacity: 0.5;
+    }
+    70% {
+        opacity: 1;
+    }
+    80% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes electric {
+    0% {
+        text-shadow: 0 0 10px currentColor;
+    }
+    50% {
+        text-shadow: 0 0 20px currentColor, 0 0 30px currentColor;
+    }
+    100% {
+        text-shadow: 0 0 10px currentColor;
+    }
+}
+
+/* Layout positioning presets */
+.top-left {
+    top: 15%;
+    left: 15%;
+}
+
+.top-center {
+    top: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.top-right {
+    top: 15%;
+    right: 15%;
+}
+
+.middle-left {
+    top: 50%;
+    left: 15%;
+    transform: translateY(-50%);
+}
+
+.middle-center {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.middle-right {
+    top: 50%;
+    right: 15%;
+    transform: translateY(-50%);
+}
+
+.bottom-left {
+    bottom: 15%;
+    left: 15%;
+}
+
+.bottom-center {
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.bottom-right {
+    bottom: 15%;
+    right: 15%;
+}
+
+/* -------------- VIBE CODING ANIMATION -------------- */
+.letter {
+    font-family: 'Anton', sans-serif;
+    font-size: clamp(3rem, 8vw, 7rem);
+    margin: 0 5px;
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    position: relative;
+    display: inline-block;
+}
+
+.space {
+    width: 2rem;
+}
+
+/* -------------- SKIP BUTTON -------------- */
+.skip-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+#skip-button {
+    font-family: 'Anton', sans-serif;
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 2px solid white;
+    padding: 8px 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 16px;
+    letter-spacing: 2px;
+}
+
+#skip-button:hover {
+    background: white;
+    color: black;
+}
+
+/* -------------- RESPONSIVE STYLES -------------- */
+@media (max-width: 768px) {
+    .title-word {
+        font-size: clamp(3rem, 12vw, 8rem);
+        letter-spacing: 5px;
+    }
+    
+    .letter {
+        font-size: clamp(2rem, 6vw, 4rem);
+        margin: 0 3px;
+    }
+}
+
+@media (max-width: 480px) {
+    .title-word {
+        font-size: clamp(2rem, 10vw, 6rem);
+        letter-spacing: 3px;
+    }
+    
+    #skip-button {
+        padding: 5px 10px;
+        font-size: 14px;
+    }
+} 

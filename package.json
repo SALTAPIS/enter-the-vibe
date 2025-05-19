@@ -1,0 +1,24 @@
+{
+  "name": "vibe-coding-ani",
+  "version": "1.0.0",
+  "description": "An immersive text animation using GSAP (GreenSock Animation Platform) to create an engaging visual experience.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [
+    "animation",
+    "gsap",
+    "typography"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "vite": "^5.0.0"
+  },
+  "dependencies": {
+    "gsap": "^3.13.0"
+  }
+}
