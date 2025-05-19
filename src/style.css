@@ -127,6 +127,16 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     width: 90%;
+    line-height: 1.2;
+}
+
+.credit.single .name-first {
+    font-size: 0.5em;
+    margin-bottom: 10px;
+}
+
+.credit.single .name-last {
+    font-size: 1em;
 }
 
 .credit.has-description {
@@ -149,14 +159,12 @@ body {
 
 /* Description below packery names */
 .packery-description {
-    font-size: 1.2rem;
     position: absolute;
+    font-size: 1.2rem;
     text-align: center;
-    color: #FFFFFF;
-    text-shadow: 0 0 5px currentColor;
-    width: auto;
-    left: 50%;
-    transform: translateX(-50%);
+    color: #DDDDDD;
+    width: 100%;
+    max-width: 100%;
 }
 
 /* Display Font Classes */
@@ -767,4 +775,105 @@ body {
 
 .action-button:hover {
     background-color: rgba(0, 100, 255, 0.6) !important;
+}
+
+/* Add styles for the grid and row layouts */
+.credit.grid-item,
+.credit.row-item {
+    position: absolute;
+    font-weight: bold;
+    text-shadow: 0 0 10px currentColor;
+    opacity: 1;
+    transition: all 0.3s ease;
+    transform-style: preserve-3d;
+    line-height: 1.2;
+}
+
+/* Styles for first and last name display */
+.name-first {
+    font-size: clamp(1.5rem, 4vw, 4rem);
+    font-weight: normal;
+    opacity: 0.9;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.name-last {
+    font-size: clamp(1.5rem, 4vw, 4rem);
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Update bilingual layout styles */
+.credit.bilingual {
+    width: 80%;
+    max-width: 900px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Update hierarchical layout styles */
+.credit.hierarchical {
+    width: 80%;
+    max-width: 900px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+/* Update firstname-lastname layout styles */
+.credit.firstname-lastname {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 5rem;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* Update packery description position */
+.packery-description {
+    position: absolute;
+    font-size: 1.2rem;
+    text-align: center;
+    color: #DDDDDD;
+    width: 100%;
+    max-width: 100%;
+}
+
+/* -------------- END SCENE STYLES -------------- */
+.end-scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+}
+
+.end-scene button {
+    padding: 1rem 2rem;
+    font-size: 1.5rem;
+    font-family: 'Anton', sans-serif;
+    background-color: transparent;
+    color: var(--neon-green);
+    border: 2px solid var(--neon-green);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.end-scene button:hover {
+    background-color: var(--neon-green);
+    color: black;
+    box-shadow: 0 0 20px rgba(51, 255, 51, 0.7);
 } 

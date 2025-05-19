@@ -8,6 +8,11 @@ gsap.registerPlugin(ScrollTrigger);
 // Will store all credits loaded from JSON
 let allCredits = [];
 
+// Global variables for state tracking
+let lastScreenChangeTime = Date.now();
+let beatDetected = null; // Will be defined by playCreditsSequence
+let minScreenDisplayTime = 300; // Minimum display time in milliseconds (0.3 seconds by default)
+
 // Load credits from JSON file
 async function loadCredits() {
     try {
@@ -19,39 +24,237 @@ async function loadCredits() {
         
         // Combine all credits into one array
         allCredits = [
-            ...creditsData.technology,
-            ...creditsData.artists,
-            ...creditsData.writers,
-            ...creditsData.hackers,
-            ...creditsData.creative,
-            ...creditsData.special
+            ...(creditsData.technology || []),
+            ...(creditsData.artists || []),
+            ...(creditsData.writers || []),
+            ...(creditsData.hackers || []),
+            ...(creditsData.creative || []),
+            ...(creditsData.special || [])
         ];
+
+        console.log(`Loaded ${allCredits.length} credits from JSON`);
         
-        console.log(`Successfully loaded ${allCredits.length} credits`);
-        
-        // Store the special layouts and featured credits for easy access
-        window.creditsData = creditsData;
-        
-        return creditsData;
+        // Now build the credits sequence
+        buildAndStartCreditsSequence(creditsData);
     } catch (error) {
-        console.error('Error loading credits:', error);
-        // Fallback to empty arrays if loading fails
-        return {
-            technology: [],
-            artists: [],
-            writers: [],
-            hackers: [],
-            creative: [],
-            special: [],
-            layouts: {
-                title: [],
-                bilingual: [],
-                hierarchical: [],
-                firstname_lastname: []
-            },
-            featured: []
-        };
+        console.error("Error loading credits:", error);
+        // Fallback to simple credits if loading fails
+        allCredits = [
+            { name: "ERROR LOADING CREDITS", description: "Please check console", category: "error" }
+        ];
     }
+}
+
+// Function to build and start the credits sequence
+function buildAndStartCreditsSequence(creditsData) {
+    console.log("Building credits sequence from JSON data");
+    
+    // Connect the beat detection to the credits sequence advancement
+    window.addEventListener('audiobeat', handleBeat);
+    
+    // The main screens array for our sequence
+    const creditScreens = [];
+    
+    // 1. Start with the title screens
+    if (creditsData.layouts && creditsData.layouts.title) {
+        creditScreens.push(...creditsData.layouts.title);
+    }
+    
+    // 2. Add various layout types in a structured sequence
+    
+    // Create a shuffled list of all regular credits
+    const regularCredits = shuffleArray([...allCredits]);
+    
+    // Create a function to get credits of a specific category
+    function getCreditsOfCategory(category, count = 4) {
+        return regularCredits
+            .filter(credit => credit.category === category)
+            .slice(0, count);
+    }
+    
+    // We'll alternate between different layout types
+    
+    // First, do single name showcases
+    for (let i = 0; i < 5; i++) {  // Show 5 individual prominent people
+        const featuredCredit = creditsData.featured?.[i] || regularCredits[i];
+        if (featuredCredit) {
+            // For each featured credit, add it as a single name
+            creditScreens.push({
+                ...featuredCredit,
+                layout: "single"
+            });
+        }
+    }
+    
+    // Add bilingual layouts
+    if (creditsData.layouts && creditsData.layouts.bilingual) {
+        // Add all bilingual layouts - they look great
+        creditScreens.push(...creditsData.layouts.bilingual);
+    }
+    
+    // Add tech people in grid layouts
+    const techCredits = getCreditsOfCategory('tech', 8);
+    if (techCredits.length >= 4) {
+        // Add them in groups of 4
+        creditScreens.push({
+            credits: techCredits.slice(0, 4),
+            layout: "grid"
+        });
+        
+        if (techCredits.length >= 8) {
+            creditScreens.push({
+                credits: techCredits.slice(4, 8),
+                layout: "grid"
+            });
+        }
+    }
+    
+    // Add more bilingual layouts
+    if (creditsData.layouts && creditsData.layouts.bilingual) {
+        // Add all bilingual layouts again - they're the focus
+        creditScreens.push(...creditsData.layouts.bilingual.slice(0, 2));
+    }
+    
+    // Add artists in row layouts
+    const artistCredits = getCreditsOfCategory('artist', 6);
+    if (artistCredits.length >= 3) {
+        creditScreens.push({
+            credits: artistCredits.slice(0, 3),
+            layout: "row"
+        });
+        
+        if (artistCredits.length >= 6) {
+            creditScreens.push({
+                credits: artistCredits.slice(3, 6),
+                layout: "row"
+            });
+        }
+    }
+    
+    // Add hierarchical layouts
+    if (creditsData.layouts && creditsData.layouts.hierarchical) {
+        creditScreens.push(...creditsData.layouts.hierarchical);
+    }
+    
+    // Add writers in grid layouts
+    const writerCredits = getCreditsOfCategory('writer', 4);
+    if (writerCredits.length >= 4) {
+        creditScreens.push({
+            credits: writerCredits,
+            layout: "grid"
+        });
+    }
+    
+    // Add firstname-lastname layouts
+    if (creditsData.layouts && creditsData.layouts["firstname-lastname"]) {
+        creditScreens.push(...creditsData.layouts["firstname-lastname"]);
+    }
+    
+    // Add hackers in row layouts
+    const hackerCredits = getCreditsOfCategory('hacker', 6);
+    if (hackerCredits.length >= 3) {
+        creditScreens.push({
+            credits: hackerCredits.slice(0, 3),
+            layout: "row"
+        });
+        
+        if (hackerCredits.length >= 6) {
+            creditScreens.push({
+                credits: hackerCredits.slice(3, 6),
+                layout: "row"
+            });
+        }
+    }
+    
+    // Add more bilingual layouts to end strong
+    if (creditsData.layouts && creditsData.layouts.bilingual) {
+        // Add remaining bilingual layouts
+        creditScreens.push(...creditsData.layouts.bilingual.slice(2));
+    }
+    
+    // Add special credits at the end
+    const specialCredits = getCreditsOfCategory('special');
+    if (specialCredits.length > 0) {
+        for (const credit of specialCredits) {
+            creditScreens.push({
+                ...credit,
+                layout: "single"
+            });
+        }
+    }
+    
+    // Start playing the credits sequence with our built screens
+    playCreditsSequence(creditScreens);
+}
+
+// Function to show the next screen
+let showNextScreen = null;
+
+// Update the playCreditsSequence function to handle the new layout types (grid and row)
+function playCreditsSequence(screens) {
+    const creditsContainer = document.querySelector('.credits-container');
+    const singleCreditContainer = document.querySelector('.single-credit-container');
+    
+    // Clear containers
+    creditsContainer.innerHTML = '';
+    singleCreditContainer.innerHTML = '';
+    
+    // Keep track of current screen index
+    let currentScreenIndex = 0;
+    
+    // Function to show the next screen
+    showNextScreen = () => {
+        console.log(`Showing screen ${currentScreenIndex + 1} of ${screens.length}`);
+        
+        // Clear containers immediately
+        creditsContainer.innerHTML = '';
+        singleCreditContainer.innerHTML = '';
+        
+        const credit = screens[currentScreenIndex];
+        
+        // Create a GSAP timeline for this screen
+        const screenTimeline = gsap.timeline();
+        
+        if (credit.layout === "single") {
+            // Single name
+            showSingleName(screenTimeline, credit);
+        } 
+        else if (credit.layout === "title" || credit.layout === "bilingual" || 
+                 credit.layout === "hierarchical" || credit.layout === "firstname-lastname") {
+            // Special layouts
+            showSpecialLayoutCredit(screenTimeline, credit);
+        }
+        else if (credit.layout === "grid" || credit.layout === "row") {
+            // Group of credits - show them together
+            // The layout property determins if we use grid or row layout
+            showPackeryGroup(screenTimeline, credit.credits, credit.layout);
+        }
+        else if (credit.credits) {
+            // Legacy packery layout
+            showPackeryGroup(screenTimeline, credit.credits);
+        }
+        
+        // Increment index for next time
+        currentScreenIndex = (currentScreenIndex + 1) % screens.length;
+        lastScreenChangeTime = Date.now();
+    };
+    
+    // Show the first screen immediately
+    showNextScreen();
+    
+    // Update the beat detection callback to show the next screen on beat
+    beatDetected = () => {
+        // Only change screen if enough time has passed to prevent rapid changes
+        const now = Date.now();
+        const timeSinceLastChange = now - lastScreenChangeTime;
+        
+        // Use the configurable minimum time between screen changes
+        if (timeSinceLastChange > minScreenDisplayTime) {
+            showNextScreen();
+        } else {
+            console.log(`Beat detected but screen shown for only ${timeSinceLastChange}ms (min: ${minScreenDisplayTime}ms)`);
+        }
+    };
 }
 
 // Shuffle the credits array to make it random each time
@@ -61,6 +264,49 @@ function shuffleArray(array) {
         [array[i], array[j]] = [array[j], array[i]];
     }
     return array;
+}
+
+// Define color palette based on the screenshots
+const colorPalette = {
+    blue: "#4495F1",    // Blue color used in some of the names
+    gold: "#D1A032",    // Gold/yellow color used in some names
+    green: "#33FF33",   // Green color used for category titles
+    red: "#FF0000",     // Red color used for Japanese text
+    white: "#FFFFFF"    // White color for most names
+};
+
+// Function to get a random color from the palette with 80% chance of white
+function getRandomColor() {
+    // 80% chance to return white
+    if (Math.random() < 0.8) {
+        return colorPalette.white;
+    }
+    
+    // For the other 20%, pick from the remaining colors
+    const colors = Object.values(colorPalette).filter(color => color !== colorPalette.white);
+    return colors[Math.floor(Math.random() * colors.length)];
+}
+
+// Function to split a name into first and last names for better display
+function splitNameIntoLines(name) {
+    // If name already contains a newline, return as is
+    if (name.includes('\n')) return name;
+    
+    // Split the name by spaces
+    const parts = name.split(' ');
+    
+    // If it's a single word, return as is
+    if (parts.length === 1) return name;
+    
+    // If two words, split into two lines
+    if (parts.length === 2) {
+        return `${parts[0]}\n${parts[1]}`;
+    }
+    
+    // For longer names, put the first name on top, rest on bottom
+    const firstName = parts[0];
+    const lastName = parts.slice(1).join(' ');
+    return `${firstName}\n${lastName}`;
 }
 
 // -------------- FONT FAMILIES --------------
@@ -130,6 +376,7 @@ let noiseFloorSlider, noiseFloorValue;
 let freqRangeSelect, freqStartSlider, freqEndSlider;
 let freqStartValue, freqEndValue;
 let fallbackToggle, fallbackInterval, intervalValue;
+let displayTimeSlider, displayTimeValue; // New control elements for display time
 let toggleControlsBtn, beatControls;
 let freqRangeHighlight; // Element to highlight the selected frequency range
 
@@ -260,6 +507,8 @@ function initBeatControls() {
     fallbackToggle = document.getElementById('fallback-toggle');
     fallbackInterval = document.getElementById('fallback-interval');
     intervalValue = document.getElementById('interval-value');
+    displayTimeSlider = document.getElementById('display-time-slider'); // Get display time slider
+    displayTimeValue = document.getElementById('display-time-value'); // Get display time value
     toggleControlsBtn = document.getElementById('toggle-controls');
     beatControls = document.getElementById('beat-controls');
     
@@ -280,6 +529,15 @@ function initBeatControls() {
         noiseFloorSlider.addEventListener('input', (e) => {
             minimumThreshold = parseInt(e.target.value);
             noiseFloorValue.textContent = minimumThreshold.toString();
+            saveSettings();
+        });
+    }
+    
+    // Add display time slider listener
+    if (displayTimeSlider) {
+        displayTimeSlider.addEventListener('input', (e) => {
+            minScreenDisplayTime = parseInt(e.target.value);
+            displayTimeValue.textContent = (minScreenDisplayTime / 1000).toFixed(1) + 's';
             saveSettings();
         });
     }
@@ -444,6 +702,7 @@ function saveSettings() {
         freqRangeEnd,
         useFallbackBeats,
         fallbackBeatInterval,
+        minScreenDisplayTime, // Save display time setting
         freqRangeType: freqRangeSelect ? freqRangeSelect.value : 'mid'
     };
     
@@ -469,6 +728,7 @@ function loadSettings() {
             freqRangeEnd = settings.freqRangeEnd || 60;
             useFallbackBeats = settings.useFallbackBeats || false;
             fallbackBeatInterval = settings.fallbackBeatInterval || 300;
+            minScreenDisplayTime = settings.minScreenDisplayTime || 300; // Load display time setting, default 0.3s
             
             console.log('Settings loaded from localStorage');
         }
@@ -498,6 +758,12 @@ function updateUIFromSettings() {
     fallbackInterval.value = fallbackBeatInterval;
     intervalValue.textContent = fallbackBeatInterval.toString();
     
+    // Update display time slider
+    if (displayTimeSlider) {
+        displayTimeSlider.value = minScreenDisplayTime;
+        displayTimeValue.textContent = (minScreenDisplayTime / 1000).toFixed(1) + 's';
+    }
+    
     // Set frequency range select based on current values
     if (freqRangeSelect) {
         // Try to determine the preset based on the current range values
@@ -522,6 +788,7 @@ function resetToDefaultSettings(saveAfterReset = true) {
     freqRangeEnd = 60;
     useFallbackBeats = false;
     fallbackBeatInterval = 300;
+    minScreenDisplayTime = 300; // Reset display time to 0.3 seconds
     
     resetPeakDetection();
     
@@ -540,6 +807,8 @@ function restartAnimation() {
     if (mainSound) {
         mainSound.pause();
         mainSound.currentTime = 0;
+        // Remove the ended event listener to prevent multiple triggers
+        mainSound.removeEventListener('ended', showEndScene);
     }
     if (glitchSound) glitchSound.pause();
     if (transitionSound) transitionSound.pause();
@@ -551,6 +820,12 @@ function restartAnimation() {
     
     // Reset animation state
     gsap.killTweensOf("*"); // Kill all GSAP animations
+    
+    // Remove end scene if it exists
+    const endScene = document.querySelector('.end-scene');
+    if (endScene) {
+        endScene.remove();
+    }
     
     // Reset audio context if it exists
     if (audioContext) {
@@ -586,15 +861,21 @@ function restartAnimation() {
 
 // Function to handle beat events during credits sequence
 function handleBeat(event) {
-    const currentTime = Date.now();
-    const minScreenTime = 1500; // 1.5 seconds minimum per screen
-    
-    // Only advance if screen has been visible for at least the minimum time
-    if (currentTime - lastScreenChangeTime >= minScreenTime) {
-        console.log("Beat detected - advancing to next screen");
-        showNextScreen();
+    // If beatDetected is defined and callable, use it
+    if (typeof beatDetected === 'function') {
+        beatDetected();
     } else {
-        console.log("Beat detected but ignoring (too soon)");
+        const currentTime = Date.now();
+        
+        // Only advance if screen has been visible for at least the minimum time
+        if (currentTime - lastScreenChangeTime >= minScreenDisplayTime) {
+            console.log("Beat detected - advancing to next screen");
+            if (typeof showNextScreen === 'function') {
+                showNextScreen();
+            }
+        } else {
+            console.log(`Beat detected but ignoring (too soon - ${currentTime - lastScreenChangeTime}ms < ${minScreenDisplayTime}ms)`);
+        }
     }
 }
 
@@ -868,7 +1149,414 @@ function resetPeakDetection() {
     lastPeakTime = 0;
 }
 
-// -------------- MAIN INITIALIZATION --------------
+// Function to show a single name with immediate appearance
+function showSingleName(timeline, credit) {
+    const singleCreditContainer = document.querySelector('.single-credit-container');
+    
+    // Clear container
+    singleCreditContainer.innerHTML = '';
+    
+    // Split name into first/last name for single display
+    const splitName = splitNameIntoLines(credit.name);
+    
+    // Create name element
+    const nameEl = document.createElement('div');
+    nameEl.classList.add('credit', 'single');
+    
+    // Use HTML to format the split name
+    const nameParts = splitName.split('\n');
+    if (nameParts.length === 2) {
+        nameEl.innerHTML = `<div class="name-first">${nameParts[0]}</div>
+                          <div class="name-last">${nameParts[1]}</div>`;
+        
+        // Ensure same font size for both parts - make it much larger
+        const firstNameEl = nameEl.querySelector('.name-first');
+        const lastNameEl = nameEl.querySelector('.name-last');
+        if (firstNameEl && lastNameEl) {
+            firstNameEl.style.fontSize = 'clamp(6rem, 12vw, 12rem)';
+            lastNameEl.style.fontSize = 'clamp(6rem, 12vw, 12rem)';
+        }
+    } else {
+        nameEl.textContent = credit.name;
+        nameEl.style.fontSize = 'clamp(6rem, 15vw, 14rem)'; // Make single line names larger too
+    }
+    
+    // Add color (80% white, 20% other colors)
+    nameEl.style.color = getRandomColor();
+    
+    // Add to container
+    singleCreditContainer.appendChild(nameEl);
+    
+    // Make it visible immediately
+    gsap.set(nameEl, { opacity: 1, scale: 1 });
+    
+    // If there's a description, add it
+    if (credit.description) {
+        const descEl = document.createElement('div');
+        descEl.classList.add('credit-description');
+        descEl.textContent = credit.description;
+        descEl.style.position = 'absolute';
+        descEl.style.top = '70%'; // Move description lower to make room for larger names
+        descEl.style.left = '0';
+        descEl.style.width = '100%';
+        descEl.style.textAlign = 'center';
+        descEl.style.fontSize = 'clamp(1.2rem, 3vw, 2.5rem)'; // Larger description text
+        
+        singleCreditContainer.appendChild(descEl);
+        
+        // Make description visible immediately
+        gsap.set(descEl, { opacity: 1 });
+    }
+    
+    // Apply effect immediately based on category
+    if (credit.category === 'tech') nameEl.classList.add('electric');
+    else if (credit.category === 'creative') nameEl.classList.add('flicker');
+    else if (credit.category === 'artist') nameEl.classList.add('electric');
+    else if (credit.category === 'writer') nameEl.classList.add('flicker');
+    else if (credit.category === 'hacker') nameEl.classList.add('flicker');
+    else if (credit.category === 'special') nameEl.classList.add('glitch');
+    else if (credit.category === 'title') nameEl.classList.add('electric');
+    
+    // Play glitch sound
+    if (document.getElementById('glitch-sound')) {
+        const glitchSound = document.getElementById('glitch-sound');
+        glitchSound.currentTime = 0;
+        glitchSound.play().catch(e => console.log("Audio error:", e));
+    }
+    
+    return timeline;
+}
+
+// Function to show special layout credits like bilingual and hierarchical
+function showSpecialLayoutCredit(timeline, credit) {
+    const creditsContainer = document.querySelector('.credits-container');
+    
+    // Clear container
+    creditsContainer.innerHTML = '';
+    
+    // Create the credit element
+    const creditEl = document.createElement('div');
+    creditEl.classList.add('credit', credit.layout);
+    
+    // For title layout, use large centered text
+    if (credit.layout === 'title') {
+        creditEl.classList.add('font-anton');
+        creditEl.textContent = credit.name;
+        creditEl.style.fontSize = 'clamp(10rem, 20vw, 20rem)'; // Much larger
+        creditEl.style.letterSpacing = '10px';
+        creditEl.style.color = colorPalette.blue; // Blue for title text
+    }
+    // For bilingual layout, format based on the language
+    else if (credit.layout === 'bilingual') {
+        // Process multiline text and preserve line breaks
+        const lines = credit.name.split('\n');
+        lines.forEach((line, i) => {
+            const lineDiv = document.createElement('div');
+            
+            // Apply language-specific styling
+            if (credit.language === 'japanese') {
+                // First line is a category, make it red
+                if (i === 0) {
+                    lineDiv.style.color = colorPalette.red;
+                    lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                    lineDiv.style.marginBottom = '1rem';
+                }
+                // Names are white in this format
+                else {
+                    lineDiv.style.color = colorPalette.white;
+                    lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)'; // Larger
+                    lineDiv.style.marginBottom = '0.5rem';
+                }
+            }
+            else if (credit.language === 'chinese') {
+                // First line is a category, make it gold
+                if (i === 0) {
+                    lineDiv.style.color = colorPalette.gold;
+                    lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                    lineDiv.style.marginBottom = '1rem';
+                }
+                // Names are white in this format
+                else {
+                    lineDiv.style.color = colorPalette.white;
+                    lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)'; // Larger
+                    lineDiv.style.marginBottom = '0.5rem';
+                }
+            }
+            else if (credit.language === 'russian') {
+                // First line is a category, make it blue
+                if (i === 0) {
+                    lineDiv.style.color = colorPalette.blue;
+                    lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                    lineDiv.style.marginBottom = '1rem';
+                }
+                // Names are white in this format
+                else {
+                    lineDiv.style.color = colorPalette.white;
+                    lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)'; // Larger
+                    lineDiv.style.marginBottom = '0.5rem';
+                }
+            }
+            
+            lineDiv.textContent = line;
+            creditEl.appendChild(lineDiv);
+        });
+    }
+    // For hierarchical layout
+    else if (credit.layout === 'hierarchical') {
+        // Process multiline text and preserve line breaks
+        const lines = credit.name.split('\n');
+        lines.forEach((line, i) => {
+            const lineDiv = document.createElement('div');
+            
+            // First line is the category title
+            if (i === 0) {
+                lineDiv.style.color = colorPalette.green; // Green for category titles
+                lineDiv.style.fontSize = 'clamp(3rem, 7vw, 5rem)'; // Larger
+                lineDiv.style.marginBottom = '1.5rem';
+                lineDiv.style.letterSpacing = '5px';
+                lineDiv.style.fontWeight = 'bold';
+            }
+            // Names
+            else {
+                lineDiv.style.color = colorPalette.white; // White for names
+                lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                lineDiv.style.marginBottom = '0.5rem';
+            }
+            
+            lineDiv.textContent = line;
+            creditEl.appendChild(lineDiv);
+        });
+    }
+    // For firstname-lastname layout
+    else if (credit.layout === 'firstname-lastname') {
+        // Split name into first and last
+        const lines = credit.name.split('\n');
+        
+        // First name on top
+        const firstNameDiv = document.createElement('div');
+        firstNameDiv.classList.add('name-first');
+        firstNameDiv.textContent = lines[0];
+        firstNameDiv.style.fontSize = 'clamp(5rem, 12vw, 10rem)'; // Much larger
+        
+        // Last name below, larger
+        const lastNameDiv = document.createElement('div');
+        lastNameDiv.classList.add('name-last');
+        lastNameDiv.textContent = lines[1];
+        lastNameDiv.style.fontSize = 'clamp(5rem, 12vw, 10rem)'; // Much larger
+        
+        // If this has the neon effect
+        if (credit.effect === 'neon') {
+            creditEl.style.color = colorPalette.blue;
+            creditEl.classList.add('electric');
+        } else {
+            creditEl.style.color = colorPalette.white;
+        }
+        
+        creditEl.appendChild(firstNameDiv);
+        creditEl.appendChild(lastNameDiv);
+    }
+    
+    // Add to container
+    creditsContainer.appendChild(creditEl);
+    
+    // Set visible immediately
+    gsap.set(creditEl, { opacity: 1 });
+    
+    // Play glitch sound
+    if (document.getElementById('glitch-sound')) {
+        const glitchSound = document.getElementById('glitch-sound');
+        glitchSound.currentTime = 0;
+        glitchSound.play().catch(e => console.log("Audio error:", e));
+    }
+    
+    return timeline;
+}
+
+// Function to show a group of credits in either grid or row layout
+function showPackeryGroup(timeline, credits, layoutType = "grid") {
+    const creditsContainer = document.querySelector('.credits-container');
+    
+    // Clear container
+    creditsContainer.innerHTML = '';
+    
+    // Get container dimensions
+    const containerWidth = creditsContainer.clientWidth;
+    const containerHeight = creditsContainer.clientHeight;
+    
+    if (layoutType === "grid") {
+        // Grid layout (2x2 or 2x3 depending on number of names)
+        const rows = credits.length <= 4 ? 2 : 3;
+        const cols = credits.length <= 4 ? 2 : 2;
+        
+        // Calculate cell dimensions
+        const cellWidth = containerWidth / cols;
+        const cellHeight = containerHeight / rows;
+        
+        // Create and position credit elements in a grid
+        credits.forEach((credit, i) => {
+            // Calculate position in grid
+            const row = Math.floor(i / cols);
+            const col = i % cols;
+            
+            // Skip if we exceed the grid dimensions
+            if (row >= rows) return;
+            
+            // Split name into first/last name
+            const splitName = splitNameIntoLines(credit.name);
+            
+            // Create the name element
+            const creditEl = document.createElement('div');
+            creditEl.classList.add('credit', 'grid-item');
+            
+            // Use HTML to format the split name
+            const nameParts = splitName.split('\n');
+            if (nameParts.length === 2) {
+                creditEl.innerHTML = `<div class="name-first">${nameParts[0]}</div>
+                                    <div class="name-last">${nameParts[1]}</div>`;
+                                    
+                // Make names larger
+                const firstNameEl = creditEl.querySelector('.name-first');
+                const lastNameEl = creditEl.querySelector('.name-last');
+                if (firstNameEl && lastNameEl) {
+                    firstNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+                    lastNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+                }
+            } else {
+                creditEl.textContent = credit.name;
+                creditEl.style.fontSize = 'clamp(2.5rem, 8vw, 5rem)';
+            }
+            
+            // Position and style
+            creditEl.style.left = `${col * cellWidth + (cellWidth * 0.1)}px`;
+            creditEl.style.top = `${row * cellHeight + (cellHeight * 0.1)}px`;
+            creditEl.style.width = `${cellWidth * 0.8}px`;
+            creditEl.style.textAlign = 'center';
+            
+            // Assign a color (80% white, 20% other colors)
+            creditEl.style.color = getRandomColor();
+            
+            creditsContainer.appendChild(creditEl);
+            
+            // Add description below
+            if (credit.description) {
+                const descEl = document.createElement('div');
+                descEl.classList.add('credit-description', 'packery-description');
+                descEl.textContent = credit.description;
+                descEl.style.left = `${col * cellWidth + (cellWidth * 0.1)}px`;
+                descEl.style.top = `${row * cellHeight + (cellHeight * 0.4)}px`;
+                descEl.style.width = `${cellWidth * 0.8}px`;
+                descEl.style.textAlign = 'center';
+                
+                creditsContainer.appendChild(descEl);
+                
+                // Set description opacity immediately
+                gsap.set(descEl, { opacity: 1 });
+            }
+            
+            // Apply effect immediately based on category
+            if (credit.category === 'tech') creditEl.classList.add('electric');
+            else if (credit.category === 'creative') creditEl.classList.add('flicker');
+            else if (credit.category === 'artist') creditEl.classList.add('electric');
+            else if (credit.category === 'writer') creditEl.classList.add('flicker');
+            else if (credit.category === 'hacker') creditEl.classList.add('flicker');
+            
+            // Set visible immediately
+            gsap.set(creditEl, { opacity: 1, scale: 1 });
+        });
+    } else if (layoutType === "row") {
+        // Row layout - multiple people in horizontal rows
+        const rows = credits.length <= 3 ? 1 : 2;
+        const itemsPerRow = Math.ceil(credits.length / rows);
+        
+        // Calculate row dimensions
+        const rowHeight = containerHeight / rows;
+        
+        // Create and position credits in rows
+        credits.forEach((credit, i) => {
+            // Calculate row and position within row
+            const row = Math.floor(i / itemsPerRow);
+            const posInRow = i % itemsPerRow;
+            
+            // Split name into first/last name
+            const splitName = splitNameIntoLines(credit.name);
+            
+            // Create the name element
+            const creditEl = document.createElement('div');
+            creditEl.classList.add('credit', 'row-item');
+            
+            // Use HTML to format the split name
+            const nameParts = splitName.split('\n');
+            if (nameParts.length === 2) {
+                creditEl.innerHTML = `<div class="name-first">${nameParts[0]}</div>
+                                    <div class="name-last">${nameParts[1]}</div>`;
+                
+                // Make names larger
+                const firstNameEl = creditEl.querySelector('.name-first');
+                const lastNameEl = creditEl.querySelector('.name-last');
+                if (firstNameEl && lastNameEl) {
+                    firstNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+                    lastNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+                }
+            } else {
+                creditEl.textContent = credit.name;
+                creditEl.style.fontSize = 'clamp(2.5rem, 8vw, 5rem)';
+            }
+            
+            // Position
+            const spacing = containerWidth / (itemsPerRow + 1);
+            creditEl.style.left = `${(posInRow + 1) * spacing - 150}px`;
+            creditEl.style.top = `${row * rowHeight + rowHeight * 0.3}px`;
+            creditEl.style.width = '300px';
+            creditEl.style.textAlign = 'center';
+            
+            // Assign a color (80% white, 20% other colors)
+            creditEl.style.color = getRandomColor();
+            
+            creditsContainer.appendChild(creditEl);
+            
+            // Add description if available
+            if (credit.description) {
+                const descEl = document.createElement('div');
+                descEl.classList.add('credit-description', 'packery-description');
+                descEl.textContent = credit.description;
+                descEl.style.left = `${(posInRow + 1) * spacing - 150}px`;
+                descEl.style.top = `${row * rowHeight + rowHeight * 0.6}px`;
+                descEl.style.width = '300px';
+                descEl.style.textAlign = 'center';
+                
+                creditsContainer.appendChild(descEl);
+                
+                // Set description opacity
+                gsap.set(descEl, { opacity: 1 });
+            }
+            
+            // Apply effects immediately based on category
+            if (credit.category === 'tech') creditEl.classList.add('electric');
+            else if (credit.category === 'creative') creditEl.classList.add('flicker');
+            else if (credit.category === 'artist') creditEl.classList.add('electric');
+            else if (credit.category === 'writer') creditEl.classList.add('flicker');
+            else if (credit.category === 'hacker') creditEl.classList.add('flicker');
+            
+            // Set visible immediately
+            gsap.set(creditEl, { opacity: 1, scale: 1 });
+        });
+    } else {
+        // Fallback to old layout method if specified
+        console.warn("Using deprecated random layout - switch to grid or row");
+        // ... original random layout code would be here ...
+    }
+    
+    // Play glitch sound
+    if (document.getElementById('glitch-sound')) {
+        const glitchSound = document.getElementById('glitch-sound');
+        glitchSound.currentTime = 0;
+        glitchSound.play().catch(e => console.log("Audio error:", e));
+    }
+    
+    return timeline;
+}
+
+// -------------- DOMContentLoaded EVENT LISTENER --------------
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize audio elements
     const mainSound = document.getElementById('main-sound');
@@ -934,6 +1622,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     mainSound.volume = 1.0;
                     mainSound.currentTime = 0;
                     
+                    // Add event listener for when audio ends
+                    mainSound.addEventListener('ended', showEndScene);
+                    
                     // Play the sound
                     mainSound.play().then(() => {
                         console.log("Main sound started playing");
@@ -978,410 +1669,21 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Timeline for cursor effect
             const cursorTimeline = gsap.timeline({
+                defaults: { ease: 'power1.out' },
                 onComplete: () => {
-                    // Hide cursor and start credits
+                    // Hide the cursor after the animation
                     gsap.to(cursor, { duration: 0.3, opacity: 0, display: 'none' });
-                    buildAndStartCreditsSequence();
                 }
             });
             
-            cursorTimeline
-                .to(cursor, { duration: 0.1, opacity: 0, repeat: 6, yoyo: true })
-                .to(cursor, { duration: 0.5, scale: 10, opacity: 0, ease: "power4.in" });
+            // Create cursor blink effect for 1 second
+            cursorTimeline.to(cursor, { duration: 0.15, opacity: 0, repeat: 3, yoyo: true })
+                .to(cursor, { duration: 0.2, scale: 3, opacity: 0, clearProps: 'all' });
         }).catch(error => {
-            console.error("Failed to load credits:", error);
-            // Start anyway with whatever credits we have (might be empty)
+            console.error("Error during Phase 1 start:", error);
+            // Still continue even if there's an error
             if (mainSound) mainSound.play().catch(e => console.log("Audio error:", e));
-            
-            const cursorTimeline = gsap.timeline({
-                onComplete: () => {
-                    gsap.to(cursor, { duration: 0.3, opacity: 0, display: 'none' });
-                    buildAndStartCreditsSequence();
-                }
-            });
-            
-            cursorTimeline
-                .to(cursor, { duration: 0.1, opacity: 0, repeat: 6, yoyo: true })
-                .to(cursor, { duration: 0.5, scale: 10, opacity: 0, ease: "power4.in" });
         });
-    }
-    
-    // New function to prepare and start the credits sequence
-    function buildAndStartCreditsSequence() {
-        console.log("Building credits sequence");
-        
-        // Get data from loaded JSON
-        const creditsData = window.creditsData || {};
-        
-        // 1. Create simple featured single-name screens using the featured list from JSON
-        const singleNameScreens = creditsData.featured || [
-            { name: "ALAN TURING", description: "Computer Science Father", color: "#33FF33", category: "tech" },
-            { name: "GRACE HOPPER", description: "Compiler Pioneer", color: "#4169E1", category: "tech" },
-            { name: "ADA LOVELACE", description: "First Programmer", color: "#BA55D3", category: "tech" }
-        ];
-        
-        // 2. Create multi-name packery screens (groups of 3-4 names)
-        const regularCredits = shuffleArray([...allCredits.filter(credit => 
-            !credit.layout && !singleNameScreens.some(s => s.name === credit.name)
-        )]);
-        
-        const packeryScreens = [];
-        for (let i = 0; i < regularCredits.length; i += 4) {
-            const group = regularCredits.slice(i, Math.min(i + 4, regularCredits.length));
-            if (group.length > 1) {
-                packeryScreens.push(group);
-            }
-        }
-        
-        // 3. Get special layouts from JSON
-        const specialLayouts = [];
-        
-        // Title layouts
-        if (creditsData.layouts && creditsData.layouts.title) {
-            specialLayouts.push(...creditsData.layouts.title);
-        } else {
-            // Fallback if JSON doesn't have the data
-            specialLayouts.push(
-                { name: "ENTER", color: "#FF6600", category: "title", layout: "title" },
-                { name: "THE", color: "#FF6600", category: "title", layout: "title" },
-                { name: "VIBE", color: "#FF6600", category: "title", layout: "title" }
-            );
-        }
-        
-        // Bilingual layouts
-        if (creditsData.layouts && creditsData.layouts.bilingual) {
-            specialLayouts.push(...creditsData.layouts.bilingual);
-        }
-        
-        // Hierarchical layouts
-        if (creditsData.layouts && creditsData.layouts.hierarchical) {
-            specialLayouts.push(...creditsData.layouts.hierarchical);
-        }
-        
-        // Firstname-lastname layouts
-        if (creditsData.layouts && creditsData.layouts["firstname-lastname"]) {
-            specialLayouts.push(...creditsData.layouts["firstname-lastname"]);
-        }
-        
-        // Combine all screens and make sure we have at least 20
-        let allScreens = [
-            ...singleNameScreens,
-            ...packeryScreens,
-            ...specialLayouts
-        ];
-        
-        // If we still don't have 20 screens, add more packery groups
-        while (allScreens.length < 20) {
-            const newGroup = shuffleArray([...regularCredits]).slice(0, 3);
-            if (newGroup.length > 1) {
-                allScreens.push(newGroup);
-            }
-        }
-        
-        // Shuffle but keep special layouts at the end
-        const regularScreens = allScreens.filter(screen => 
-            !Array.isArray(screen) && !screen.layout);
-        const packeryGroupScreens = allScreens.filter(screen => 
-            Array.isArray(screen));
-        
-        // Shuffle the regular and packery screens
-        const shuffledRegular = shuffleArray([...regularScreens]);
-        const shuffledPackery = shuffleArray([...packeryGroupScreens]);
-        
-        // Final sequence with Enter the Vibe screens at the end
-        const titleScreens = specialLayouts.filter(screen => screen.layout === "title");
-        const otherSpecialLayouts = specialLayouts.filter(screen => screen.layout !== "title");
-        
-        const finalSequence = [
-            ...shuffledRegular,
-            ...shuffledPackery,
-            ...otherSpecialLayouts,
-            ...titleScreens
-        ];
-        
-        console.log(`Prepared ${finalSequence.length} credit screens`);
-        
-        // Now start the actual sequence
-        playCreditsSequence(finalSequence);
-    }
-    
-    // Function to play the credits sequence
-    function playCreditsSequence(screens) {
-        const creditsContainer = document.querySelector('.credits-container');
-        const singleCreditContainer = document.querySelector('.single-credit-container');
-        
-        // Clear containers
-        creditsContainer.innerHTML = '';
-        singleCreditContainer.innerHTML = '';
-        
-        // Keep track of current screen index
-        let currentScreenIndex = 0;
-        let lastScreenChangeTime = Date.now();
-        
-        // Function to show the next screen
-        const showNextScreen = () => {
-            console.log(`Showing screen ${currentScreenIndex + 1} of ${screens.length}`);
-            
-            // Clear containers immediately
-            creditsContainer.innerHTML = '';
-            singleCreditContainer.innerHTML = '';
-            
-            // Check if we've reached the end of all screens
-            if (currentScreenIndex >= screens.length) {
-                console.log("End of credits sequence - transitioning to phase 2");
-                transitionToPhase2();
-                return;
-            }
-            
-            const screen = screens[currentScreenIndex];
-            const screenTimeline = gsap.timeline();
-            
-            // Handle different screen types immediately without animation
-            if (Array.isArray(screen)) {
-                // Packery layout with multiple names
-                showPackeryGroup(screenTimeline, screen);
-            } else if (screen.layout) {
-                // Special layout screen
-                showSpecialLayoutCredit(screenTimeline, screen);
-            } else {
-                // Single name screen
-                showSingleName(screenTimeline, screen);
-            }
-            
-            // Increment screen index for next time
-            currentScreenIndex++;
-            lastScreenChangeTime = Date.now();
-        };
-        
-        // Beat detection event handler 
-        const handleBeat = () => {
-            const currentTime = Date.now();
-            const minScreenTime = 1000; // 1 second minimum per screen (reduced from 1.5s)
-            
-            // Only advance if screen has been visible for at least the minimum time
-            if (currentTime - lastScreenChangeTime >= minScreenTime) {
-                console.log("Beat detected - advancing to next screen");
-                showNextScreen();
-            } else {
-                console.log("Beat detected but ignoring (too soon)");
-            }
-        };
-        
-        // Add event listener for beat detection
-        window.addEventListener('audiobeat', handleBeat);
-        
-        // Start with the first screen
-        showNextScreen();
-        
-        // Fallback: if no beats detected for 5 seconds, advance anyway
-        const checkForInactivity = () => {
-            const currentTime = Date.now();
-            const phase1 = document.getElementById('phase1');
-            const isPhase1Active = phase1 && !phase1.classList.contains('hidden');
-            
-            if (isPhase1Active) {
-                if (currentTime - lastScreenChangeTime >= 5000) {
-                    console.log("No beats detected for 5s - auto-advancing");
-                    showNextScreen();
-                }
-                // Continue checking while in phase 1
-                setTimeout(checkForInactivity, 2000);
-            } else {
-                // Clean up event listener when phase 1 is done
-                window.removeEventListener('audiobeat', handleBeat);
-            }
-        };
-        
-        setTimeout(checkForInactivity, 5000);
-        
-        // Return a simple timeline (no animations)
-        return gsap.timeline();
-    }
-    
-    // Function to show a single name
-    function showSingleName(timeline, credit) {
-        const singleCreditContainer = document.querySelector('.single-credit-container');
-        
-        // Clear the container
-        singleCreditContainer.innerHTML = '';
-        
-        // Create the main credit element
-        const creditEl = document.createElement('div');
-        creditEl.classList.add('credit', 'single');
-        creditEl.textContent = credit.name;
-        creditEl.style.color = credit.color;
-        
-        // Add to container first (name at the top)
-        singleCreditContainer.appendChild(creditEl);
-        
-        // Always add description below the name
-        const descEl = document.createElement('div');
-        descEl.classList.add('credit-description');
-        // Use description or category if no description
-        descEl.textContent = credit.description || credit.category.toUpperCase();
-        descEl.style.top = '60%'; // Position below the name
-        singleCreditContainer.appendChild(descEl);
-        
-        // Apply effects immediately without animation
-        if (credit.category === 'tech') creditEl.classList.add('electric');
-        else if (credit.category === 'creative') creditEl.classList.add('flicker');
-        else if (credit.category === 'artist') creditEl.classList.add('electric');
-        else if (credit.category === 'writer') creditEl.classList.add('flicker');
-        else if (credit.category === 'hacker') creditEl.classList.add('flicker');
-        else if (credit.category === 'special') {
-            creditEl.classList.add('flicker');
-        }
-        
-        // Play sound
-        if (glitchSound) {
-            glitchSound.currentTime = 0;
-            glitchSound.play().catch(e => console.log("Audio error:", e));
-        }
-        
-        // Set visibility immediately without animation
-        gsap.set(creditEl, { opacity: 1, scale: 1 });
-        gsap.set(descEl, { opacity: 1 });
-        
-        return timeline;
-    }
-    
-    // Function to show a packery group of names
-    function showPackeryGroup(timeline, credits) {
-        const creditsContainer = document.querySelector('.credits-container');
-        
-        // Clear container
-        creditsContainer.innerHTML = '';
-        
-        // Get container dimensions
-        const containerWidth = creditsContainer.clientWidth;
-        const containerHeight = creditsContainer.clientHeight;
-        
-        // Calculate optimal font size and positions
-        const packeryLayout = calculatePackeryLayout(credits, containerWidth, containerHeight);
-        
-        // Create and position credit elements
-        packeryLayout.forEach((item, i) => {
-            const credit = credits[i];
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit');
-            creditEl.textContent = credit.name;
-            creditEl.dataset.category = credit.category;
-            
-            // Apply position and size from packery algorithm
-            creditEl.style.left = `${item.x}px`;
-            creditEl.style.top = `${item.y}px`;
-            creditEl.style.width = `${item.width}px`;
-            creditEl.style.fontSize = `${item.fontSize}px`;
-            creditEl.style.color = credit.color;
-            
-            creditsContainer.appendChild(creditEl);
-            
-            // Add description if available
-            if (credit.description) {
-                const descEl = document.createElement('div');
-                descEl.classList.add('credit-description', 'packery-description');
-                descEl.textContent = credit.description;
-                
-                // Position the description below the name
-                descEl.style.left = `${item.x}px`;
-                descEl.style.top = `${item.y + item.fontSize * 1.2}px`;
-                descEl.style.width = `${item.width}px`;
-                
-                creditsContainer.appendChild(descEl);
-                
-                // Set description opacity (no animation)
-                gsap.set(descEl, { opacity: 1 });
-            }
-            
-            // Apply effect immediately based on category
-            if (credit.category === 'tech') creditEl.classList.add('electric');
-            else if (credit.category === 'creative') creditEl.classList.add('flicker');
-            else if (credit.category === 'artist') creditEl.classList.add('electric');
-            else if (credit.category === 'writer') creditEl.classList.add('flicker');
-            else if (credit.category === 'hacker') creditEl.classList.add('flicker');
-            
-            // Set visible immediately without animation
-            gsap.set(creditEl, { opacity: 1, scale: 1 });
-        });
-        
-        // Play glitch sound
-        if (glitchSound) {
-            glitchSound.currentTime = 0;
-            glitchSound.play().catch(e => console.log("Audio error:", e));
-        }
-        
-        return timeline;
-    }
-    
-    function calculatePackeryLayout(items, containerWidth, containerHeight) {
-        // Packery algorithm implementation
-        const positions = [];
-        const padding = 20; // Space between items
-        
-        // Calculate optimal font size based on number of items and container size
-        const totalArea = containerWidth * containerHeight;
-        const itemArea = totalArea / (items.length * 1.7); // Using more space for better readability
-        
-        items.forEach((item, index) => {
-            const textLength = item.name.length;
-            
-            // Calculate font size - longer names get slightly smaller fonts
-            const fontSize = Math.min(
-                72,  // Maximum font size - increased for better visibility
-                Math.max(
-                    28,  // Minimum font size - increased for readability
-                    Math.floor(Math.sqrt(itemArea) / Math.sqrt(textLength) * 0.9)
-                )
-            );
-            
-            // Estimate width based on text length and font size
-            const width = (textLength * fontSize * 0.6) + padding;
-            const height = fontSize * 1.2 + padding;
-            
-            // Find a position where this item doesn't overlap with existing items
-            let x = Math.random() * (containerWidth - width);
-            let y = Math.random() * (containerHeight - height);
-            
-            // Simple collision detection and repositioning
-            let attempts = 0;
-            const maxAttempts = 50;
-            
-            while (attempts < maxAttempts) {
-                let collision = false;
-                
-                // Check for collisions with existing items
-                for (const pos of positions) {
-                    if (
-                        x < pos.x + pos.width + padding &&
-                        x + width + padding > pos.x &&
-                        y < pos.y + pos.height + padding &&
-                        y + height + padding > pos.y
-                    ) {
-                        collision = true;
-                        break;
-                    }
-                }
-                
-                if (!collision) break;
-                
-                // Try a new random position
-                x = Math.random() * (containerWidth - width);
-                y = Math.random() * (containerHeight - height);
-                attempts++;
-            }
-            
-            // Add the item to our layout
-            positions.push({
-                x,
-                y,
-                width,
-                height,
-                fontSize,
-                index
-            });
-        });
-        
-        return positions;
     }
     
     // -------------- PHASE 2: MAIN TITLE --------------
@@ -1657,150 +1959,96 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
-    // Function to handle special layouts
-    function showSpecialLayoutCredit(timeline, credit) {
-        const creditsContainer = document.querySelector('.credits-container');
-        const singleCreditContainer = document.querySelector('.single-credit-container');
+    // Function to show the end scene when audio finishes
+    function showEndScene() {
+        console.log("Audio finished - showing end scene");
         
-        // Clear containers
-        creditsContainer.innerHTML = '';
-        singleCreditContainer.innerHTML = '';
+        // First transition to phase 3 if not already there
+        const currentPhase = document.querySelector('.phase:not(.hidden)');
+        if (currentPhase.id !== 'phase3') {
+            // Force transition to phase 3
+            transitionToPhase3();
+        }
         
-        if (credit.layout === "title") {
-            // Title layout (like "ENTER", "THE", "VIBE")
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit', 'single', 'title');
-            creditEl.textContent = credit.name;
-            creditEl.style.color = credit.color;
-            creditEl.style.fontSize = 'clamp(6rem, 20vw, 16rem)';
-            creditEl.style.fontWeight = 'bold';
-            
-            singleCreditContainer.appendChild(creditEl);
-            
-            // Add flicker effect immediately
-            creditEl.classList.add('flicker');
-            
-            // Set immediately visible
-            gsap.set(creditEl, { opacity: 1, scale: 1 });
-        }
-        else if (credit.layout === "hierarchical") {
-            // Hierarchical layout with roles and names
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit', 'hierarchical');
-            
-            // Parse the hierarchical text
-            const lines = credit.name.split('\n');
-            let htmlContent = '';
-            
-            lines.forEach((line, index) => {
-                // Every even line is a role (colored), every odd line is a name (white)
-                const isRole = index % 2 === 0;
-                const textColor = isRole ? credit.color : 'white';
-                htmlContent += `<div style="color: ${textColor}; margin-bottom: ${isRole ? '10px' : '25px'}; font-size: ${isRole ? '2.5rem' : '3.5rem'}; font-weight: ${isRole ? 'normal' : 'bold'}; letter-spacing: ${isRole ? '2px' : '1px'}">${line}</div>`;
-            });
-            
-            creditEl.innerHTML = htmlContent;
-            creditEl.style.textAlign = 'center';
-            
-            singleCreditContainer.appendChild(creditEl);
-            
-            // Apply effects immediately
-            const roleElements = creditEl.querySelectorAll('div');
-            roleElements.forEach(el => {
-                if (el.style.color === credit.color) {
-                    el.classList.add('electric');
-                } else {
-                    el.classList.add('flicker');
-                }
-            });
-            
-            // Set immediately visible
-            gsap.set(creditEl, { opacity: 1, scale: 1 });
-        }
-        else if (credit.layout === "bilingual") {
-            // Bilingual layout with Japanese/Chinese/Russian + English
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit', 'bilingual');
-            
-            // Parse the bilingual text
-            const lines = credit.name.split('\n');
-            let htmlContent = '';
-            
-            // Apply specific font for each language
-            let fontFamily = 'sans-serif';
-            if (credit.language === 'japanese') {
-                fontFamily = "'Noto Sans JP', sans-serif";
-            } else if (credit.language === 'chinese') {
-                fontFamily = "'Noto Sans SC', sans-serif";
-            } else if (credit.language === 'russian') {
-                fontFamily = "'Noto Sans', sans-serif";
-            }
-            
-            lines.forEach((line, index) => {
-                // Every even line is a header (colored), others are names
-                const isHeader = index % 3 === 0;
-                const hasDot = line.includes('•');
-                
-                if (isHeader) {
-                    htmlContent += `<div style="color: ${credit.color}; margin-bottom: 15px; font-size: 2.5rem; font-family: ${fontFamily}; letter-spacing: 2px; font-weight: bold;">${line}</div>`;
-                } else if (hasDot) {
-                    const [foreign, english] = line.split('•');
-                    htmlContent += `<div style="color: white; margin-bottom: 25px; font-size: 3.5rem">
-                        <span style="font-family: ${fontFamily}; font-weight: bold;">${foreign.trim()}</span>
-                        <span style="color: ${credit.color}; margin: 0 15px; opacity: 0.8;">•</span>
-                        <span style="letter-spacing: 1px;">${english.trim()}</span>
-                    </div>`;
-                } else {
-                    htmlContent += `<div style="color: white; margin-bottom: 25px; font-size: 3.5rem; font-family: ${fontFamily}; letter-spacing: 1px;">${line}</div>`;
-                }
-            });
-            
-            creditEl.innerHTML = htmlContent;
-            creditEl.style.textAlign = 'center';
-            
-            singleCreditContainer.appendChild(creditEl);
-            
-            // Apply effects immediately
-            const headerElements = creditEl.querySelectorAll(`div[style*="color: ${credit.color}"]`);
-            headerElements.forEach(el => {
-                el.classList.add('electric');
-            });
-            
-            // Set immediately visible
-            gsap.set(creditEl, { opacity: 1, scale: 1 });
-        }
-        else if (credit.layout === "firstname-lastname") {
-            // First name above last name layout
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit', 'firstname-lastname');
-            
-            // Parse the name parts
-            const [firstName, lastName] = credit.name.split('\n');
-            
-            if (credit.effect === "neon") {
-                // Neon effect with outline
-                creditEl.innerHTML = `
-                    <div style="font-size: 2.5rem; margin-bottom: 0px;">${firstName}</div>
-                    <div style="font-size: 5.5rem; text-shadow: 0 0 10px ${credit.outlineColor}, 0 0 20px ${credit.outlineColor};">${lastName}</div>
-                `;
-                creditEl.style.color = credit.color;
-                creditEl.classList.add('electric');
-            } else {
-                // Regular styling
-                creditEl.innerHTML = `
-                    <div style="font-size: 2.5rem; margin-bottom: 0px;">${firstName}</div>
-                    <div style="font-size: 5.5rem;">${lastName}</div>
-                `;
-                creditEl.style.color = credit.color;
-                creditEl.classList.add('flicker');
-            }
-            
-            creditEl.style.textAlign = 'center';
-            
-            singleCreditContainer.appendChild(creditEl);
-            
-            // Set immediately visible
-            gsap.set(creditEl, { opacity: 1, scale: 1 });
-        }
+        // Create end scene elements
+        const endScene = document.createElement('div');
+        endScene.classList.add('end-scene');
+        endScene.style.position = 'absolute';
+        endScene.style.top = '0';
+        endScene.style.left = '0';
+        endScene.style.width = '100%';
+        endScene.style.height = '100%';
+        endScene.style.display = 'flex';
+        endScene.style.flexDirection = 'column';
+        endScene.style.justifyContent = 'center';
+        endScene.style.alignItems = 'center';
+        endScene.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        endScene.style.zIndex = '1000';
+        
+        // Create end title
+        const endTitle = document.createElement('div');
+        endTitle.textContent = 'ENTER THE VIBE';
+        endTitle.style.fontSize = '6rem';
+        endTitle.style.fontFamily = "'Anton', sans-serif";
+        endTitle.style.color = 'white';
+        endTitle.style.marginBottom = '2rem';
+        endTitle.style.letterSpacing = '5px';
+        endTitle.classList.add('electric');
+        
+        // Create subtitle
+        const subtitle = document.createElement('div');
+        subtitle.textContent = 'THANK YOU FOR WATCHING';
+        subtitle.style.fontSize = '2rem';
+        subtitle.style.fontFamily = "'Inter', sans-serif";
+        subtitle.style.color = '#4495F1';
+        subtitle.style.marginBottom = '3rem';
+        
+        // Create restart button
+        const restartBtn = document.createElement('button');
+        restartBtn.textContent = 'RESTART';
+        restartBtn.style.padding = '1rem 2rem';
+        restartBtn.style.fontSize = '1.5rem';
+        restartBtn.style.fontFamily = "'Anton', sans-serif";
+        restartBtn.style.backgroundColor = 'transparent';
+        restartBtn.style.color = '#33FF33';
+        restartBtn.style.border = '2px solid #33FF33';
+        restartBtn.style.cursor = 'pointer';
+        restartBtn.addEventListener('click', restartAnimation);
+        
+        // Append elements
+        endScene.appendChild(endTitle);
+        endScene.appendChild(subtitle);
+        endScene.appendChild(restartBtn);
+        
+        // Add to phase 3
+        const phase3 = document.getElementById('phase3');
+        phase3.appendChild(endScene);
+        
+        // Animate in
+        gsap.from(endScene, {
+            opacity: 0,
+            duration: 1.5
+        });
+        
+        gsap.from(endTitle, {
+            y: -50,
+            opacity: 0,
+            duration: 1,
+            delay: 0.5
+        });
+        
+        gsap.from(subtitle, {
+            y: -30,
+            opacity: 0,
+            duration: 1,
+            delay: 1
+        });
+        
+        gsap.from(restartBtn, {
+            y: 30,
+            opacity: 0,
+            duration: 1,
+            delay: 1.5
+        });
     }
 }); 
