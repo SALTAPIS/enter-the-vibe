@@ -199,6 +199,185 @@ const techFonts = [
     "'Rajdhani', sans-serif"
 ];
 
+// -------------- AUDIO VISUALIZATION & BEAT DETECTION --------------
+let audioContext;
+let analyser;
+let audioSource;
+let frequencyData;
+let beatDetected = false;
+let lastBeatTime = 0;
+let beatThreshold = 0.25; // Increased threshold for more pronounced beats
+let beatHoldTime = 400; // Increased to catch fewer beats
+let beatEnergy = 0;
+let beatEnergyDecay = 0.98;
+let beatCutoff = 0;
+let beatCutoffDecay = 0.98; // Slower decay to prevent too many beats
+
+// Setup audio visualization
+function setupAudioVisualization(audioElement) {
+    // Create audio context
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Create analyzer node
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 512; // Higher value for more detailed analysis
+    analyser.smoothingTimeConstant = 0.7; // Better for detecting distinct beats
+    
+    // Connect audio element to analyzer
+    audioSource = audioContext.createMediaElementSource(audioElement);
+    audioSource.connect(analyser);
+    analyser.connect(audioContext.destination);
+    
+    // Create frequency data array
+    frequencyData = new Uint8Array(analyser.frequencyBinCount);
+    
+    // Log setup success
+    console.log("Audio visualization setup complete");
+    
+    // Start visualization loop
+    drawVisualization();
+}
+
+// Draw visualization
+function drawVisualization() {
+    // Get canvas and context
+    const canvas = document.getElementById('audio-visualizer');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas size to match window
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    
+    // Animation loop
+    function animate() {
+        requestAnimationFrame(animate);
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Get frequency data
+        analyser.getByteFrequencyData(frequencyData);
+        
+        // Detect beats
+        detectBeats();
+        
+        // Draw visualization based on frequency data
+        drawVisualizationBars(ctx, canvas, frequencyData);
+    }
+    
+    // Start animation loop
+    animate();
+}
+
+// Draw frequency bars
+function drawVisualizationBars(ctx, canvas, frequencyData) {
+    const barWidth = Math.ceil(canvas.width / (frequencyData.length / 2));
+    const heightMultiplier = canvas.height / 255 * 0.7; // 70% of canvas height max
+    
+    // Draw from center of screen
+    ctx.translate(0, canvas.height / 2);
+    
+    for (let i = 0; i < frequencyData.length / 2; i++) { // Use half the frequencies for better visuals
+        const barHeight = frequencyData[i] * heightMultiplier;
+        
+        // Determine color based on frequency and beat
+        const r = beatDetected ? 255 : (frequencyData[i]);
+        const g = 120 + frequencyData[i] / 3;
+        const b = 255 - frequencyData[i] / 3;
+        const alpha = beatDetected ? 0.8 : 0.6;
+        
+        // Top bar (goes up)
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        ctx.fillRect(i * barWidth, -barHeight, barWidth - 1, barHeight);
+        
+        // Bottom bar (mirror, goes down)
+        ctx.fillRect(i * barWidth, 0, barWidth - 1, barHeight);
+    }
+    
+    // Reset transformation
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    
+    // Add a more pronounced glow effect if beat detected
+    if (beatDetected) {
+        const gradient = ctx.createRadialGradient(
+            canvas.width / 2, canvas.height / 2, 0,
+            canvas.width / 2, canvas.height / 2, canvas.height / 2
+        );
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+        gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.1)');
+        gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Also add a beat indicator in the corner for debugging
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
+        ctx.fillRect(canvas.width - 30, 10, 20, 20);
+    }
+}
+
+// Detect beats using energy algorithm with better bass focus
+function detectBeats() {
+    const currentTime = Date.now();
+    
+    // Calculate energy with emphasis on bass frequencies (0-10 bins)
+    let bassEnergy = 0;
+    let totalEnergy = 0;
+    
+    // Focus more on bass frequencies (first 8-10 bins typically)
+    for (let i = 0; i < 10; i++) {
+        // Weight the first few bins higher (bass frequencies)
+        let weight = 1.0;
+        if (i < 4) weight = 3.0; // Boost the lowest frequencies
+        
+        bassEnergy += frequencyData[i] * weight;
+    }
+    bassEnergy = bassEnergy / 20; // Normalize
+    
+    // Also check overall energy for context
+    for (let i = 0; i < frequencyData.length / 4; i++) {
+        totalEnergy += frequencyData[i];
+    }
+    totalEnergy = totalEnergy / (frequencyData.length / 4);
+    
+    // Calculate running average with more weight on bass
+    beatEnergy = beatEnergy * beatEnergyDecay + bassEnergy * (1 - beatEnergyDecay);
+    
+    // Dynamic beat cutoff with slower decay
+    if (bassEnergy > beatCutoff) {
+        beatCutoff = bassEnergy;
+    } else {
+        beatCutoff = beatCutoff * beatCutoffDecay;
+    }
+    
+    // Detect beats with higher threshold for more distinct beats
+    beatDetected = false;
+    
+    // Check if energy is above threshold, has minimum time since last beat,
+    // and is a significant amount above the running average
+    if (bassEnergy > beatCutoff * (1 + beatThreshold) && 
+        currentTime - lastBeatTime > beatHoldTime &&
+        bassEnergy > 40) { // Ensure minimal energy level
+        
+        beatDetected = true;
+        lastBeatTime = currentTime;
+        
+        console.log(`Beat detected! Energy: ${Math.round(bassEnergy)}, Cutoff: ${Math.round(beatCutoff)}`);
+        
+        // Trigger screen change on beat
+        triggerOnBeat();
+    }
+}
+
+// Function to be called when a beat is detected
+function triggerOnBeat() {
+    // Only trigger during credits phase
+    const phase1 = document.getElementById('phase1');
+    if (phase1 && !phase1.classList.contains('hidden')) {
+        window.dispatchEvent(new Event('audiobeat'));
+    }
+}
+
 // -------------- MAIN INITIALIZATION --------------
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize audio elements
@@ -224,6 +403,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const phase1 = document.getElementById('phase1');
                 phase1.classList.remove('hidden');
                 gsap.set(phase1, { opacity: 1 });
+                
+                // Initialize audio context and visualization
+                if (mainSound) {
+                    setupAudioVisualization(mainSound);
+                }
+                
                 // Start the experience
                 startPhase1();
             } 
@@ -395,52 +580,89 @@ document.addEventListener('DOMContentLoaded', () => {
         creditsContainer.innerHTML = '';
         singleCreditContainer.innerHTML = '';
         
-        // Create the main timeline
-        const masterTimeline = gsap.timeline({
-            onComplete: () => {
-                transitionToPhase2();
-            }
-        });
+        // Keep track of current screen index
+        let currentScreenIndex = 0;
+        let lastScreenChangeTime = Date.now();
         
-        // Calculate timing to ensure at least 30 seconds total duration
-        const minDuration = 30; // seconds
-        const avgScreenDuration = 2; // average seconds per screen
-        const baseDelay = Math.max(1.2, minDuration / screens.length);
-        
-        // Function to add screens to the timeline
-        const addScreen = (index) => {
-            if (index >= screens.length) {
-                return; // End of sequence
-            }
-            
-            const screen = screens[index];
-            const screenTimeline = gsap.timeline();
+        // Function to show the next screen
+        const showNextScreen = () => {
+            console.log(`Showing screen ${currentScreenIndex + 1} of ${screens.length}`);
             
             // Clear containers
             creditsContainer.innerHTML = '';
             singleCreditContainer.innerHTML = '';
+            
+            // Check if we've reached the end of all screens
+            if (currentScreenIndex >= screens.length) {
+                console.log("End of credits sequence - transitioning to phase 2");
+                transitionToPhase2();
+                return;
+            }
+            
+            const screen = screens[currentScreenIndex];
+            const screenTimeline = gsap.timeline();
             
             // Handle different screen types
             if (Array.isArray(screen)) {
                 // Packery layout with multiple names
                 showPackeryGroup(screenTimeline, screen);
             } else if (screen.layout) {
-                // Special Enter the Void style screen
+                // Special layout screen
                 showSpecialLayoutCredit(screenTimeline, screen);
             } else {
                 // Single name screen
                 showSingleName(screenTimeline, screen);
             }
             
-            // Add this screen's timeline to the master timeline
-            masterTimeline.add(screenTimeline);
-            
-            // Schedule the next screen
-            masterTimeline.call(() => addScreen(index + 1), [], `+=${baseDelay}`);
+            // Increment screen index for next time
+            currentScreenIndex++;
+            lastScreenChangeTime = Date.now();
         };
         
+        // Beat detection event handler
+        const handleBeat = () => {
+            const currentTime = Date.now();
+            const minScreenTime = 1500; // 1.5 seconds minimum per screen
+            
+            // Only advance if screen has been visible for at least the minimum time
+            if (currentTime - lastScreenChangeTime >= minScreenTime) {
+                console.log("Beat detected - advancing to next screen");
+                showNextScreen();
+            } else {
+                console.log("Beat detected but ignoring (too soon)");
+            }
+        };
+        
+        // Add event listener for beat detection
+        window.addEventListener('audiobeat', handleBeat);
+        
         // Start with the first screen
-        addScreen(0);
+        showNextScreen();
+        
+        // Fallback: if no beats detected for 5 seconds, advance anyway
+        const checkForInactivity = () => {
+            const currentTime = Date.now();
+            const phase1 = document.getElementById('phase1');
+            const isPhase1Active = phase1 && !phase1.classList.contains('hidden');
+            
+            if (isPhase1Active) {
+                if (currentTime - lastScreenChangeTime >= 5000) {
+                    console.log("No beats detected for 5s - auto-advancing");
+                    showNextScreen();
+                }
+                // Continue checking while in phase 1
+                setTimeout(checkForInactivity, 2000);
+            } else {
+                // Clean up event listener when phase 1 is done
+                window.removeEventListener('audiobeat', handleBeat);
+            }
+        };
+        
+        setTimeout(checkForInactivity, 5000);
+        
+        // Create a master timeline that will NOT auto-transition to phase 2
+        // (we'll let the beat detection handle that)
+        return gsap.timeline();
     }
     
     // Function to show a single name

@@ -38,6 +38,7 @@ body {
     justify-content: center;
     align-items: center;
     overflow: hidden;
+    z-index: 5;
 }
 
 .hidden {
@@ -563,4 +564,30 @@ body {
 
 #start-button:active {
     transform: scale(0.98);
+}
+
+/* -------------- AUDIO VISUALIZER -------------- */
+.audio-visualizer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* All phases should be above the visualizer */
+.phase {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    z-index: 5;
 } 
