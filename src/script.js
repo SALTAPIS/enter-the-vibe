@@ -199,22 +199,113 @@ const techFonts = [
     "'Rajdhani', sans-serif"
 ];
 
-// -------------- AUDIO VISUALIZATION & BEAT DETECTION --------------
+// -------------- AUDIO VARIABLES --------------
+// Audio contexts and elements
 let audioContext;
-let analyser;
 let audioSource;
+let analyser;
 let frequencyData;
-let beatDetected = false;
-let lastBeatTime = 0;
-let beatThreshold = 0.25; // Increased threshold for more pronounced beats
-let beatHoldTime = 400; // Increased to catch fewer beats
-let beatEnergy = 0;
-let beatEnergyDecay = 0.98;
-let beatCutoff = 0;
-let beatCutoffDecay = 0.98; // Slower decay to prevent too many beats
+
+// Peak detection (replacing beat detection)
+let peakDetected = false;
+let lastPeakTime = 0;
+let signalEnergy = 0;
+let peakThreshold = 0.05; // Updated default sensitivity threshold
+let minimumThreshold = 70; // Updated noise gate threshold
+let peakHoldTime = 250; // Minimum time between peaks
+let energyDecay = 0.95; // Decay rate for energy smoothing
+let peakCutoff = 0;
+let cutoffDecay = 0.95; // Decay rate for dynamic threshold
+let isAudioActuallyPlaying = false; // Flag to check if audio has real content
+
+// Frequency range for peak detection
+let freqRangeStart = 10; // Start bin index
+let freqRangeEnd = 60;   // End bin index
+
+// Fallback beat timer
+let useFallbackBeats = false; // Default to OFF
+let fallbackBeatInterval = 300; // Updated interval
+let fallbackBeatTimer = null;
+let peakCount = 0; // Counter for detected peaks
+let beatIndicator; // The separate beat indicator element
+let debugPanel; // Debug panel element
+let debugEnergyEl, debugCutoffEl, debugCountEl; // Debug elements
+
+// Beat control elements
+let thresholdSlider, thresholdValue;
+let noiseFloorSlider, noiseFloorValue;
+let freqRangeSelect, freqStartSlider, freqEndSlider;
+let freqStartValue, freqEndValue;
+let fallbackToggle, fallbackInterval, intervalValue;
+let toggleControlsBtn, beatControls;
+let freqRangeHighlight; // Element to highlight the selected frequency range
+
+// Function to start fallback beat timer
+function startFallbackBeatTimer() {
+    stopFallbackBeatTimer(); // First stop any existing timer
+    
+    if (useFallbackBeats && !fallbackBeatTimer) {
+        console.log(`Starting fallback beat timer with interval ${fallbackBeatInterval}ms`);
+        fallbackBeatTimer = setInterval(() => {
+            // Only trigger fallback beats if audio is actually playing
+            if (useFallbackBeats && isAudioActuallyPlaying) {
+                console.log("Fallback beat triggered");
+                // Force a peak detection
+                detectPeak(true);
+            }
+        }, fallbackBeatInterval);
+    }
+}
+
+// Function to stop fallback beat timer
+function stopFallbackBeatTimer() {
+    if (fallbackBeatTimer) {
+        console.log("Stopping fallback beat timer");
+        clearInterval(fallbackBeatTimer);
+        fallbackBeatTimer = null;
+    }
+}
 
 // Setup audio visualization
 function setupAudioVisualization(audioElement) {
+    console.log("Setting up audio visualization...");
+    
+    // Initialize beat indicator
+    beatIndicator = document.getElementById('beat-indicator');
+    
+    // Initialize debug panel
+    debugPanel = document.getElementById('debug-panel');
+    debugEnergyEl = document.getElementById('debug-energy');
+    debugCutoffEl = document.getElementById('debug-cutoff');
+    debugCountEl = document.getElementById('debug-count');
+    
+    // Initialize beat controls
+    initBeatControls();
+    
+    // Check if audio is actually playing
+    if (audioElement.paused) {
+        console.error("Audio element is paused! Attempting to play...");
+        audioElement.play()
+            .then(() => {
+                console.log("Audio started playing successfully");
+                // Start monitoring audio for actual content
+                checkForAudioContent();
+                // Start fallback beats only if enabled
+                if (useFallbackBeats) {
+                    startFallbackBeatTimer();
+                }
+            })
+            .catch(err => console.error("Failed to play audio:", err));
+    } else {
+        console.log("Audio is already playing");
+        // Start monitoring audio for actual content
+        checkForAudioContent();
+        // Start fallback beats only if enabled
+        if (useFallbackBeats) {
+            startFallbackBeatTimer();
+        }
+    }
+    
     // Create audio context
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     
@@ -238,6 +329,382 @@ function setupAudioVisualization(audioElement) {
     drawVisualization();
 }
 
+// Check if audio contains actual content (not silence)
+function checkForAudioContent() {
+    // Create a timer to check every 500ms if audio has real content
+    let checkTimer = setInterval(() => {
+        if (!frequencyData) return; // Not ready yet
+        
+        // Check if there's significant energy in the signal
+        let totalEnergy = 0;
+        for (let i = 0; i < frequencyData.length; i++) {
+            totalEnergy += frequencyData[i];
+        }
+        
+        // If we detect energy above our minimum threshold, consider audio to be playing
+        if (totalEnergy > minimumThreshold * 10) {
+            isAudioActuallyPlaying = true;
+            console.log("Audio content detected!");
+            clearInterval(checkTimer); // Stop checking once we've detected audio
+        } else {
+            isAudioActuallyPlaying = false;
+        }
+    }, 500);
+}
+
+// Initialize beat controls
+function initBeatControls() {
+    // Get control elements
+    thresholdSlider = document.getElementById('threshold-slider');
+    thresholdValue = document.getElementById('threshold-value');
+    noiseFloorSlider = document.getElementById('noise-floor-slider');
+    noiseFloorValue = document.getElementById('noise-floor-value');
+    freqRangeSelect = document.getElementById('freq-range');
+    freqStartSlider = document.getElementById('freq-start');
+    freqEndSlider = document.getElementById('freq-end');
+    freqStartValue = document.getElementById('freq-start-value');
+    freqEndValue = document.getElementById('freq-end-value');
+    fallbackToggle = document.getElementById('fallback-toggle');
+    fallbackInterval = document.getElementById('fallback-interval');
+    intervalValue = document.getElementById('interval-value');
+    toggleControlsBtn = document.getElementById('toggle-controls');
+    beatControls = document.getElementById('beat-controls');
+    
+    // Load saved settings or use defaults
+    loadSettings();
+    
+    // Initialize values in UI
+    updateUIFromSettings();
+    
+    // Add event listeners
+    thresholdSlider.addEventListener('input', (e) => {
+        peakThreshold = parseFloat(e.target.value);
+        thresholdValue.textContent = peakThreshold.toFixed(2);
+        saveSettings();
+    });
+    
+    if (noiseFloorSlider) {
+        noiseFloorSlider.addEventListener('input', (e) => {
+            minimumThreshold = parseInt(e.target.value);
+            noiseFloorValue.textContent = minimumThreshold.toString();
+            saveSettings();
+        });
+    }
+    
+    // Add frequency range controls
+    if (freqRangeSelect) {
+        freqRangeSelect.addEventListener('change', (e) => {
+            const range = e.target.value;
+            switch (range) {
+                case 'bass':
+                    freqRangeStart = 0;
+                    freqRangeEnd = 20;
+                    break;
+                case 'mid':
+                    freqRangeStart = 10;
+                    freqRangeEnd = 60;
+                    break;
+                case 'high':
+                    freqRangeStart = 50;
+                    freqRangeEnd = 100;
+                    break;
+                case 'full':
+                    freqRangeStart = 0;
+                    freqRangeEnd = 120;
+                    break;
+            }
+            
+            // Update sliders to match the preset
+            freqStartSlider.value = freqRangeStart;
+            freqEndSlider.value = freqRangeEnd;
+            freqStartValue.textContent = freqRangeStart.toString();
+            freqEndValue.textContent = freqRangeEnd.toString();
+            
+            // Reset the peak detection values when changing ranges
+            resetPeakDetection();
+            saveSettings();
+        });
+    }
+    
+    if (freqStartSlider) {
+        freqStartSlider.addEventListener('input', (e) => {
+            freqRangeStart = parseInt(e.target.value);
+            // Ensure start is less than end
+            if (freqRangeStart >= freqRangeEnd) {
+                freqRangeStart = freqRangeEnd - 1;
+                freqStartSlider.value = freqRangeStart;
+            }
+            freqStartValue.textContent = freqRangeStart.toString();
+            
+            // Reset the peak detection values when changing ranges
+            resetPeakDetection();
+            saveSettings();
+        });
+    }
+    
+    if (freqEndSlider) {
+        freqEndSlider.addEventListener('input', (e) => {
+            freqRangeEnd = parseInt(e.target.value);
+            // Ensure end is greater than start
+            if (freqRangeEnd <= freqRangeStart) {
+                freqRangeEnd = freqRangeStart + 1;
+                freqEndSlider.value = freqRangeEnd;
+            }
+            freqEndValue.textContent = freqRangeEnd.toString();
+            
+            // Reset the peak detection values when changing ranges
+            resetPeakDetection();
+            saveSettings();
+        });
+    }
+    
+    fallbackToggle.addEventListener('change', (e) => {
+        useFallbackBeats = e.target.checked;
+        if (useFallbackBeats) {
+            startFallbackBeatTimer();
+        } else {
+            stopFallbackBeatTimer();
+        }
+        saveSettings();
+    });
+    
+    fallbackInterval.addEventListener('input', (e) => {
+        fallbackBeatInterval = parseInt(e.target.value);
+        intervalValue.textContent = fallbackBeatInterval.toString();
+        if (useFallbackBeats) {
+            startFallbackBeatTimer(); // Restart with new interval
+        }
+        saveSettings();
+    });
+    
+    // Add restart button listener
+    const restartButton = document.getElementById('restart-button');
+    if (restartButton) {
+        restartButton.addEventListener('click', () => {
+            restartAnimation();
+        });
+    }
+    
+    // Add reset settings button listener
+    const resetSettingsButton = document.getElementById('reset-settings');
+    if (resetSettingsButton) {
+        resetSettingsButton.addEventListener('click', () => {
+            resetToDefaultSettings();
+        });
+    }
+    
+    toggleControlsBtn.addEventListener('click', () => {
+        const controlRows = beatControls.querySelectorAll('.control-row:not(:last-child)');
+        for (const row of controlRows) {
+            row.style.display = row.style.display === 'none' ? 'flex' : 'none';
+        }
+        toggleControlsBtn.textContent = toggleControlsBtn.textContent === 'Hide Controls' ? 'Show Controls' : 'Hide Controls';
+    });
+    
+    // Make beat indicator clickable to manually trigger beats or toggle auto mode
+    if (beatIndicator) {
+        beatIndicator.style.pointerEvents = 'auto';
+        
+        // Double click to toggle auto beats
+        beatIndicator.addEventListener('dblclick', () => {
+            useFallbackBeats = !useFallbackBeats;
+            fallbackToggle.checked = useFallbackBeats;
+            
+            if (useFallbackBeats) {
+                startFallbackBeatTimer();
+                beatIndicator.textContent = "AUTO";
+                setTimeout(() => { beatIndicator.textContent = "BEAT"; }, 1000);
+            } else {
+                stopFallbackBeatTimer();
+                beatIndicator.textContent = "MANUAL";
+                setTimeout(() => { beatIndicator.textContent = "BEAT"; }, 1000);
+            }
+            saveSettings();
+        });
+        
+        // Single click to trigger manual beat
+        beatIndicator.addEventListener('click', (e) => {
+            if (e.detail === 1) { // Only for single clicks (not part of double click)
+                // Manual peak triggering
+                setTimeout(() => {
+                    if (e.detail === 1) { // Still a single click after timeout
+                        console.log("Manual peak triggered");
+                        detectPeak(true);
+                    }
+                }, 200);
+            }
+        });
+    }
+    
+    // Create a frequency range highlight element
+    freqRangeHighlight = document.createElement('div');
+    freqRangeHighlight.classList.add('freq-range-highlight');
+    document.body.appendChild(freqRangeHighlight);
+}
+
+// Save settings to localStorage
+function saveSettings() {
+    const settings = {
+        peakThreshold,
+        minimumThreshold,
+        freqRangeStart,
+        freqRangeEnd,
+        useFallbackBeats,
+        fallbackBeatInterval,
+        freqRangeType: freqRangeSelect ? freqRangeSelect.value : 'mid'
+    };
+    
+    try {
+        localStorage.setItem('vibeSettings', JSON.stringify(settings));
+        console.log('Settings saved to localStorage');
+    } catch (e) {
+        console.error('Failed to save settings to localStorage:', e);
+    }
+}
+
+// Load settings from localStorage
+function loadSettings() {
+    try {
+        const savedSettings = localStorage.getItem('vibeSettings');
+        if (savedSettings) {
+            const settings = JSON.parse(savedSettings);
+            
+            // Apply saved settings
+            peakThreshold = settings.peakThreshold || 0.05;
+            minimumThreshold = settings.minimumThreshold || 70;
+            freqRangeStart = settings.freqRangeStart || 10;
+            freqRangeEnd = settings.freqRangeEnd || 60;
+            useFallbackBeats = settings.useFallbackBeats || false;
+            fallbackBeatInterval = settings.fallbackBeatInterval || 300;
+            
+            console.log('Settings loaded from localStorage');
+        }
+    } catch (e) {
+        console.error('Failed to load settings from localStorage:', e);
+        // If loading fails, use defaults
+        resetToDefaultSettings(false);
+    }
+}
+
+// Update UI elements to reflect current settings
+function updateUIFromSettings() {
+    // Update sliders and values
+    thresholdSlider.value = peakThreshold;
+    thresholdValue.textContent = peakThreshold.toFixed(2);
+    
+    noiseFloorSlider.value = minimumThreshold;
+    noiseFloorValue.textContent = minimumThreshold.toString();
+    
+    freqStartSlider.value = freqRangeStart;
+    freqStartValue.textContent = freqRangeStart.toString();
+    
+    freqEndSlider.value = freqRangeEnd;
+    freqEndValue.textContent = freqRangeEnd.toString();
+    
+    fallbackToggle.checked = useFallbackBeats;
+    fallbackInterval.value = fallbackBeatInterval;
+    intervalValue.textContent = fallbackBeatInterval.toString();
+    
+    // Set frequency range select based on current values
+    if (freqRangeSelect) {
+        // Try to determine the preset based on the current range values
+        if (freqRangeStart === 0 && freqRangeEnd === 20) {
+            freqRangeSelect.value = 'bass';
+        } else if (freqRangeStart === 10 && freqRangeEnd === 60) {
+            freqRangeSelect.value = 'mid';
+        } else if (freqRangeStart === 50 && freqRangeEnd === 100) {
+            freqRangeSelect.value = 'high';
+        } else if (freqRangeStart === 0 && freqRangeEnd === 120) {
+            freqRangeSelect.value = 'full';
+        }
+        // If no preset matches, the custom range will be kept
+    }
+}
+
+// Reset to default settings
+function resetToDefaultSettings(saveAfterReset = true) {
+    peakThreshold = 0.05;
+    minimumThreshold = 70;
+    freqRangeStart = 10;
+    freqRangeEnd = 60;
+    useFallbackBeats = false;
+    fallbackBeatInterval = 300;
+    
+    resetPeakDetection();
+    
+    if (saveAfterReset) {
+        updateUIFromSettings();
+        saveSettings();
+        console.log('Settings reset to defaults');
+    }
+}
+
+// Restart the animation from the beginning
+function restartAnimation() {
+    console.log("Restarting animation...");
+    
+    // Stop all sounds and timers
+    if (mainSound) {
+        mainSound.pause();
+        mainSound.currentTime = 0;
+    }
+    if (glitchSound) glitchSound.pause();
+    if (transitionSound) transitionSound.pause();
+    
+    stopFallbackBeatTimer();
+    
+    // Remove any attached event listeners for beat detection
+    window.removeEventListener('audiobeat', handleBeat);
+    
+    // Reset animation state
+    gsap.killTweensOf("*"); // Kill all GSAP animations
+    
+    // Reset audio context if it exists
+    if (audioContext) {
+        audioContext.close().then(() => {
+            console.log("Audio context closed");
+            audioContext = null;
+            analyser = null;
+            audioSource = null;
+        }).catch(err => {
+            console.error("Error closing audio context:", err);
+        });
+    }
+    
+    // Hide all phases
+    document.querySelectorAll('.phase').forEach(phase => {
+        phase.classList.add('hidden');
+    });
+    
+    // Show start screen
+    const startScreen = document.getElementById('start-screen');
+    if (startScreen) {
+        startScreen.classList.remove('hidden');
+        gsap.set(startScreen, { opacity: 1, display: 'flex' });
+    }
+    
+    // Reset beat counter and detection
+    peakCount = 0;
+    if (debugCountEl) debugCountEl.textContent = "0";
+    resetPeakDetection();
+    
+    console.log("Animation restarted, ready for user to press start");
+}
+
+// Function to handle beat events during credits sequence
+function handleBeat(event) {
+    const currentTime = Date.now();
+    const minScreenTime = 1500; // 1.5 seconds minimum per screen
+    
+    // Only advance if screen has been visible for at least the minimum time
+    if (currentTime - lastScreenChangeTime >= minScreenTime) {
+        console.log("Beat detected - advancing to next screen");
+        showNextScreen();
+    } else {
+        console.log("Beat detected but ignoring (too soon)");
+    }
+}
+
 // Draw visualization
 function drawVisualization() {
     // Get canvas and context
@@ -258,8 +725,8 @@ function drawVisualization() {
         // Get frequency data
         analyser.getByteFrequencyData(frequencyData);
         
-        // Detect beats
-        detectBeats();
+        // Check for peaks
+        detectPeak();
         
         // Draw visualization based on frequency data
         drawVisualizationBars(ctx, canvas, frequencyData);
@@ -277,28 +744,118 @@ function drawVisualizationBars(ctx, canvas, frequencyData) {
     // Draw from center of screen
     ctx.translate(0, canvas.height / 2);
     
+    // Calculate total signal energy for visualization purposes
+    let totalSignalEnergy = 0;
+    const binsToAnalyze = Math.min(frequencyData.length / 2, Math.max(freqRangeEnd, 120)); // Limit to visible bins
+    
+    // Focus only on the selected frequency range
+    for (let i = freqRangeStart; i < freqRangeEnd && i < binsToAnalyze; i++) {
+        // Apply weight based on position in the range
+        const normalizedPos = (i - freqRangeStart) / (freqRangeEnd - freqRangeStart);
+        // Bell curve weighting with higher weight in the middle of the range
+        const weight = 1.0 + Math.sin(normalizedPos * Math.PI) * 0.5;
+        
+        totalSignalEnergy += frequencyData[i] * weight;
+    }
+    
+    // Normalize the energy based on the size of the range
+    const rangeSize = Math.min(freqRangeEnd - freqRangeStart, binsToAnalyze);
+    totalSignalEnergy = totalSignalEnergy / (rangeSize * 1.2);
+    
+    // Update frequency range highlight position
+    if (freqRangeHighlight) {
+        const startX = freqRangeStart * barWidth;
+        const width = (freqRangeEnd - freqRangeStart) * barWidth;
+        
+        freqRangeHighlight.style.left = `${startX}px`;
+        freqRangeHighlight.style.width = `${width}px`;
+        freqRangeHighlight.style.top = '0';
+        freqRangeHighlight.style.bottom = '0';
+    }
+    
+    // Draw silence threshold line (noise gate)
+    const noiseGateHeight = minimumThreshold * heightMultiplier;
+    ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)';
+    ctx.lineWidth = 2;
+    ctx.setLineDash([5, 5]);
+    ctx.beginPath();
+    ctx.moveTo(0, -noiseGateHeight);
+    ctx.lineTo(canvas.width, -noiseGateHeight);
+    ctx.stroke();
+    ctx.moveTo(0, noiseGateHeight);
+    ctx.lineTo(canvas.width, noiseGateHeight);
+    ctx.stroke();
+    
+    // Draw peak threshold line
+    const peakHeight = (peakCutoff * (1 + peakThreshold)) * heightMultiplier;
+    ctx.strokeStyle = 'rgba(255, 0, 0, 0.8)';
+    ctx.setLineDash([8, 4]);
+    ctx.beginPath();
+    ctx.moveTo(0, -peakHeight);
+    ctx.lineTo(canvas.width, -peakHeight);
+    ctx.stroke();
+    ctx.moveTo(0, peakHeight);
+    ctx.lineTo(canvas.width, peakHeight);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Display audio playback status (if no audio is detected)
+    if (!isAudioActuallyPlaying) {
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.7)';
+        ctx.font = '20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('No Audio Detected', canvas.width / 2, -canvas.height / 4);
+    }
+    
+    // Draw frequency bars
     for (let i = 0; i < frequencyData.length / 2; i++) { // Use half the frequencies for better visuals
         const barHeight = frequencyData[i] * heightMultiplier;
         
-        // Determine color based on frequency and beat
-        const r = beatDetected ? 255 : (frequencyData[i]);
+        // Skip drawing very small bars (reduces visual noise)
+        if (barHeight < 2) continue;
+        
+        // Determine if this frequency is in our analysis range
+        const isInRange = i >= freqRangeStart && i < freqRangeEnd;
+        
+        // Determine color based on frequency and peak
+        const r = peakDetected ? 255 : (frequencyData[i]);
         const g = 120 + frequencyData[i] / 3;
         const b = 255 - frequencyData[i] / 3;
-        const alpha = beatDetected ? 0.8 : 0.6;
+        const alpha = peakDetected ? 0.8 : 0.6;
+        
+        // Highlight frequencies in our selected range
+        const highlight = isInRange ? 0.3 : 0;
         
         // Top bar (goes up)
-        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${alpha + highlight})`;
         ctx.fillRect(i * barWidth, -barHeight, barWidth - 1, barHeight);
         
         // Bottom bar (mirror, goes down)
         ctx.fillRect(i * barWidth, 0, barWidth - 1, barHeight);
+        
+        // Highlight frequencies that are beyond threshold
+        if (isInRange && frequencyData[i] > peakCutoff * (1 + peakThreshold) && 
+            frequencyData[i] > minimumThreshold) {
+            ctx.fillStyle = `rgba(255, 50, 50, 0.7)`;
+            ctx.fillRect(i * barWidth, -barHeight, barWidth - 1, barHeight);
+            ctx.fillRect(i * barWidth, 0, barWidth - 1, barHeight);
+        }
     }
+    
+    // Draw current energy level line
+    const energyHeight = totalSignalEnergy * heightMultiplier;
+    ctx.strokeStyle = 'rgba(255, 255, 0, 0.9)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.moveTo(0, -energyHeight);
+    ctx.lineTo(90, -energyHeight);
+    ctx.stroke();
     
     // Reset transformation
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     
-    // Add a more pronounced glow effect if beat detected
-    if (beatDetected) {
+    // Add a more pronounced glow effect if peak detected
+    if (peakDetected) {
         const gradient = ctx.createRadialGradient(
             canvas.width / 2, canvas.height / 2, 0,
             canvas.width / 2, canvas.height / 2, canvas.height / 2
@@ -309,73 +866,113 @@ function drawVisualizationBars(ctx, canvas, frequencyData) {
         
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Also add a beat indicator in the corner for debugging
-        ctx.fillStyle = 'rgba(255, 0, 0, 0.7)';
-        ctx.fillRect(canvas.width - 30, 10, 20, 20);
     }
+    
+    // Update debug info
+    if (debugEnergyEl) debugEnergyEl.textContent = Math.round(signalEnergy);
+    if (debugCutoffEl) debugCutoffEl.textContent = Math.round(peakCutoff);
+    if (debugCountEl) debugCountEl.textContent = peakCount;
 }
 
-// Detect beats using energy algorithm with better bass focus
-function detectBeats() {
+// Function to manually trigger a peak detection event
+function detectPeak(forcePeak = false) {
+    if (forcePeak || shouldTriggerPeak()) {
+        // Increment peak count
+        peakCount++;
+        
+        // Update peak detected state
+        peakDetected = true;
+        
+        // Update UI
+        if (beatIndicator) {
+            beatIndicator.classList.add('active');
+        }
+        
+        // Log peak detection
+        console.log(`Peak detected! (${forcePeak ? 'forced' : 'detected'}) Count: ${peakCount}`);
+        
+        // Create and dispatch a custom event for peak detection (reusing the same event name)
+        const peakEvent = new CustomEvent('audiobeat', { 
+            detail: { 
+                time: Date.now(),
+                forced: forcePeak
+            } 
+        });
+        window.dispatchEvent(peakEvent);
+        
+        // Reset peak detected flag after a short delay
+        setTimeout(() => {
+            peakDetected = false;
+            if (beatIndicator) {
+                beatIndicator.classList.remove('active');
+            }
+        }, 200); // Keep it visible a bit longer (200ms)
+        
+        // Update last peak time
+        lastPeakTime = Date.now();
+        
+        return true;
+    }
+    
+    return false;
+}
+
+// Check if we should trigger a peak based on audio analysis
+function shouldTriggerPeak() {
     const currentTime = Date.now();
     
-    // Calculate energy with emphasis on bass frequencies (0-10 bins)
-    let bassEnergy = 0;
-    let totalEnergy = 0;
+    // If no frequency data is available yet, return false
+    if (!frequencyData || !frequencyData.length) return false;
     
-    // Focus more on bass frequencies (first 8-10 bins typically)
-    for (let i = 0; i < 10; i++) {
-        // Weight the first few bins higher (bass frequencies)
-        let weight = 1.0;
-        if (i < 4) weight = 3.0; // Boost the lowest frequencies
+    // Calculate signal energy across the selected frequency range
+    let currentEnergy = 0;
+    const binsToAnalyze = Math.min(frequencyData.length, Math.max(freqRangeEnd, 120));
+    
+    // Focus only on the selected frequency range
+    for (let i = freqRangeStart; i < freqRangeEnd && i < binsToAnalyze; i++) {
+        // Apply weight based on position in the range
+        const normalizedPos = (i - freqRangeStart) / (freqRangeEnd - freqRangeStart);
+        // Bell curve weighting with higher weight in the middle of the range
+        const weight = 1.0 + Math.sin(normalizedPos * Math.PI) * 0.5;
         
-        bassEnergy += frequencyData[i] * weight;
+        currentEnergy += frequencyData[i] * weight;
     }
-    bassEnergy = bassEnergy / 20; // Normalize
     
-    // Also check overall energy for context
-    for (let i = 0; i < frequencyData.length / 4; i++) {
-        totalEnergy += frequencyData[i];
-    }
-    totalEnergy = totalEnergy / (frequencyData.length / 4);
+    // Normalize the energy based on the size of the range
+    const rangeSize = Math.min(freqRangeEnd - freqRangeStart, binsToAnalyze);
+    currentEnergy = currentEnergy / (rangeSize * 1.2);
     
-    // Calculate running average with more weight on bass
-    beatEnergy = beatEnergy * beatEnergyDecay + bassEnergy * (1 - beatEnergyDecay);
+    // Calculate running average
+    signalEnergy = signalEnergy * energyDecay + currentEnergy * (1 - energyDecay);
     
-    // Dynamic beat cutoff with slower decay
-    if (bassEnergy > beatCutoff) {
-        beatCutoff = bassEnergy;
+    // Dynamic peak cutoff calculation
+    if (currentEnergy > peakCutoff) {
+        peakCutoff = currentEnergy;
     } else {
-        beatCutoff = beatCutoff * beatCutoffDecay;
+        peakCutoff = peakCutoff * cutoffDecay;
     }
     
-    // Detect beats with higher threshold for more distinct beats
-    beatDetected = false;
+    // Check if we're above the noise floor (silence threshold)
+    if (currentEnergy < minimumThreshold) {
+        return false; // Ignore signal below the noise gate
+    }
     
-    // Check if energy is above threshold, has minimum time since last beat,
+    // Check if energy is above threshold, has minimum time since last peak,
     // and is a significant amount above the running average
-    if (bassEnergy > beatCutoff * (1 + beatThreshold) && 
-        currentTime - lastBeatTime > beatHoldTime &&
-        bassEnergy > 40) { // Ensure minimal energy level
-        
-        beatDetected = true;
-        lastBeatTime = currentTime;
-        
-        console.log(`Beat detected! Energy: ${Math.round(bassEnergy)}, Cutoff: ${Math.round(beatCutoff)}`);
-        
-        // Trigger screen change on beat
-        triggerOnBeat();
+    if (currentEnergy > peakCutoff * (1 + peakThreshold) && 
+        currentTime - lastPeakTime > peakHoldTime) {
+        return true;
     }
+    
+    return false;
 }
 
-// Function to be called when a beat is detected
-function triggerOnBeat() {
-    // Only trigger during credits phase
-    const phase1 = document.getElementById('phase1');
-    if (phase1 && !phase1.classList.contains('hidden')) {
-        window.dispatchEvent(new Event('audiobeat'));
-    }
+// Function to reset peak detection values when changing frequency range
+function resetPeakDetection() {
+    signalEnergy = 0;
+    peakCutoff = 0;
+    peakDetected = false;
+    lastPeakTime = 0;
 }
 
 // -------------- MAIN INITIALIZATION --------------
@@ -385,13 +982,47 @@ document.addEventListener('DOMContentLoaded', () => {
     const glitchSound = document.getElementById('glitch-sound');
     const transitionSound = document.getElementById('transition-sound');
     
-    // Initialize buttons
+    // Initialize UI elements
     const startButton = document.getElementById('start-button');
     const skipButton = document.getElementById('skip-button');
+    const beatIndicator = document.getElementById('beat-indicator');
+    
+    // Set up event listeners
     skipButton.addEventListener('click', skipToPhase3);
+    
+    // Allow manual beat triggering by clicking on the beat indicator
+    if (beatIndicator) {
+        beatIndicator.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log("Manual beat triggered by click");
+            detectPeak(true);
+        });
+        // Make it clickable
+        beatIndicator.style.pointerEvents = 'auto';
+    }
+
+    // Allow triggering beats with spacebar
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            console.log("Manual beat triggered by spacebar");
+            detectPeak(true);
+            e.preventDefault(); // Prevent page scrolling
+        }
+    });
     
     // Setup start button
     startButton.addEventListener('click', () => {
+        console.log("Start button clicked");
+        
+        // Resume audio context if suspended (required by modern browsers)
+        if (audioContext && audioContext.state === 'suspended') {
+            audioContext.resume().then(() => {
+                console.log("AudioContext resumed successfully");
+            }).catch(err => {
+                console.error("Failed to resume AudioContext:", err);
+            });
+        }
+        
         // Hide start screen
         const startScreen = document.getElementById('start-screen');
         gsap.to(startScreen, { 
@@ -406,7 +1037,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Initialize audio context and visualization
                 if (mainSound) {
-                    setupAudioVisualization(mainSound);
+                    // Make sure audio is ready to play
+                    mainSound.volume = 1.0;
+                    mainSound.currentTime = 0;
+                    
+                    // Play the sound
+                    mainSound.play().then(() => {
+                        console.log("Main sound started playing");
+                        setupAudioVisualization(mainSound);
+                        
+                        // Ensure fallback beats are running (even if audio analysis is working)
+                        startFallbackBeatTimer();
+                    }).catch(err => {
+                        console.error("Error playing main sound:", err);
+                        // If audio fails to play, still start fallback beats
+                        startFallbackBeatTimer();
+                    });
+                } else {
+                    console.error("Main sound element not found!");
+                    // Even without sound, start fallback beats
+                    startFallbackBeatTimer();
                 }
                 
                 // Start the experience

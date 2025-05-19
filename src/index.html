@@ -36,6 +36,60 @@
     <!-- Audio Visualizer -->
     <canvas id="audio-visualizer" class="audio-visualizer"></canvas>
     
+    <!-- Beat Debug Indicator -->
+    <div id="beat-indicator" class="beat-indicator">BEAT</div>
+    
+    <!-- Beat Control Panel -->
+    <div id="beat-controls" class="beat-controls">
+        <div class="control-row">
+            <label for="threshold-slider">Peak Threshold: <span id="threshold-value">0.05</span></label>
+            <input type="range" id="threshold-slider" min="0.01" max="0.20" step="0.01" value="0.05">
+        </div>
+        <div class="control-row">
+            <label for="noise-floor-slider">Noise Floor: <span id="noise-floor-value">70</span></label>
+            <input type="range" id="noise-floor-slider" min="30" max="150" step="1" value="70">
+        </div>
+        <div class="control-row">
+            <label for="freq-range">Frequency Focus:</label>
+            <select id="freq-range">
+                <option value="bass">Bass (Low)</option>
+                <option value="mid" selected>Mids</option>
+                <option value="high">Highs</option>
+                <option value="full">Full Spectrum</option>
+            </select>
+        </div>
+        <div class="control-row">
+            <label for="freq-start">Freq Start: <span id="freq-start-value">10</span></label>
+            <input type="range" id="freq-start" min="0" max="100" step="1" value="10">
+        </div>
+        <div class="control-row">
+            <label for="freq-end">Freq End: <span id="freq-end-value">60</span></label>
+            <input type="range" id="freq-end" min="10" max="120" step="1" value="60">
+        </div>
+        <div class="control-row">
+            <label for="fallback-toggle">Auto Beats:</label>
+            <input type="checkbox" id="fallback-toggle">
+        </div>
+        <div class="control-row">
+            <label for="fallback-interval">Interval: <span id="interval-value">300</span>ms</label>
+            <input type="range" id="fallback-interval" min="100" max="1000" step="50" value="300">
+        </div>
+        <div class="control-row button-row">
+            <button id="restart-button" class="action-button">Restart</button>
+            <button id="reset-settings" class="action-button">Reset Settings</button>
+        </div>
+        <div class="control-row">
+            <button id="toggle-controls">Hide Controls</button>
+        </div>
+    </div>
+    
+    <!-- Debug Info Panel -->
+    <div id="debug-panel" class="debug-panel">
+        <div>Beat Energy: <span id="debug-energy">0</span></div>
+        <div>Cutoff: <span id="debug-cutoff">0</span></div>
+        <div>Beats Detected: <span id="debug-count">0</span></div>
+    </div>
+    
     <!-- Start Screen -->
     <div id="start-screen" class="phase">
         <div class="start-container">

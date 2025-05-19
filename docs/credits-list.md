@@ -1,20 +1,57 @@
 # ENTER THE VIBE - Credits List
 
 ## Technology Pioneers
+- KONRAD ZUSE - First Programmable Computer Creator
+- VANNEVAR BUSH - Memex Concept Pioneer
+- NORBERT WIENER - Cybernetics Founder
+- JOHN VON NEUMANN - Computer Architecture Pioneer
+- CLAUDE SHANNON - Information Theory Father
 - ALAN TURING - Computer Science Father
 - GRACE HOPPER - Compiler Pioneer
+- ADA LOVELACE - First Programmer
+- DOUGLAS ENGELBART - Interactive Computing Pioneer
+- DONALD DAVIES - Packet Switching Inventor
+- VINTON CERF - Internet Protocol Co-designer
+- BOB KAHN - TCP/IP Co-creator
+- TED NELSON - Hypertext Visionary
+- JANE SAMMET - Programming Language Pioneer
+- VITALIK BUTERIN - Ethereum Creator
+- LARRY PAGE - Google Co-founder
+- SERGEY BRIN - Google Co-founder
+- BILL GATES - Microsoft Founder
+- STEVE JOBS - Apple Visionary
+- STEVE WOZNIAK - Apple Co-founder
+- MARK ZUCKERBERG - Facebook Founder
+- DONALD KNUTH - Algorithms Pioneer
+- LESLIE LAMPORT - Distributed Systems Pioneer
+- EDSGER DIJKSTRA - Computer Science Pioneer
+- BARBARA LISKOV - Programming Language Pioneer
+- TIM BERNERS-LEE - World Wide Web Inventor
+- LINUS TORVALDS - Linux Creator
+- SATOSHI NAKAMOTO - Bitcoin Creator
+- RICHARD STALLMAN - Free Software Movement
 - JOHN McCARTHY - AI Pioneer
 - MARVIN MINSKY - Neural Network Pioneer
 - MARGARET HAMILTON - Apollo Software Director
-- JOHN VON NEUMANN - Computer Architecture Pioneer
-- ADA LOVELACE - First Programmer
-- DOUGLAS ENGELBART - Interactive Computing Pioneer
-- TIM BERNERS-LEE - World Wide Web Inventor
-- RICHARD STALLMAN - Free Software Movement
-- LINUS TORVALDS - Linux Creator
-- DONALD KNUTH - Algorithms Pioneer
-- BARBARA LISKOV - Programming Language Pioneer
-- EDSGER DIJKSTRA - Computer Science Pioneer
+- IVAN SUTHERLAND - Computer Graphics Pioneer
+- KEN THOMPSON - Unix Co-creator
+- DENNIS RITCHIE - C Language Creator
+- BRIAN KERNIGHAN - Unix Pioneer
+- BJARNE STROUSTRUP - C++ Creator
+- LARRY WALL - Perl Creator
+- JAMES GOSLING - Java Creator
+- ANDERS HEJLSBERG - C# Creator
+- YUKIHIRO MATSUMOTO - Ruby Creator
+- BRENDAN EICH - JavaScript Creator
+- GUIDO VAN ROSSUM - Python Creator
+- JOHN RESIG - jQuery Creator
+- RASMUS LERDORF - PHP Creator
+- DHH - Ruby on Rails Creator
+- SOPHIE WILSON - ARM Architecture Designer
+- JOHN MCAFEE - McAfee Antivirus Founder
+- PHIL ZIMMERMANN - PGP Creator
+- WHITFIELD DIFFIE - Public Key Cryptography Pioneer
+- MARTIN HELLMAN - Cryptography Pioneer
 - GEOFFREY HINTON - Deep Learning Pioneer
 - YANN LECUN - Convolutional Networks Pioneer
 - YOSHUA BENGIO - Deep Learning Pioneer
@@ -28,8 +65,29 @@
 - ILYA SUTSKEVER - Transformer Architecture Pioneer
 - JENSEN HUANG - NVIDIA Founder
 - CHRIS LATTNER - LLVM & Swift Creator
-- BRENDAN EICH - JavaScript Creator
-- GUIDO VAN ROSSUM - Python Creator
+- MARK DEAN - PC Architecture Pioneer
+- PIERRE OMIDYAR - eBay Founder
+- SHAFI GOLDWASSER - Cryptography Pioneer
+- SILVIO MICALI - Cryptocurrency Pioneer
+- RAY KURZWEIL - Futurist & AI Pioneer
+- JARON LANIER - VR Pioneer
+- FRAN ALLEN - Compiler Optimization Pioneer
+- MURRAY CAMPBELL - Chess AI Pioneer
+- MARISSA MAYER - Yahoo CEO & Google Pioneer
+- MITCHELL BAKER - Mozilla Foundation Chair
+- HOWARD RHEINGOLD - Virtual Community Pioneer
+- ANITA BORG - Women in Tech Advocate
+- SALLY RIDE - First American Woman in Space
+- MAE JEMISON - First Black Woman in Space
+- HEDY LAMARR - Frequency Hopping Co-inventor
+- ANNIE EASLEY - NASA Computer Scientist
+- KAREN SPÄRCK JONES - NLP Pioneer
+- ADELE GOLDBERG - Smalltalk Pioneer
+- CAROL SHAW - First Female Game Designer
+- DONNA DUBINSKY - Palm Computing Founder
+- MICHAEL DELL - Dell Computers Founder
+- JIMMY WALES - Wikipedia Founder
+- ELIZABETH FEINLER - DNS Pioneer
 - NATALIE SILVANOVICH - Security Researcher
 - KATIE BOUMAN - Black Hole Imaging Pioneer
 - MEREDITH WHITTAKER - AI Ethics Pioneer
@@ -45,11 +103,10 @@
 - KATHY SIERRA - Learning Experience Pioneer
 - NATCHA ENGTRAKUL - Compiler Expert
 - SVEN BERGMANN - Blockchain Pioneer
-- CLAUDE SHANNON - Information Theory Father
 - SEYMOUR PAPERT - Educational Computing Pioneer
 - SHIGERU MIYAMOTO - Game Design Legend
 - IVAN SUTHERLAND - Computer Graphics Pioneer
-- VINTON CERF - Internet Protocol Co-designer
+- TIM BERNERS-LEE - World Wide Web Inventor
 - BOB KAHN - TCP/IP Co-creator
 - TED NELSON - Hypertext Visionary
 - JANE SAMMET - Programming Language Pioneer
@@ -91,11 +148,11 @@
 - JAMES GOSLING - Java Creator
 - ANDERS HEJLSBERG - C# Creator
 - YUKIHIRO MATSUMOTO - Ruby Creator
+- BRENDAN EICH - JavaScript Creator
+- GUIDO VAN ROSSUM - Python Creator
 - JOHN RESIG - jQuery Creator
 - RASMUS LERDORF - PHP Creator
 - DHH - Ruby on Rails Creator
-- SATOSHI NAKAMOTO - Bitcoin Creator
-- VITALIK BUTERIN - Ethereum Creator
 - SOPHIE WILSON - ARM Architecture Designer
 - JOHN MCAFEE - McAfee Antivirus Founder
 - PHIL ZIMMERMANN - PGP Creator
@@ -199,58 +256,6 @@
 - DOUGLAS ADAMS - Hitchhiker's Guide Author
 - RUDY RUCKER - Cyberpunk Pioneer
 
-## Hackers & Security Researchers
-- KEVIN MITNICK - Famous Hacker
-- RICHARD STALLMAN - Free Software Hacker
-- LINUS TORVALDS - Linux Hacker
-- JOHN DRAPER (CAPTAIN CRUNCH) - Phone Phreaking Pioneer
-- DAN KAMINSKY - DNS Security Researcher
-- PEITER "MUDGE" ZATKO - L0pht Hacker
-- KATIE MOUSSOURIS - Bug Bounty Pioneer
-- BRUCE SCHNEIER - Security Expert
-- STEVEN LEVY - Hacker Culture Chronicler
-- MARK ABENE (PHIBER OPTIK) - Hacker
-- KEVIN POULSEN - Hacker Turned Journalist
-- ROBERT MORRIS - Morris Worm Creator
-- AARON SWARTZ - Internet Activist
-- JOANNA RUTKOWSKA - Virtualization Security
-- MOXIE MARLINSPIKE - Signal Creator
-- TAVIS ORMANDY - Zero-Day Researcher
-- EDWARD SNOWDEN - NSA Whistleblower
-- JULIAN ASSANGE - WikiLeaks Founder
-- CHELSEA MANNING - Military Whistleblower
-- JEN EASTERLY - CISA Director
-- MIKKO HYPPÖNEN - Security Researcher
-- MARCUS HUTCHINS - WannaCry Stopper
-- WEI DAI - Cryptocurrency Pioneer
-- CHRIS SOGHOIAN - Privacy Technologist
-- CHARLIE MILLER - Car Hacking Pioneer
-- HALVAR FLAKE - Reverse Engineering Expert
-- MATT BLAZE - Cryptography Researcher
-- SAMY KAMKAR - MySpace Worm Creator
-- HD MOORE - Metasploit Creator
-- RAFAEL SCHEEL - Smart TV Security Expert
-- DAN GEER - Security Visionary
-- DINO DAI ZOVI - Mobile Security Pioneer
-- PARISA TABRIZ - Security Princess
-- KEREN ELAZARI - Security Researcher
-- JAYA BALOO - CISO & Security Expert
-- JAYSON STREET - Social Engineering Expert
-- SPACE ROGUE - L0pht Member
-- BARNABY JACK - ATM Hacker
-- KARL KOCH - KGB Hacker
-- CHRIS WYSOPAL - Veracode Founder
-- JEREMY HAMMOND - LulzSec Hacker
-- MATTHEW GREEN - Cryptography Expert
-- GABRIELLA COLEMAN - Hacker Culture Anthropologist
-- LOYD BLANKENSHIP (THE MENTOR) - Hacker Manifesto Author
-- GEORGE HOTZ - iPhone Jailbreaker
-- JEFF MOSS (DARK TANGENT) - DEFCON & Black Hat Founder
-- VAN JACOBSON - TCP/IP Developer
-- TSUTOMU SHIMOMURA - Tracked Kevin Mitnick
-- SUSAN LANDAU - Privacy & Surveillance Expert
-- RUNA SANDVIK - Security Journalist
-- SOLAR DESIGNER - OpenWall Project Leader
 
 ## Film & Music Pioneers
 - KRAFTWERK - Electronic Music Pioneers
@@ -295,6 +300,4 @@
 - SATOSHI KON - Paprika Director
 - MASAKI YUASA - Mind Game Director
 - GASPAR NOÉ - Enter the Void Director
-
-## Directed by
-- GHOST IN THE MACHINE 
+ 
