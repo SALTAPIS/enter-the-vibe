@@ -14,7 +14,6 @@
     { "name": "BOB KAHN", "description": "TCP/IP Co-creator", "category": "tech" },
     { "name": "TED NELSON", "description": "Hypertext Visionary", "category": "tech" },
     { "name": "JANE SAMMET", "description": "Programming Language Pioneer", "category": "tech" },
-    { "name": "VITALIK BUTERIN", "description": "Ethereum Creator", "category": "tech" },
     { "name": "LARRY PAGE", "description": "Google Co-founder", "category": "tech" },
     { "name": "SERGEY BRIN", "description": "Google Co-founder", "category": "tech" },
     { "name": "BILL GATES", "description": "Microsoft Founder", "category": "tech" },

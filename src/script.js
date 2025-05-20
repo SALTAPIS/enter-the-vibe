@@ -4,6 +4,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 // Register the ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
+// Global app configuration
+let appConfig = null;
+
 // -------------- CREDIT SEQUENCE DATA --------------
 // Will store all credits loaded from JSON
 let allCredits = [];
@@ -12,6 +15,28 @@ let allCredits = [];
 let lastScreenChangeTime = Date.now();
 let beatDetected = null; // Will be defined by playCreditsSequence
 let minScreenDisplayTime = 300; // Minimum display time in milliseconds (0.3 seconds by default)
+
+// Load app configuration from JSON file
+async function loadAppConfig() {
+    try {
+        const response = await fetch('./data/app-config.json');
+        if (!response.ok) {
+            throw new Error(`Failed to load app config: ${response.status} ${response.statusText}`);
+        }
+        appConfig = await response.json();
+        console.log('App configuration loaded successfully');
+        
+        // Apply initial config values
+        if (appConfig.display && appConfig.display.timing) {
+            minScreenDisplayTime = appConfig.display.timing.minDisplayTime;
+        }
+        
+        return appConfig;
+    } catch (error) {
+        console.error("Error loading app configuration:", error);
+        return null;
+    }
+}
 
 // Load credits from JSON file
 async function loadCredits() {
@@ -44,6 +69,121 @@ async function loadCredits() {
         ];
     }
 }
+
+// Main initialization function
+async function init() {
+    // First load app configuration
+    await loadAppConfig();
+    
+    // Then load credits and continue initialization
+    await loadCredits();
+    
+    // Initialize user controls after config is loaded
+    initBeatControls();
+    
+    // Initialize UI elements
+    const startButton = document.getElementById('start-button');
+    const skipButton = document.getElementById('skip-button');
+    const beatIndicator = document.getElementById('beat-indicator');
+    const mainSound = document.getElementById('main-sound');
+    const glitchSound = document.getElementById('glitch-sound');
+    const transitionSound = document.getElementById('transition-sound');
+    
+    // Set up event listeners
+    if (skipButton) {
+        skipButton.addEventListener('click', skipToPhase3);
+    }
+    
+    // Allow manual beat triggering by clicking on the beat indicator
+    if (beatIndicator) {
+        beatIndicator.addEventListener('click', (e) => {
+            e.stopPropagation();
+            console.log("Manual beat triggered by click");
+            detectPeak(true);
+        });
+        // Make it clickable
+        beatIndicator.style.pointerEvents = 'auto';
+    }
+
+    // Allow triggering beats with spacebar
+    document.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+            console.log("Manual beat triggered by spacebar");
+            detectPeak(true);
+            e.preventDefault(); // Prevent page scrolling
+        }
+    });
+    
+    // Setup start button
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            console.log("Start button clicked");
+            
+            // Resume audio context if suspended (required by modern browsers)
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    console.log("AudioContext resumed successfully");
+                }).catch(err => {
+                    console.error("Failed to resume AudioContext:", err);
+                });
+            }
+            
+            // Hide start screen
+            const startScreen = document.getElementById('start-screen');
+            gsap.to(startScreen, { 
+                duration: 0.5, 
+                opacity: 0, 
+                onComplete: () => {
+                    startScreen.classList.add('hidden');
+                    // Show phase 1
+                    const phase1 = document.getElementById('phase1');
+                    phase1.classList.remove('hidden');
+                    gsap.set(phase1, { opacity: 1 });
+                    
+                    // Initialize audio context and visualization
+                    if (mainSound) {
+                        // Make sure audio is ready to play
+                        mainSound.volume = 1.0;
+                        mainSound.currentTime = 0;
+                        
+                        // Add event listener for when audio ends
+                        mainSound.addEventListener('ended', showEndScene);
+                        
+                        // Play the sound
+                        mainSound.play().then(() => {
+                            console.log("Main sound started playing");
+                            setupAudioVisualization(mainSound);
+                            
+                            // Ensure fallback beats are running (even if audio analysis is working)
+                            startFallbackBeatTimer();
+                        }).catch(err => {
+                            console.error("Error playing main sound:", err);
+                            // If audio fails to play, still start fallback beats
+                            startFallbackBeatTimer();
+                        });
+                    } else {
+                        console.error("Main sound element not found!");
+                        // Even without sound, start fallback beats
+                        startFallbackBeatTimer();
+                    }
+                    
+                    // Start the experience
+                    startPhase1();
+                } 
+            });
+        });
+    }
+    
+    // Init phases
+    const phase1 = document.getElementById('phase1');
+    const phase2 = document.getElementById('phase2');
+    const phase3 = document.getElementById('phase3');
+    
+    console.log("Initialization complete");
+}
+
+// Start initialization when DOM is loaded
+document.addEventListener('DOMContentLoaded', init);
 
 // Function to build and start the credits sequence
 function buildAndStartCreditsSequence(creditsData) {
@@ -1372,179 +1512,76 @@ function showSpecialLayoutCredit(timeline, credit) {
     return timeline;
 }
 
-// Function to show a group of credits in either grid or row layout
-function showPackeryGroup(timeline, credits, layoutType = "grid") {
+// Function to show packery group layout - multiple people in a more artistic layout
+function showPackeryGroup(timeline, screen) {
     const creditsContainer = document.querySelector('.credits-container');
     
-    // Clear container
-    creditsContainer.innerHTML = '';
+    // Clear the container first
+    gsap.set('.credit, .credit-description', { 
+        opacity: 0, 
+        onComplete: function() {
+            document.querySelectorAll('.credit, .credit-description').forEach(el => el.remove());
+        }
+    });
     
-    // Get container dimensions
-    const containerWidth = creditsContainer.clientWidth;
-    const containerHeight = creditsContainer.clientHeight;
+    // Extract the credits array from the screen object
+    const credits = screen.credits || [];
     
-    if (layoutType === "grid") {
-        // Grid layout (2x2 or 2x3 depending on number of names)
-        const rows = credits.length <= 4 ? 2 : 3;
-        const cols = credits.length <= 4 ? 2 : 2;
-        
-        // Calculate cell dimensions
-        const cellWidth = containerWidth / cols;
-        const cellHeight = containerHeight / rows;
-        
-        // Create and position credit elements in a grid
-        credits.forEach((credit, i) => {
-            // Calculate position in grid
-            const row = Math.floor(i / cols);
-            const col = i % cols;
-            
-            // Skip if we exceed the grid dimensions
-            if (row >= rows) return;
-            
-            // Split name into first/last name
-            const splitName = splitNameIntoLines(credit.name);
-            
-            // Create the name element
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit', 'grid-item');
-            
-            // Use HTML to format the split name
-            const nameParts = splitName.split('\n');
-            if (nameParts.length === 2) {
-                creditEl.innerHTML = `<div class="name-first">${nameParts[0]}</div>
-                                    <div class="name-last">${nameParts[1]}</div>`;
-                                    
-                // Make names larger
-                const firstNameEl = creditEl.querySelector('.name-first');
-                const lastNameEl = creditEl.querySelector('.name-last');
-                if (firstNameEl && lastNameEl) {
-                    firstNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
-                    lastNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
-                }
-            } else {
-                creditEl.textContent = credit.name;
-                creditEl.style.fontSize = 'clamp(2.5rem, 8vw, 5rem)';
-            }
-            
-            // Position and style
-            creditEl.style.left = `${col * cellWidth + (cellWidth * 0.1)}px`;
-            creditEl.style.top = `${row * cellHeight + (cellHeight * 0.1)}px`;
-            creditEl.style.width = `${cellWidth * 0.8}px`;
-            creditEl.style.textAlign = 'center';
-            
-            // Assign a color (80% white, 20% other colors)
-            creditEl.style.color = getRandomColor();
-            
-            creditsContainer.appendChild(creditEl);
-            
-            // Add description below
-            if (credit.description) {
-                const descEl = document.createElement('div');
-                descEl.classList.add('credit-description', 'packery-description');
-                descEl.textContent = credit.description;
-                descEl.style.left = `${col * cellWidth + (cellWidth * 0.1)}px`;
-                descEl.style.top = `${row * cellHeight + (cellHeight * 0.4)}px`;
-                descEl.style.width = `${cellWidth * 0.8}px`;
-                descEl.style.textAlign = 'center';
-                
-                creditsContainer.appendChild(descEl);
-                
-                // Set description opacity immediately
-                gsap.set(descEl, { opacity: 1 });
-            }
-            
-            // Apply effect immediately based on category
-            if (credit.category === 'tech') creditEl.classList.add('electric');
-            else if (credit.category === 'creative') creditEl.classList.add('flicker');
-            else if (credit.category === 'artist') creditEl.classList.add('electric');
-            else if (credit.category === 'writer') creditEl.classList.add('flicker');
-            else if (credit.category === 'hacker') creditEl.classList.add('flicker');
-            
-            // Set visible immediately
-            gsap.set(creditEl, { opacity: 1, scale: 1 });
-        });
-    } else if (layoutType === "row") {
-        // Row layout - multiple people in horizontal rows
-        const rows = credits.length <= 3 ? 1 : 2;
-        const itemsPerRow = Math.ceil(credits.length / rows);
-        
-        // Calculate row dimensions
-        const rowHeight = containerHeight / rows;
-        
-        // Create and position credits in rows
-        credits.forEach((credit, i) => {
-            // Calculate row and position within row
-            const row = Math.floor(i / itemsPerRow);
-            const posInRow = i % itemsPerRow;
-            
-            // Split name into first/last name
-            const splitName = splitNameIntoLines(credit.name);
-            
-            // Create the name element
-            const creditEl = document.createElement('div');
-            creditEl.classList.add('credit', 'row-item');
-            
-            // Use HTML to format the split name
-            const nameParts = splitName.split('\n');
-            if (nameParts.length === 2) {
-                creditEl.innerHTML = `<div class="name-first">${nameParts[0]}</div>
-                                    <div class="name-last">${nameParts[1]}</div>`;
-                
-                // Make names larger
-                const firstNameEl = creditEl.querySelector('.name-first');
-                const lastNameEl = creditEl.querySelector('.name-last');
-                if (firstNameEl && lastNameEl) {
-                    firstNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
-                    lastNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
-                }
-            } else {
-                creditEl.textContent = credit.name;
-                creditEl.style.fontSize = 'clamp(2.5rem, 8vw, 5rem)';
-            }
-            
-            // Position
-            const spacing = containerWidth / (itemsPerRow + 1);
-            creditEl.style.left = `${(posInRow + 1) * spacing - 150}px`;
-            creditEl.style.top = `${row * rowHeight + rowHeight * 0.3}px`;
-            creditEl.style.width = '300px';
-            creditEl.style.textAlign = 'center';
-            
-            // Assign a color (80% white, 20% other colors)
-            creditEl.style.color = getRandomColor();
-            
-            creditsContainer.appendChild(creditEl);
-            
-            // Add description if available
-            if (credit.description) {
-                const descEl = document.createElement('div');
-                descEl.classList.add('credit-description', 'packery-description');
-                descEl.textContent = credit.description;
-                descEl.style.left = `${(posInRow + 1) * spacing - 150}px`;
-                descEl.style.top = `${row * rowHeight + rowHeight * 0.6}px`;
-                descEl.style.width = '300px';
-                descEl.style.textAlign = 'center';
-                
-                creditsContainer.appendChild(descEl);
-                
-                // Set description opacity
-                gsap.set(descEl, { opacity: 1 });
-            }
-            
-            // Apply effects immediately based on category
-            if (credit.category === 'tech') creditEl.classList.add('electric');
-            else if (credit.category === 'creative') creditEl.classList.add('flicker');
-            else if (credit.category === 'artist') creditEl.classList.add('electric');
-            else if (credit.category === 'writer') creditEl.classList.add('flicker');
-            else if (credit.category === 'hacker') creditEl.classList.add('flicker');
-            
-            // Set visible immediately
-            gsap.set(creditEl, { opacity: 1, scale: 1 });
-        });
-    } else {
-        // Fallback to old layout method if specified
-        console.warn("Using deprecated random layout - switch to grid or row");
-        // ... original random layout code would be here ...
+    if (!credits.length) {
+        console.error("No credits provided for packery layout");
+        return timeline;
     }
+    
+    // Create and position credits with packery layout
+    credits.forEach((credit, i) => {
+        const creditEl = document.createElement('div');
+        creditEl.classList.add('credit', 'packery-item');
+        creditEl.textContent = credit.name;
+        
+        // Randomize size a bit within constraints (3x3 to 5x5 grid)
+        const width = Math.floor(Math.random() * 3) + 3;
+        const height = Math.floor(Math.random() * 3) + 3;
+        
+        // Responsive sizing that maintains the grid feel
+        const gridSize = Math.min(window.innerWidth, window.innerHeight) / 12;
+        
+        creditEl.style.width = `${width * gridSize}px`;
+        creditEl.style.height = `${height * gridSize}px`;
+        creditEl.style.fontSize = '2rem';
+        creditEl.style.fontWeight = 'bold';
+        
+        // Position randomly but ensure it's within container bounds
+        const maxLeft = window.innerWidth - (width * gridSize);
+        const maxTop = window.innerHeight - (height * gridSize) - 100; // Account for possible description
+        
+        creditEl.style.left = `${Math.random() * maxLeft}px`;
+        creditEl.style.top = `${Math.random() * maxTop}px`;
+        
+        // Assign a color
+        creditEl.style.color = colorPalette.white;
+        
+        creditsContainer.appendChild(creditEl);
+        
+        // Add description if available
+        if (credit.description) {
+            const descEl = document.createElement('div');
+            descEl.classList.add('credit-description', 'packery-description');
+            descEl.textContent = credit.description;
+            
+            // Position description below the credit
+            const creditRect = creditEl.getBoundingClientRect();
+            descEl.style.left = `${creditRect.left}px`;
+            descEl.style.top = `${creditRect.bottom + 10}px`;
+            descEl.style.width = `${creditRect.width}px`;
+            
+            creditsContainer.appendChild(descEl);
+        }
+        
+        // Apply animations
+        if (credit.category === 'tech') creditEl.classList.add('electric');
+        else if (credit.category === 'artist') creditEl.classList.add('electric');
+        else creditEl.classList.add('flicker');
+    });
     
     // Play glitch sound
     if (document.getElementById('glitch-sound')) {
@@ -1556,499 +1593,382 @@ function showPackeryGroup(timeline, credits, layoutType = "grid") {
     return timeline;
 }
 
-// -------------- DOMContentLoaded EVENT LISTENER --------------
-document.addEventListener('DOMContentLoaded', () => {
-    // Initialize audio elements
-    const mainSound = document.getElementById('main-sound');
-    const glitchSound = document.getElementById('glitch-sound');
-    const transitionSound = document.getElementById('transition-sound');
+// -------------- PHASE 1: CREDITS SEQUENCE --------------
+function startPhase1() {
+    console.log("Starting Phase 1: Credits Sequence");
     
-    // Initialize UI elements
-    const startButton = document.getElementById('start-button');
-    const skipButton = document.getElementById('skip-button');
-    const beatIndicator = document.getElementById('beat-indicator');
+    // Show cursor for 1 second
+    const cursor = document.querySelector('.cursor');
+    gsap.set(cursor, { display: 'block', top: '50%', left: '50%', xPercent: -50, yPercent: -50 });
     
-    // Set up event listeners
-    skipButton.addEventListener('click', skipToPhase3);
-    
-    // Allow manual beat triggering by clicking on the beat indicator
-    if (beatIndicator) {
-        beatIndicator.addEventListener('click', (e) => {
-            e.stopPropagation();
-            console.log("Manual beat triggered by click");
-            detectPeak(true);
-        });
-        // Make it clickable
-        beatIndicator.style.pointerEvents = 'auto';
-    }
+    // Load credits data then play main sequence
+    loadCredits();
+}
 
-    // Allow triggering beats with spacebar
-    document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-            console.log("Manual beat triggered by spacebar");
-            detectPeak(true);
-            e.preventDefault(); // Prevent page scrolling
+// -------------- PHASE 2: MAIN TITLE --------------
+function transitionToPhase2() {
+    console.log("Transitioning to Phase 2: Main Title");
+    
+    // Hide phase 1, show phase 2 immediately without animation
+    phase1.classList.add('hidden');
+    phase2.classList.remove('hidden');
+    gsap.set(phase2, { display: 'block', opacity: 1 });
+    
+    // Start title sequence immediately
+    startTitleSequence();
+}
+
+function startTitleSequence() {
+    const titleElements = document.querySelectorAll('.title-word');
+    const titleEnter = document.getElementById('title-enter');
+    const titleThe = document.getElementById('title-the');
+    const titleVibe = document.getElementById('title-vibe');
+    
+    // Title animation sequence
+    const titleTimeline = gsap.timeline({
+        onComplete: () => {
+            // Brief pause before transition - longer (2.5s)
+            gsap.delayedCall(2.5, () => {
+                // Add final glitchy effect before transition
+                titleElements.forEach(el => {
+                    el.classList.add('electric');
+                });
+                
+                // Play transition sound
+                if (transitionSound) {
+                    transitionSound.play().catch(e => console.log("Audio error:", e));
+                }
+                
+                gsap.delayedCall(1, transitionToPhase3);
+            });
         }
     });
     
-    // Setup start button
-    startButton.addEventListener('click', () => {
-        console.log("Start button clicked");
+    // Animate each title word - "Enter the Void" style but with Anton font (no rotations)
+    titleTimeline
+        // ENTER
+        .to(titleEnter, {
+            duration: 1,
+            opacity: 1,
+            ease: "power1.out"
+        })
+        // Add electric effect
+        .add(() => {
+            titleEnter.classList.add('electric');
+            if (glitchSound) {
+                glitchSound.currentTime = 0;
+                glitchSound.play().catch(e => console.log("Audio error:", e));
+            }
+        }, "+=0.5") // Longer delay
         
-        // Resume audio context if suspended (required by modern browsers)
-        if (audioContext && audioContext.state === 'suspended') {
-            audioContext.resume().then(() => {
-                console.log("AudioContext resumed successfully");
-            }).catch(err => {
-                console.error("Failed to resume AudioContext:", err);
-            });
-        }
+        // THE
+        .to(titleThe, {
+            duration: 0.8,
+            opacity: 1,
+            ease: "power1.out",
+            delay: 0.6 // Longer delay
+        })
+        // Add flicker effect
+        .add(() => {
+            titleThe.classList.add('flicker');
+        }, "+=0.4") // Longer delay
         
-        // Hide start screen
-        const startScreen = document.getElementById('start-screen');
-        gsap.to(startScreen, { 
-            duration: 0.5, 
-            opacity: 0, 
-            onComplete: () => {
-                startScreen.classList.add('hidden');
-                // Show phase 1
-                const phase1 = document.getElementById('phase1');
-                phase1.classList.remove('hidden');
-                gsap.set(phase1, { opacity: 1 });
-                
-                // Initialize audio context and visualization
-                if (mainSound) {
-                    // Make sure audio is ready to play
-                    mainSound.volume = 1.0;
-                    mainSound.currentTime = 0;
-                    
-                    // Add event listener for when audio ends
-                    mainSound.addEventListener('ended', showEndScene);
-                    
-                    // Play the sound
-                    mainSound.play().then(() => {
-                        console.log("Main sound started playing");
-                        setupAudioVisualization(mainSound);
-                        
-                        // Ensure fallback beats are running (even if audio analysis is working)
-                        startFallbackBeatTimer();
-                    }).catch(err => {
-                        console.error("Error playing main sound:", err);
-                        // If audio fails to play, still start fallback beats
-                        startFallbackBeatTimer();
-                    });
-                } else {
-                    console.error("Main sound element not found!");
-                    // Even without sound, start fallback beats
-                    startFallbackBeatTimer();
-                }
-                
-                // Start the experience
-                startPhase1();
-            } 
+        // VIBE
+        .to(titleVibe, {
+            duration: 1.2,
+            opacity: 1,
+            ease: "power1.out",
+            delay: 0.7 // Longer delay
+        })
+        // Add glitch effect
+        .add(() => {
+            titleVibe.classList.add('glitch');
+            if (glitchSound) {
+                glitchSound.currentTime = 0;
+                glitchSound.play().catch(e => console.log("Audio error:", e));
+            }
+        }, "+=0.5") // Longer delay
+        
+        // Pulse the entire title - longer duration (2.5s)
+        .to(titleElements, {
+            duration: 2.5,
+            filter: "brightness(1.5)",
+            repeat: 1,
+            yoyo: true,
+            stagger: 0.3,
+            ease: "sine.inOut"
         });
-    });
+}
+
+// -------------- PHASE 3: DIGITAL LANDSCAPE --------------
+function transitionToPhase3() {
+    console.log("Transitioning to Phase 3: Digital Landscape");
     
-    // Init phases
-    const phase1 = document.getElementById('phase1');
-    const phase2 = document.getElementById('phase2');
-    const phase3 = document.getElementById('phase3');
+    // Hide phase 2, show phase 3
+    gsap.to(phase2, { duration: 0.5, opacity: 0, display: 'none', onComplete: () => {
+        phase2.classList.add('hidden');
+        phase3.classList.remove('hidden');
+        gsap.set(phase3, { display: 'block', opacity: 1 });
+        startDigitalLandscape();
+    }});
+}
+
+function startDigitalLandscape() {
+    // Create flying particles
+    createParticles();
     
-    // -------------- PHASE 1: CREDITS SEQUENCE --------------
-    function startPhase1() {
-        console.log("Starting Phase 1: Credits Sequence");
-        
-        // Show cursor for 1 second
-        const cursor = document.querySelector('.cursor');
-        gsap.set(cursor, { display: 'block', top: '50%', left: '50%', xPercent: -50, yPercent: -50 });
-        
-        // Load credits data then play main sound and start animation
-        loadCredits().then(() => {
-            // Play main sound (if available)
-            if (mainSound) mainSound.play().catch(e => console.log("Audio error:", e));
-            
-            // Timeline for cursor effect
-            const cursorTimeline = gsap.timeline({
-                defaults: { ease: 'power1.out' },
-                onComplete: () => {
-                    // Hide the cursor after the animation
-                    gsap.to(cursor, { duration: 0.3, opacity: 0, display: 'none' });
-                }
-            });
-            
-            // Create cursor blink effect for 1 second
-            cursorTimeline.to(cursor, { duration: 0.15, opacity: 0, repeat: 3, yoyo: true })
-                .to(cursor, { duration: 0.2, scale: 3, opacity: 0, clearProps: 'all' });
-        }).catch(error => {
-            console.error("Error during Phase 1 start:", error);
-            // Still continue even if there's an error
-            if (mainSound) mainSound.play().catch(e => console.log("Audio error:", e));
-        });
-    }
+    // Start VIBE CODING animation
+    initVibeCoding();
+}
+
+function createParticles() {
+    const particlesContainer = document.querySelector('.particles-container');
     
-    // -------------- PHASE 2: MAIN TITLE --------------
-    function transitionToPhase2() {
-        console.log("Transitioning to Phase 2: Main Title");
-        
-        // Hide phase 1, show phase 2 immediately without animation
-        phase1.classList.add('hidden');
-        phase2.classList.remove('hidden');
-        gsap.set(phase2, { display: 'block', opacity: 1 });
-        
-        // Start title sequence immediately
-        startTitleSequence();
-    }
+    // Clear any existing particles
+    particlesContainer.innerHTML = '';
     
-    function startTitleSequence() {
-        const titleElements = document.querySelectorAll('.title-word');
-        const titleEnter = document.getElementById('title-enter');
-        const titleThe = document.getElementById('title-the');
-        const titleVibe = document.getElementById('title-vibe');
+    // Create particles
+    for (let i = 0; i < 100; i++) {
+        const particle = document.createElement('div');
+        particle.classList.add('particle');
         
-        // Title animation sequence
-        const titleTimeline = gsap.timeline({
-            onComplete: () => {
-                // Brief pause before transition - longer (2.5s)
-                gsap.delayedCall(2.5, () => {
-                    // Add final glitchy effect before transition
-                    titleElements.forEach(el => {
-                        el.classList.add('electric');
-                    });
-                    
-                    // Play transition sound
-                    if (transitionSound) {
-                        transitionSound.play().catch(e => console.log("Audio error:", e));
-                    }
-                    
-                    gsap.delayedCall(1, transitionToPhase3);
+        // Random size
+        const size = Math.random() * 3 + 1;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random color
+        const colors = ['#00FFFF', '#FF00FF', '#00FF00', '#FFFF00', '#FFFFFF'];
+        particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        
+        // Random starting position
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Add to container
+        particlesContainer.appendChild(particle);
+        
+        // Animate - linear movement only (no rotation as per requirements)
+        gsap.to(particle, {
+            y: `+=${Math.random() * 1000 + 500}`,
+            x: `+=${(Math.random() * 200) - 100}`,
+            opacity: 0,
+            duration: Math.random() * 10 + 5,
+            delay: Math.random() * 5,
+            repeat: -1,
+            ease: "none",
+            onRepeat: () => {
+                gsap.set(particle, {
+                    y: -100,
+                    x: Math.random() * window.innerWidth,
+                    opacity: Math.random() * 0.8 + 0.2
                 });
             }
         });
-        
-        // Animate each title word - "Enter the Void" style but with Anton font (no rotations)
-        titleTimeline
-            // ENTER
-            .to(titleEnter, {
-                duration: 1,
-                opacity: 1,
-                ease: "power1.out"
-            })
-            // Add electric effect
-            .add(() => {
-                titleEnter.classList.add('electric');
-                if (glitchSound) {
-                    glitchSound.currentTime = 0;
-                    glitchSound.play().catch(e => console.log("Audio error:", e));
-                }
-            }, "+=0.5") // Longer delay
-            
-            // THE
-            .to(titleThe, {
-                duration: 0.8,
-                opacity: 1,
-                ease: "power1.out",
-                delay: 0.6 // Longer delay
-            })
-            // Add flicker effect
-            .add(() => {
-                titleThe.classList.add('flicker');
-            }, "+=0.4") // Longer delay
-            
-            // VIBE
-            .to(titleVibe, {
-                duration: 1.2,
-                opacity: 1,
-                ease: "power1.out",
-                delay: 0.7 // Longer delay
-            })
-            // Add glitch effect
-            .add(() => {
-                titleVibe.classList.add('glitch');
-                if (glitchSound) {
-                    glitchSound.currentTime = 0;
-                    glitchSound.play().catch(e => console.log("Audio error:", e));
-                }
-            }, "+=0.5") // Longer delay
-            
-            // Pulse the entire title - longer duration (2.5s)
-            .to(titleElements, {
-                duration: 2.5,
-                filter: "brightness(1.5)",
-                repeat: 1,
-                yoyo: true,
-                stagger: 0.3,
-                ease: "sine.inOut"
-            });
     }
+}
+
+function initVibeCoding() {
+    // Select elements
+    const letters = document.querySelectorAll('.letter');
+    const vibeCoding = document.querySelector('.vibe-coding');
     
-    // -------------- PHASE 3: DIGITAL LANDSCAPE --------------
-    function transitionToPhase3() {
-        console.log("Transitioning to Phase 3: Digital Landscape");
+    // Create a timeline for the VIBE CODING animation
+    const vibeTimeline = gsap.timeline({
+        repeat: -1,
+        repeatDelay: 1.5 // Longer delay between repetitions
+    });
+    
+    // Make the vibe-coding element visible
+    gsap.to(vibeCoding, { opacity: 1, duration: 0.5 });
+    
+    // Entrance animation - no rotation as per requirements
+    vibeTimeline.fromTo(letters, 
+        {
+            opacity: 0,
+            y: 50, // Less movement
+            scale: 0.8
+        }, 
+        {
+            opacity: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.5, // Slower animation
+            ease: "power1.out",
+            stagger: 0.12
+        }
+    )
+    
+    // Color effect - no rotation
+    .to(letters, {
+        duration: 3, // Longer duration
+        color: (i) => {
+            const colors = ['#FF4081', '#536DFE', '#8BC34A', '#FFC107', '#E040FB', '#00BCD4'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        },
+        textShadow: "0 0 30px rgba(255,255,255,0.9)",
+        ease: "sine.inOut",
+        stagger: {
+            each: 0.1,
+            repeat: 1,
+            yoyo: true
+        }
+    })
+    
+    // Electric effect on letters
+    .call(() => {
+        letters.forEach(letter => {
+            if (!letter.classList.contains('space')) {
+                letter.classList.add('electric');
+            }
+        });
         
-        // Hide phase 2, show phase 3
-        gsap.to(phase2, { duration: 0.5, opacity: 0, display: 'none', onComplete: () => {
-            phase2.classList.add('hidden');
+        // Keep electric effect longer (2s instead of 1s)
+        gsap.delayedCall(2, () => {
+            letters.forEach(letter => {
+                letter.classList.remove('electric');
+            });
+        });
+    })
+    
+    // Longer hold before fade out (1s)
+    .to(letters, { duration: 1 })
+    
+    // Fade out - no rotation
+    .to(letters, {
+        opacity: 0,
+        y: -30, // Less movement
+        scale: 0.8,
+        duration: 1, // Slower fade
+        stagger: 0.08,
+        ease: "power1.in"
+    });
+}
+
+function skipToPhase3() {
+    // Stop all sounds
+    if (mainSound) mainSound.pause();
+    if (glitchSound) glitchSound.pause();
+    if (transitionSound) transitionSound.pause();
+    
+    // Skip to phase 3 from any point in the sequence
+    const currentPhase = document.querySelector('.phase:not(.hidden)');
+    
+    if (currentPhase.id === 'phase3') return; // Already in phase 3
+    
+    // Fade out current phase
+    gsap.killTweensOf('.phase'); // Kill all animations
+    gsap.to(currentPhase, { 
+        duration: 0.5, 
+        opacity: 0, 
+        display: 'none', 
+        onComplete: () => {
+            // Hide all phases
+            document.querySelectorAll('.phase').forEach(phase => {
+                phase.classList.add('hidden');
+            });
+            
+            // Show phase 3
             phase3.classList.remove('hidden');
             gsap.set(phase3, { display: 'block', opacity: 1 });
+            
+            // Initialize phase 3
             startDigitalLandscape();
-        }});
-    }
-    
-    function startDigitalLandscape() {
-        // Create flying particles
-        createParticles();
-        
-        // Start VIBE CODING animation
-        initVibeCoding();
-    }
-    
-    function createParticles() {
-        const particlesContainer = document.querySelector('.particles-container');
-        
-        // Clear any existing particles
-        particlesContainer.innerHTML = '';
-        
-        // Create particles
-        for (let i = 0; i < 100; i++) {
-            const particle = document.createElement('div');
-            particle.classList.add('particle');
-            
-            // Random size
-            const size = Math.random() * 3 + 1;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            
-            // Random color
-            const colors = ['#00FFFF', '#FF00FF', '#00FF00', '#FFFF00', '#FFFFFF'];
-            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            
-            // Random starting position
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
-            
-            // Add to container
-            particlesContainer.appendChild(particle);
-            
-            // Animate - linear movement only (no rotation as per requirements)
-            gsap.to(particle, {
-                y: `+=${Math.random() * 1000 + 500}`,
-                x: `+=${(Math.random() * 200) - 100}`,
-                opacity: 0,
-                duration: Math.random() * 10 + 5,
-                delay: Math.random() * 5,
-                repeat: -1,
-                ease: "none",
-                onRepeat: () => {
-                    gsap.set(particle, {
-                        y: -100,
-                        x: Math.random() * window.innerWidth,
-                        opacity: Math.random() * 0.8 + 0.2
-                    });
-                }
-            });
         }
+    });
+}
+
+// Function to show the end scene when audio finishes
+function showEndScene() {
+    console.log("Audio finished - showing end scene");
+    
+    // First transition to phase 3 if not already there
+    const currentPhase = document.querySelector('.phase:not(.hidden)');
+    if (currentPhase && currentPhase.id !== 'phase3') {
+        // Force transition to phase 3
+        transitionToPhase3();
     }
     
-    function initVibeCoding() {
-        // Select elements
-        const letters = document.querySelectorAll('.letter');
-        const vibeCoding = document.querySelector('.vibe-coding');
-        
-        // Create a timeline for the VIBE CODING animation
-        const vibeTimeline = gsap.timeline({
-            repeat: -1,
-            repeatDelay: 1.5 // Longer delay between repetitions
-        });
-        
-        // Make the vibe-coding element visible
-        gsap.to(vibeCoding, { opacity: 1, duration: 0.5 });
-        
-        // Entrance animation - no rotation as per requirements
-        vibeTimeline.fromTo(letters, 
-            {
-                opacity: 0,
-                y: 50, // Less movement
-                scale: 0.8
-            }, 
-            {
-                opacity: 1,
-                y: 0,
-                scale: 1,
-                duration: 1.5, // Slower animation
-                ease: "power1.out",
-                stagger: 0.12
-            }
-        )
-        
-        // Color effect - no rotation
-        .to(letters, {
-            duration: 3, // Longer duration
-            color: (i) => {
-                const colors = ['#FF4081', '#536DFE', '#8BC34A', '#FFC107', '#E040FB', '#00BCD4'];
-                return colors[Math.floor(Math.random() * colors.length)];
-            },
-            textShadow: "0 0 30px rgba(255,255,255,0.9)",
-            ease: "sine.inOut",
-            stagger: {
-                each: 0.1,
-                repeat: 1,
-                yoyo: true
-            }
-        })
-        
-        // Electric effect on letters
-        .call(() => {
-            letters.forEach(letter => {
-                if (!letter.classList.contains('space')) {
-                    letter.classList.add('electric');
-                }
-            });
-            
-            // Keep electric effect longer (2s instead of 1s)
-            gsap.delayedCall(2, () => {
-                letters.forEach(letter => {
-                    letter.classList.remove('electric');
-                });
-            });
-        })
-        
-        // Longer hold before fade out (1s)
-        .to(letters, { duration: 1 })
-        
-        // Fade out - no rotation
-        .to(letters, {
-            opacity: 0,
-            y: -30, // Less movement
-            scale: 0.8,
-            duration: 1, // Slower fade
-            stagger: 0.08,
-            ease: "power1.in"
-        });
-    }
+    // Create end scene elements
+    const endScene = document.createElement('div');
+    endScene.classList.add('end-scene');
+    endScene.style.position = 'absolute';
+    endScene.style.top = '0';
+    endScene.style.left = '0';
+    endScene.style.width = '100%';
+    endScene.style.height = '100%';
+    endScene.style.display = 'flex';
+    endScene.style.flexDirection = 'column';
+    endScene.style.justifyContent = 'center';
+    endScene.style.alignItems = 'center';
+    endScene.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    endScene.style.zIndex = '1000';
     
-    function skipToPhase3() {
-        // Stop all sounds
-        if (mainSound) mainSound.pause();
-        if (glitchSound) glitchSound.pause();
-        if (transitionSound) transitionSound.pause();
-        
-        // Skip to phase 3 from any point in the sequence
-        const currentPhase = document.querySelector('.phase:not(.hidden)');
-        
-        if (currentPhase.id === 'phase3') return; // Already in phase 3
-        
-        // Fade out current phase
-        gsap.killTweensOf('.phase'); // Kill all animations
-        gsap.to(currentPhase, { 
-            duration: 0.5, 
-            opacity: 0, 
-            display: 'none', 
-            onComplete: () => {
-                // Hide all phases
-                document.querySelectorAll('.phase').forEach(phase => {
-                    phase.classList.add('hidden');
-                });
-                
-                // Show phase 3
-                phase3.classList.remove('hidden');
-                gsap.set(phase3, { display: 'block', opacity: 1 });
-                
-                // Initialize phase 3
-                startDigitalLandscape();
-            }
-        });
-    }
+    // Create end title
+    const endTitle = document.createElement('div');
+    endTitle.textContent = 'ENTER THE VIBE';
+    endTitle.style.fontSize = '6rem';
+    endTitle.style.fontFamily = "'Anton', sans-serif";
+    endTitle.style.color = 'white';
+    endTitle.style.marginBottom = '2rem';
+    endTitle.style.letterSpacing = '5px';
+    endTitle.classList.add('electric');
     
-    // Function to show the end scene when audio finishes
-    function showEndScene() {
-        console.log("Audio finished - showing end scene");
-        
-        // First transition to phase 3 if not already there
-        const currentPhase = document.querySelector('.phase:not(.hidden)');
-        if (currentPhase.id !== 'phase3') {
-            // Force transition to phase 3
-            transitionToPhase3();
-        }
-        
-        // Create end scene elements
-        const endScene = document.createElement('div');
-        endScene.classList.add('end-scene');
-        endScene.style.position = 'absolute';
-        endScene.style.top = '0';
-        endScene.style.left = '0';
-        endScene.style.width = '100%';
-        endScene.style.height = '100%';
-        endScene.style.display = 'flex';
-        endScene.style.flexDirection = 'column';
-        endScene.style.justifyContent = 'center';
-        endScene.style.alignItems = 'center';
-        endScene.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        endScene.style.zIndex = '1000';
-        
-        // Create end title
-        const endTitle = document.createElement('div');
-        endTitle.textContent = 'ENTER THE VIBE';
-        endTitle.style.fontSize = '6rem';
-        endTitle.style.fontFamily = "'Anton', sans-serif";
-        endTitle.style.color = 'white';
-        endTitle.style.marginBottom = '2rem';
-        endTitle.style.letterSpacing = '5px';
-        endTitle.classList.add('electric');
-        
-        // Create subtitle
-        const subtitle = document.createElement('div');
-        subtitle.textContent = 'THANK YOU FOR WATCHING';
-        subtitle.style.fontSize = '2rem';
-        subtitle.style.fontFamily = "'Inter', sans-serif";
-        subtitle.style.color = '#4495F1';
-        subtitle.style.marginBottom = '3rem';
-        
-        // Create restart button
-        const restartBtn = document.createElement('button');
-        restartBtn.textContent = 'RESTART';
-        restartBtn.style.padding = '1rem 2rem';
-        restartBtn.style.fontSize = '1.5rem';
-        restartBtn.style.fontFamily = "'Anton', sans-serif";
-        restartBtn.style.backgroundColor = 'transparent';
-        restartBtn.style.color = '#33FF33';
-        restartBtn.style.border = '2px solid #33FF33';
-        restartBtn.style.cursor = 'pointer';
-        restartBtn.addEventListener('click', restartAnimation);
-        
-        // Append elements
-        endScene.appendChild(endTitle);
-        endScene.appendChild(subtitle);
-        endScene.appendChild(restartBtn);
-        
-        // Add to phase 3
-        const phase3 = document.getElementById('phase3');
+    // Create subtitle
+    const subtitle = document.createElement('div');
+    subtitle.textContent = 'THANK YOU FOR WATCHING';
+    subtitle.style.fontSize = '2rem';
+    subtitle.style.fontFamily = "'Inter', sans-serif";
+    subtitle.style.color = '#4495F1';
+    subtitle.style.marginBottom = '3rem';
+    
+    // Create restart button
+    const restartBtn = document.createElement('button');
+    restartBtn.textContent = 'RESTART';
+    restartBtn.style.padding = '1rem 2rem';
+    restartBtn.style.fontSize = '1.5rem';
+    restartBtn.style.fontFamily = "'Anton', sans-serif";
+    restartBtn.style.backgroundColor = 'transparent';
+    restartBtn.style.color = '#33FF33';
+    restartBtn.style.border = '2px solid #33FF33';
+    restartBtn.style.cursor = 'pointer';
+    restartBtn.addEventListener('click', restartAnimation);
+    
+    // Append elements
+    endScene.appendChild(endTitle);
+    endScene.appendChild(subtitle);
+    endScene.appendChild(restartBtn);
+    
+    // Add to phase 3
+    const phase3 = document.getElementById('phase3');
+    if (phase3) {
         phase3.appendChild(endScene);
-        
-        // Animate in
-        gsap.from(endScene, {
-            opacity: 0,
-            duration: 1.5
-        });
-        
-        gsap.from(endTitle, {
-            y: -50,
-            opacity: 0,
-            duration: 1,
-            delay: 0.5
-        });
-        
-        gsap.from(subtitle, {
-            y: -30,
-            opacity: 0,
-            duration: 1,
-            delay: 1
-        });
-        
-        gsap.from(restartBtn, {
-            y: 30,
-            opacity: 0,
-            duration: 1,
-            delay: 1.5
-        });
     }
-}); 
+    
+    // Animate in
+    gsap.from(endScene, {
+        opacity: 0,
+        duration: 1.5
+    });
+    
+    gsap.from(endTitle, {
+        y: -50,
+        opacity: 0,
+        duration: 1,
+        delay: 0.5
+    });
+    
+    gsap.from(subtitle, {
+        y: -30,
+        opacity: 0,
+        duration: 1,
+        delay: 1
+    });
+    
+    gsap.from(restartBtn, {
+        y: 30,
+        opacity: 0,
+        duration: 1,
+        delay: 1.5
+    });
+} 
