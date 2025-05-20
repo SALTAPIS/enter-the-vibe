@@ -307,7 +307,4 @@ MakerBot (3D printers)
 23andMe (consumer genetics)
 Illumina (DNA sequencing technology)
 SpaceX (private space exploration, Starlink internet)
-Planet Labs (satellite imaging)
-Garmin (GPS navigation)
-TomTom (GPS navigation)
-Waze (navigation app)
+Grok
