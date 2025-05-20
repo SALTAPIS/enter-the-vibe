@@ -1596,7 +1596,7 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
     // Helper function to create credit element
     function createCreditElement(credit, layoutType) {
         const el = document.createElement('div');
-        el.classList.add('credit', `${layoutType}-credit`);
+        el.classList.add('credit', `${layoutType}-item`);
         el.style.textAlign = 'center';
         el.style.width = '100%';
         
