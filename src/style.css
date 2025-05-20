@@ -780,13 +780,20 @@ body {
 /* Add styles for the grid and row layouts */
 .credit.grid-item,
 .credit.row-item {
-    position: absolute;
+    position: relative;
     font-weight: bold;
     text-shadow: 0 0 10px currentColor;
     opacity: 1;
     transition: all 0.3s ease;
     transform-style: preserve-3d;
     line-height: 1.2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    padding: 20px;
 }
 
 /* Styles for first and last name display */
@@ -797,12 +804,16 @@ body {
     margin-bottom: 5px;
     text-transform: uppercase;
     letter-spacing: 2px;
+    width: 100%;
+    text-align: center;
 }
 
 .name-last {
     font-size: clamp(1.5rem, 4vw, 4rem);
     font-weight: bold;
     letter-spacing: 1px;
+    width: 100%;
+    text-align: center;
 }
 
 /* Update bilingual layout styles */

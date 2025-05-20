@@ -1552,7 +1552,7 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
         wrapper.style.flexDirection = 'column';
         wrapper.style.alignItems = 'center';
         wrapper.style.justifyContent = 'center';
-        wrapper.style.gap = '30px';
+        wrapper.style.gap = '40px';
         
         // Add credits to row layout
         credits.forEach(credit => {
@@ -1563,42 +1563,47 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
         // Create grid layout - use specific grid settings
         wrapper.style.display = 'grid';
         
-        // Calculate grid dimensions
+        // Calculate grid dimensions based on number of credits
         const totalCredits = credits.length;
-        let columns;
+        let columns, rows;
         
-        if (totalCredits <= 2) columns = totalCredits;
-        else if (totalCredits <= 4) columns = 2;
-        else if (totalCredits <= 6) columns = 3;
-        else columns = 4;
+        if (totalCredits <= 2) {
+            columns = totalCredits;
+            rows = 1;
+        } else if (totalCredits <= 4) {
+            columns = 2;
+            rows = Math.ceil(totalCredits / 2);
+        } else if (totalCredits <= 6) {
+            columns = 3;
+            rows = Math.ceil(totalCredits / 3);
+        } else {
+            columns = 4;
+            rows = Math.ceil(totalCredits / 4);
+        }
         
-        // Set grid template columns with equal width columns
+        // Set explicit grid template
         wrapper.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
-        wrapper.style.gap = '30px 40px';
+        wrapper.style.gridTemplateRows = `repeat(${rows}, auto)`;
+        wrapper.style.gap = '40px 60px';
         wrapper.style.justifyItems = 'center';
-        wrapper.style.alignItems = 'center';
-        
-        // Add credits to grid layout
-        credits.forEach((credit, index) => {
-            const creditEl = createCreditElement(credit, "grid");
-            // Set explicit grid column and row
-            const col = (index % columns) + 1;
-            const row = Math.floor(index / columns) + 1;
-            creditEl.style.gridColumn = col;
-            creditEl.style.gridRow = row;
-            wrapper.appendChild(creditEl);
-        });
+        wrapper.style.alignItems = 'start';
     }
     
     // Add the wrapper to the container
     creditsContainer.appendChild(wrapper);
     
+    // Add credits to the layout
+    if (layout === "grid") {
+        credits.forEach((credit, index) => {
+            const creditEl = createCreditElement(credit, "grid");
+            wrapper.appendChild(creditEl);
+        });
+    }
+    
     // Helper function to create credit element
     function createCreditElement(credit, layoutType) {
         const el = document.createElement('div');
         el.classList.add('credit', `${layoutType}-item`);
-        el.style.textAlign = 'center';
-        el.style.width = '100%';
         
         // Split name for better display
         const splitName = splitNameIntoLines(credit.name);
@@ -1608,33 +1613,35 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             const firstNameEl = document.createElement('div');
             firstNameEl.classList.add('name-first');
             firstNameEl.textContent = nameParts[0];
+            firstNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
             
             const lastNameEl = document.createElement('div');
             lastNameEl.classList.add('name-last');
             lastNameEl.textContent = nameParts[1];
-            
-            // Set font sizes
-            firstNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
-            lastNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+            lastNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
             
             el.appendChild(firstNameEl);
             el.appendChild(lastNameEl);
         } else {
             // Single line name
-            el.textContent = credit.name;
-            el.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+            const nameEl = document.createElement('div');
+            nameEl.textContent = credit.name;
+            nameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+            nameEl.style.fontWeight = 'bold';
+            el.appendChild(nameEl);
         }
         
-        // Set color
-        el.style.color = colorPalette.white;
+        // Assign a color - using blue as in the examples
+        el.style.color = "#4495F1";
         
         // Add description if available
         if (credit.description) {
             const descEl = document.createElement('div');
             descEl.classList.add('credit-description');
             descEl.textContent = credit.description;
-            descEl.style.fontSize = 'clamp(0.8rem, 2vw, 1.5rem)';
-            descEl.style.marginTop = '8px';
+            descEl.style.fontSize = 'clamp(0.9rem, 2vw, 1.5rem)';
+            descEl.style.marginTop = '15px';
+            descEl.style.opacity = '0.9';
             
             el.appendChild(descEl);
         }
