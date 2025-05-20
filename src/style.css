@@ -4,6 +4,15 @@
     box-sizing: border-box;
 }
 
+/* Add OCR A font import */
+@font-face {
+    font-family: 'OCR A';
+    src: url('/fonts/OCRAStd.otf') format('opentype'),
+         url('/fonts/OCRAStd.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 :root {
     --neon-pink: #FF10F0;
     --neon-blue: #00FFFF;
@@ -18,13 +27,14 @@
 }
 
 body {
-    font-family: 'Anton', sans-serif;
+    font-family: 'OCR A', 'Anton', sans-serif;
     background-color: var(--dark-bg);
     color: white;
     height: 100vh;
     width: 100vw;
     overflow: hidden;
     position: relative;
+    line-height: 1.05; /* Global line height: font-size + 5% */
 }
 
 /* -------------- PHASE CONTAINERS -------------- */
@@ -123,11 +133,8 @@ body {
     letter-spacing: 4px;
     text-align: center;
     font-weight: bold;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
     width: 90%;
-    line-height: 1.2;
+    line-height: 1.05;
 }
 
 .credit.single .name-first {
@@ -144,16 +151,16 @@ body {
 }
 
 .credit-description {
-    font-family: 'Inter', sans-serif;
+    font-family: 'OCR A', 'Inter', sans-serif;
     font-weight: bold;
     font-size: clamp(0.8rem, 2vw, 1.5rem);
     opacity: 0.9;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-top: 10px;
-    position: absolute;
+    position: relative;
     text-align: center;
-    max-width: 80%;
+    max-width: 100%;
     color: #dddddd;
 }
 
@@ -171,6 +178,11 @@ body {
 .font-anton {
     font-family: 'Anton', sans-serif;
     letter-spacing: 2px;
+}
+
+.font-ocr-a {
+    font-family: 'OCR A', monospace;
+    letter-spacing: 1px;
 }
 
 .font-clash-display {
@@ -782,11 +794,11 @@ body {
 .credit.row-item {
     position: relative;
     font-weight: bold;
-    text-shadow: 0 0 10px currentColor;
+    text-shadow: none;
     opacity: 1;
     transition: all 0.3s ease;
     transform-style: preserve-3d;
-    line-height: 1.2;
+    line-height: 1.05;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -806,6 +818,7 @@ body {
     letter-spacing: 2px;
     width: 100%;
     text-align: center;
+    line-height: 1.05;
 }
 
 .name-last {
@@ -814,6 +827,7 @@ body {
     letter-spacing: 1px;
     width: 100%;
     text-align: center;
+    line-height: 1.05;
 }
 
 /* Update bilingual layout styles */
@@ -844,7 +858,7 @@ body {
     transform: translate(-50%, -50%);
     font-size: 5rem;
     text-align: center;
-    line-height: 1.2;
+    line-height: 1.05;
 }
 
 /* Update packery description position */

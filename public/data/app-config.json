@@ -16,37 +16,38 @@
     "fonts": {
       "layouts": {
         "single": {
-          "nameFirst": "clamp(6rem, 12vw, 12rem)",
-          "nameLast": "clamp(6rem, 12vw, 12rem)",
+          "nameFirst": "clamp(7.8rem, 15.6vw, 15.6rem)",
+          "nameLast": "clamp(7.8rem, 15.6vw, 15.6rem)",
           "description": "clamp(1.2rem, 3vw, 2.5rem)"
         },
         "grid": {
-          "nameFirst": "clamp(2rem, 6vw, 4rem)",
-          "nameLast": "clamp(2rem, 6vw, 4rem)",
+          "nameFirst": "clamp(2.6rem, 7.8vw, 5.2rem)",
+          "nameLast": "clamp(2.6rem, 7.8vw, 5.2rem)",
           "description": "clamp(0.8rem, 2vw, 1.5rem)"
         },
         "row": {
-          "nameFirst": "clamp(2rem, 6vw, 4rem)",
-          "nameLast": "clamp(2rem, 6vw, 4rem)",
+          "nameFirst": "clamp(2.6rem, 7.8vw, 5.2rem)",
+          "nameLast": "clamp(2.6rem, 7.8vw, 5.2rem)",
           "description": "clamp(0.8rem, 2vw, 1.5rem)"
         },
         "firstnameLastname": {
-          "nameFirst": "clamp(5rem, 12vw, 10rem)",
-          "nameLast": "clamp(5rem, 12vw, 10rem)"
+          "nameFirst": "clamp(6.5rem, 15.6vw, 13rem)",
+          "nameLast": "clamp(6.5rem, 15.6vw, 13rem)"
         },
         "title": {
           "text": "clamp(10rem, 20vw, 20rem)"
         },
         "bilingual": {
-          "heading": "clamp(2.5rem, 6vw, 4rem)",
-          "text": "clamp(2rem, 5vw, 3.5rem)"
+          "heading": "clamp(3.25rem, 7.8vw, 5.2rem)",
+          "text": "clamp(2.6rem, 6.5vw, 4.55rem)"
         },
         "hierarchical": {
-          "heading": "clamp(3rem, 7vw, 5rem)",
-          "text": "clamp(2.5rem, 6vw, 4rem)"
+          "heading": "clamp(3.9rem, 9.1vw, 6.5rem)",
+          "text": "clamp(3.25rem, 7.8vw, 5.2rem)"
         }
       },
       "families": [
+        "font-ocr-a",
         "font-anton",
         "font-clash-display",
         "font-cabinet-grotesk",
@@ -55,7 +56,8 @@
         "font-switzer",
         "font-melodrama",
         "font-tanker"
-      ]
+      ],
+      "primary": "font-ocr-a"
     },
     "colors": {
       "blue": "#4495F1",

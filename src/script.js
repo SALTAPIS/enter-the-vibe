@@ -31,6 +31,15 @@ async function loadAppConfig() {
             minScreenDisplayTime = appConfig.display.timing.minDisplayTime;
         }
         
+        // Apply font settings to CSS variables if needed
+        if (appConfig.display && appConfig.display.fonts) {
+            console.log('Font settings loaded from app-config');
+            
+            // You can add code here if you want to apply any font settings globally via CSS variables
+            // For example:
+            // document.documentElement.style.setProperty('--single-name-font-size', appConfig.display.fonts.layouts.single.nameFirst);
+        }
+        
         return appConfig;
     } catch (error) {
         console.error("Error loading app configuration:", error);
@@ -74,6 +83,11 @@ async function loadCredits() {
 async function init() {
     // First load app configuration
     await loadAppConfig();
+    
+    // Apply primary font if specified in the config
+    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.primary) {
+        document.body.classList.add(appConfig.display.fonts.primary);
+    }
     
     // Then load credits and continue initialization
     await loadCredits();
@@ -1296,12 +1310,29 @@ function showSingleName(timeline, credit) {
     // Clear container
     singleCreditContainer.innerHTML = '';
     
+    // Create a wrapper for the credit and description
+    const creditWrapper = document.createElement('div');
+    creditWrapper.style.position = 'absolute';
+    creditWrapper.style.top = '50%'; // Changed from 40% to 50% for better vertical centering
+    creditWrapper.style.left = '50%';
+    creditWrapper.style.transform = 'translate(-50%, -50%)';
+    creditWrapper.style.width = '90%';
+    creditWrapper.style.textAlign = 'center';
+    creditWrapper.style.display = 'flex';
+    creditWrapper.style.flexDirection = 'column';
+    creditWrapper.style.alignItems = 'center';
+    creditWrapper.style.justifyContent = 'center'; // Add justify-content center
+    
     // Split name into first/last name for single display
     const splitName = splitNameIntoLines(credit.name);
     
     // Create name element
     const nameEl = document.createElement('div');
     nameEl.classList.add('credit', 'single');
+    nameEl.style.position = 'relative'; // Changed from absolute
+    nameEl.style.transform = 'none'; // Remove transform
+    nameEl.style.top = 'auto'; // Clear top positioning from CSS
+    nameEl.style.left = 'auto'; // Clear left positioning from CSS
     
     // Use HTML to format the split name
     const nameParts = splitName.split('\n');
@@ -1313,40 +1344,56 @@ function showSingleName(timeline, credit) {
         const firstNameEl = nameEl.querySelector('.name-first');
         const lastNameEl = nameEl.querySelector('.name-last');
         if (firstNameEl && lastNameEl) {
-            firstNameEl.style.fontSize = 'clamp(6rem, 12vw, 12rem)';
-            lastNameEl.style.fontSize = 'clamp(6rem, 12vw, 12rem)';
+            // Use font sizes from appConfig if available
+            if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.single) {
+                firstNameEl.style.fontSize = appConfig.display.fonts.layouts.single.nameFirst;
+                lastNameEl.style.fontSize = appConfig.display.fonts.layouts.single.nameLast;
+            } else {
+                // Fallback to hardcoded value
+                firstNameEl.style.fontSize = 'clamp(6rem, 12vw, 12rem)';
+                lastNameEl.style.fontSize = 'clamp(6rem, 12vw, 12rem)';
+            }
         }
     } else {
         nameEl.textContent = credit.name;
-        nameEl.style.fontSize = 'clamp(6rem, 15vw, 14rem)'; // Make single line names larger too
+        // Use title font size from appConfig if available
+        if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.title) {
+            nameEl.style.fontSize = appConfig.display.fonts.layouts.title.text;
+        } else {
+            // Fallback to hardcoded value
+            nameEl.style.fontSize = 'clamp(6rem, 15vw, 14rem)';
+        }
     }
     
     // Add color (80% white, 20% other colors)
     nameEl.style.color = getRandomColor();
     
-    // Add to container
-    singleCreditContainer.appendChild(nameEl);
-    
-    // Make it visible immediately
-    gsap.set(nameEl, { opacity: 1, scale: 1 });
+    // Add to wrapper
+    creditWrapper.appendChild(nameEl);
     
     // If there's a description, add it
     if (credit.description) {
         const descEl = document.createElement('div');
         descEl.classList.add('credit-description');
         descEl.textContent = credit.description;
-        descEl.style.position = 'absolute';
-        descEl.style.top = '70%'; // Move description lower to make room for larger names
-        descEl.style.left = '0';
-        descEl.style.width = '100%';
-        descEl.style.textAlign = 'center';
-        descEl.style.fontSize = 'clamp(1.2rem, 3vw, 2.5rem)'; // Larger description text
         
-        singleCreditContainer.appendChild(descEl);
+        // Use description font size from appConfig if available
+        if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.single) {
+            descEl.style.fontSize = appConfig.display.fonts.layouts.single.description;
+        } else {
+            // Fallback to hardcoded value
+            descEl.style.fontSize = 'clamp(1.2rem, 3vw, 2.5rem)';
+        }
         
-        // Make description visible immediately
-        gsap.set(descEl, { opacity: 1 });
+        // Add description to wrapper
+        creditWrapper.appendChild(descEl);
     }
+    
+    // Add wrapper to container
+    singleCreditContainer.appendChild(creditWrapper);
+    
+    // Make it visible immediately
+    gsap.set(creditWrapper, { opacity: 1 });
     
     // Apply effect immediately based on category
     if (credit.category === 'tech') nameEl.classList.add('electric');
@@ -1382,7 +1429,15 @@ function showSpecialLayoutCredit(timeline, credit) {
     if (credit.layout === 'title') {
         creditEl.classList.add('font-anton');
         creditEl.textContent = credit.name;
-        creditEl.style.fontSize = 'clamp(10rem, 20vw, 20rem)'; // Much larger
+        
+        // Use title font size from appConfig if available
+        if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.title) {
+            creditEl.style.fontSize = appConfig.display.fonts.layouts.title.text;
+        } else {
+            // Fallback to hardcoded value
+            creditEl.style.fontSize = 'clamp(10rem, 20vw, 20rem)';
+        }
+        
         creditEl.style.letterSpacing = '10px';
         creditEl.style.color = colorPalette.blue; // Blue for title text
     }
@@ -1398,13 +1453,29 @@ function showSpecialLayoutCredit(timeline, credit) {
                 // First line is a category, make it red
                 if (i === 0) {
                     lineDiv.style.color = colorPalette.red;
-                    lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                    
+                    // Use heading font size from appConfig if available
+                    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
+                        lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.heading;
+                    } else {
+                        // Fallback to hardcoded value
+                        lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)';
+                    }
+                    
                     lineDiv.style.marginBottom = '1rem';
                 }
                 // Names are white in this format
                 else {
                     lineDiv.style.color = colorPalette.white;
-                    lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)'; // Larger
+                    
+                    // Use text font size from appConfig if available
+                    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
+                        lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.text;
+                    } else {
+                        // Fallback to hardcoded value
+                        lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)';
+                    }
+                    
                     lineDiv.style.marginBottom = '0.5rem';
                 }
             }
@@ -1412,13 +1483,29 @@ function showSpecialLayoutCredit(timeline, credit) {
                 // First line is a category, make it gold
                 if (i === 0) {
                     lineDiv.style.color = colorPalette.gold;
-                    lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                    
+                    // Use heading font size from appConfig if available
+                    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
+                        lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.heading;
+                    } else {
+                        // Fallback to hardcoded value
+                        lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)';
+                    }
+                    
                     lineDiv.style.marginBottom = '1rem';
                 }
                 // Names are white in this format
                 else {
                     lineDiv.style.color = colorPalette.white;
-                    lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)'; // Larger
+                    
+                    // Use text font size from appConfig if available
+                    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
+                        lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.text;
+                    } else {
+                        // Fallback to hardcoded value
+                        lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)';
+                    }
+                    
                     lineDiv.style.marginBottom = '0.5rem';
                 }
             }
@@ -1426,13 +1513,29 @@ function showSpecialLayoutCredit(timeline, credit) {
                 // First line is a category, make it blue
                 if (i === 0) {
                     lineDiv.style.color = colorPalette.blue;
-                    lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                    
+                    // Use heading font size from appConfig if available
+                    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
+                        lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.heading;
+                    } else {
+                        // Fallback to hardcoded value
+                        lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)';
+                    }
+                    
                     lineDiv.style.marginBottom = '1rem';
                 }
                 // Names are white in this format
                 else {
                     lineDiv.style.color = colorPalette.white;
-                    lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)'; // Larger
+                    
+                    // Use text font size from appConfig if available
+                    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
+                        lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.text;
+                    } else {
+                        // Fallback to hardcoded value
+                        lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)';
+                    }
+                    
                     lineDiv.style.marginBottom = '0.5rem';
                 }
             }
@@ -1451,7 +1554,15 @@ function showSpecialLayoutCredit(timeline, credit) {
             // First line is the category title
             if (i === 0) {
                 lineDiv.style.color = colorPalette.green; // Green for category titles
-                lineDiv.style.fontSize = 'clamp(3rem, 7vw, 5rem)'; // Larger
+                
+                // Use heading font size from appConfig if available
+                if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.hierarchical) {
+                    lineDiv.style.fontSize = appConfig.display.fonts.layouts.hierarchical.heading;
+                } else {
+                    // Fallback to hardcoded value
+                    lineDiv.style.fontSize = 'clamp(3rem, 7vw, 5rem)';
+                }
+                
                 lineDiv.style.marginBottom = '1.5rem';
                 lineDiv.style.letterSpacing = '5px';
                 lineDiv.style.fontWeight = 'bold';
@@ -1459,7 +1570,15 @@ function showSpecialLayoutCredit(timeline, credit) {
             // Names
             else {
                 lineDiv.style.color = colorPalette.white; // White for names
-                lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)'; // Larger
+                
+                // Use text font size from appConfig if available
+                if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.hierarchical) {
+                    lineDiv.style.fontSize = appConfig.display.fonts.layouts.hierarchical.text;
+                } else {
+                    // Fallback to hardcoded value
+                    lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)';
+                }
+                
                 lineDiv.style.marginBottom = '0.5rem';
             }
             
@@ -1476,13 +1595,27 @@ function showSpecialLayoutCredit(timeline, credit) {
         const firstNameDiv = document.createElement('div');
         firstNameDiv.classList.add('name-first');
         firstNameDiv.textContent = lines[0];
-        firstNameDiv.style.fontSize = 'clamp(5rem, 12vw, 10rem)'; // Much larger
+        
+        // Use nameFirst font size from appConfig if available
+        if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.firstnameLastname) {
+            firstNameDiv.style.fontSize = appConfig.display.fonts.layouts.firstnameLastname.nameFirst;
+        } else {
+            // Fallback to hardcoded value
+            firstNameDiv.style.fontSize = 'clamp(5rem, 12vw, 10rem)';
+        }
         
         // Last name below, larger
         const lastNameDiv = document.createElement('div');
         lastNameDiv.classList.add('name-last');
         lastNameDiv.textContent = lines[1];
-        lastNameDiv.style.fontSize = 'clamp(5rem, 12vw, 10rem)'; // Much larger
+        
+        // Use nameLast font size from appConfig if available
+        if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.firstnameLastname) {
+            lastNameDiv.style.fontSize = appConfig.display.fonts.layouts.firstnameLastname.nameLast;
+        } else {
+            // Fallback to hardcoded value
+            lastNameDiv.style.fontSize = 'clamp(5rem, 12vw, 10rem)';
+        }
         
         // If this has the neon effect
         if (credit.effect === 'neon') {
@@ -1609,47 +1742,82 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
         const splitName = splitNameIntoLines(credit.name);
         const nameParts = splitName.split('\n');
         
+        // Create a div for just the name part
+        const nameContainer = document.createElement('div');
+        nameContainer.style.display = 'flex';
+        nameContainer.style.flexDirection = 'column';
+        nameContainer.style.alignItems = 'center';
+        
         if (nameParts.length === 2) {
             const firstNameEl = document.createElement('div');
             firstNameEl.classList.add('name-first');
             firstNameEl.textContent = nameParts[0];
-            firstNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+            
+            // Use nameFirst font size from appConfig if available
+            if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
+                firstNameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameFirst;
+            } else {
+                // Fallback to hardcoded value
+                firstNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+            }
             
             const lastNameEl = document.createElement('div');
             lastNameEl.classList.add('name-last');
             lastNameEl.textContent = nameParts[1];
-            lastNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
             
-            el.appendChild(firstNameEl);
-            el.appendChild(lastNameEl);
+            // Use nameLast font size from appConfig if available
+            if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
+                lastNameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameLast;
+            } else {
+                // Fallback to hardcoded value
+                lastNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+            }
+            
+            nameContainer.appendChild(firstNameEl);
+            nameContainer.appendChild(lastNameEl);
         } else {
             // Single line name
             const nameEl = document.createElement('div');
             nameEl.textContent = credit.name;
-            nameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+            
+            // Use nameFirst font size from appConfig if available (for single line)
+            if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
+                nameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameFirst;
+            } else {
+                // Fallback to hardcoded value
+                nameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+            }
+            
             nameEl.style.fontWeight = 'bold';
-            el.appendChild(nameEl);
+            nameContainer.appendChild(nameEl);
         }
         
-        // Assign a color - using blue as in the examples
-        el.style.color = "#4495F1";
+        // Add the name container to the credit element
+        el.appendChild(nameContainer);
+        
+        // Use white color for all grid/row items
+        el.style.color = "#FFFFFF";
         
         // Add description if available
         if (credit.description) {
             const descEl = document.createElement('div');
             descEl.classList.add('credit-description');
             descEl.textContent = credit.description;
-            descEl.style.fontSize = 'clamp(0.9rem, 2vw, 1.5rem)';
+            
+            // Use description font size from appConfig if available
+            if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
+                descEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].description;
+            } else {
+                // Fallback to hardcoded value
+                descEl.style.fontSize = 'clamp(0.9rem, 2vw, 1.5rem)';
+            }
+            
             descEl.style.marginTop = '15px';
             descEl.style.opacity = '0.9';
             
+            // Add description below the name
             el.appendChild(descEl);
         }
-        
-        // Apply effect based on category
-        if (credit.category === 'tech') el.classList.add('electric');
-        else if (credit.category === 'artist') el.classList.add('electric');
-        else el.classList.add('flicker');
         
         return el;
     }
