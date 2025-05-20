@@ -10,6 +10,8 @@ let appConfig = null;
 // -------------- CREDIT SEQUENCE DATA --------------
 // Will store all credits loaded from JSON
 let allCredits = [];
+// Will store timeline data loaded from JSON
+let timelineCredits = [];
 
 // Global variables for state tracking
 let lastScreenChangeTime = Date.now();
@@ -50,6 +52,9 @@ async function loadAppConfig() {
 // Load credits from JSON file
 async function loadCredits() {
     try {
+        // Load timeline data first
+        await loadTimelineData();
+        
         const response = await fetch('./data/credits.json');
         if (!response.ok) {
             throw new Error(`Failed to load credits: ${response.status} ${response.statusText}`);
@@ -76,6 +81,34 @@ async function loadCredits() {
         allCredits = [
             { name: "ERROR LOADING CREDITS", description: "Please check console", category: "error" }
         ];
+    }
+}
+
+// Load timeline data from JSON file
+async function loadTimelineData() {
+    try {
+        const response = await fetch('./data/credits-timeline.json');
+        if (!response.ok) {
+            throw new Error(`Failed to load timeline: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        
+        // Transform the timeline data to match the credit format
+        timelineCredits = (data.timeline || []).map(entry => ({
+            name: entry.entity,
+            description: entry.description,
+            category: entry.category.toLowerCase(),
+            years: entry.years,
+            origin: entry.origin,
+            caption: entry.caption
+        }));
+        
+        console.log(`Loaded ${timelineCredits.length} timeline entries from JSON`);
+        return timelineCredits;
+    } catch (error) {
+        console.error("Error loading timeline data:", error);
+        timelineCredits = [];
+        return [];
     }
 }
 
@@ -244,6 +277,66 @@ function buildAndStartCreditsSequence(creditsData) {
     if (creditsData.layouts && creditsData.layouts.bilingual) {
         // Add all bilingual layouts - they look great
         creditScreens.push(...creditsData.layouts.bilingual);
+    }
+
+    // Add timeline entries - chronological history of computing and digital media
+    if (timelineCredits.length > 0) {
+        // Group timeline entries by era (ancient, early computing, modern, digital age)
+        const ancientEra = timelineCredits.filter(entry => entry.years.includes("BCE") || parseInt(entry.years) < 1900);
+        const earlyComputingEra = timelineCredits.filter(entry => {
+            const year = parseInt(entry.years);
+            return !entry.years.includes("BCE") && year >= 1900 && year < 1970;
+        });
+        const modernEra = timelineCredits.filter(entry => {
+            const year = parseInt(entry.years);
+            return year >= 1970 && year < 2000;
+        });
+        const digitalEra = timelineCredits.filter(entry => {
+            const year = parseInt(entry.years);
+            return year >= 2000;
+        });
+        
+        // Create chronological displays for each era
+        if (ancientEra.length > 0) {
+            creditScreens.push({
+                credits: ancientEra.slice(0, 6),
+                layout: "grid",
+                title: "Ancient Computing"
+            });
+        }
+        
+        if (earlyComputingEra.length > 0) {
+            // Group early computing in sets of 6
+            for (let i = 0; i < earlyComputingEra.length; i += 6) {
+                creditScreens.push({
+                    credits: earlyComputingEra.slice(i, i + 6),
+                    layout: "grid",
+                    title: "Early Computing Era"
+                });
+            }
+        }
+        
+        if (modernEra.length > 0) {
+            // Group modern era in sets of 6
+            for (let i = 0; i < modernEra.length; i += 6) {
+                creditScreens.push({
+                    credits: modernEra.slice(i, i + 6),
+                    layout: "grid",
+                    title: "Modern Computing Era"
+                });
+            }
+        }
+        
+        if (digitalEra.length > 0) {
+            // Group digital era in sets of 6
+            for (let i = 0; i < digitalEra.length; i += 6) {
+                creditScreens.push({
+                    credits: digitalEra.slice(i, i + 6),
+                    layout: "grid",
+                    title: "Digital Age"
+                });
+            }
+        }
     }
     
     // Add tech people in grid layouts
@@ -1656,10 +1749,13 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
     // 1. Passing an array of credits directly
     // 2. Passing an object with a credits property
     let credits = [];
+    let title = null;
+    
     if (Array.isArray(creditsInput)) {
         credits = creditsInput;
     } else if (creditsInput && creditsInput.credits) {
         credits = creditsInput.credits;
+        title = creditsInput.title;
     }
     
     if (!credits.length) {
@@ -1678,6 +1774,18 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
     wrapper.style.top = '50%';
     wrapper.style.left = '50%';
     wrapper.style.transform = 'translate(-50%, -50%)';
+    
+    // If we have a title, add it to the top
+    if (title) {
+        const titleEl = document.createElement('div');
+        titleEl.classList.add('section-title');
+        titleEl.textContent = title;
+        titleEl.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)';
+        titleEl.style.textAlign = 'center';
+        titleEl.style.marginBottom = '2rem';
+        titleEl.style.color = 'white';
+        wrapper.appendChild(titleEl);
+    }
     
     if (layout === "row") {
         // Create row layout - simple column flex
@@ -1817,6 +1925,17 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             
             // Add description below the name
             el.appendChild(descEl);
+        }
+        
+        // If this is a timeline entry with years, add the year
+        if (credit.years) {
+            const yearText = document.createElement('div');
+            yearText.classList.add('credit-year');
+            yearText.textContent = credit.years;
+            yearText.style.fontSize = '0.9rem';
+            yearText.style.fontWeight = 'bold';
+            yearText.style.marginBottom = '0.2rem';
+            el.insertBefore(yearText, el.firstChild);
         }
         
         return el;
