@@ -336,6 +336,44 @@
     { "name": "OPENAI", "description": "AI Research Lab (2015)", "category": "company" },
     { "name": "DEEPMIND", "description": "AI Research Pioneer (2010)", "category": "company" }
   ],
+  "ai_companies": [
+    { "name": "OPENAI", "description": "GPT Models, Founded 2015", "category": "ai_company" },
+    { "name": "GOOGLE DEEPMIND", "description": "AlphaGo/Gemini, Founded 2010", "category": "ai_company" },
+    { "name": "ANTHROPIC", "description": "Claude AI, Founded 2021", "category": "ai_company" },
+    { "name": "HUGGING FACE", "description": "Open Source ML Hub, Founded 2016", "category": "ai_company" },
+    { "name": "META AI", "description": "LLaMA Models, Founded 2013", "category": "ai_company" },
+    { "name": "COHERE", "description": "Enterprise AI, Founded 2019", "category": "ai_company" },
+    { "name": "STABILITY AI", "description": "Stable Diffusion, Founded 2020", "category": "ai_company" },
+    { "name": "MIDJOURNEY", "description": "Visual AI, Founded 2021", "category": "ai_company" },
+    { "name": "NVIDIA", "description": "AI Hardware, Founded 1993", "category": "ai_company" },
+    { "name": "MICROSOFT", "description": "Azure AI, Founded 1975", "category": "ai_company" },
+    { "name": "AMAZON AWS", "description": "AI Cloud Services, Founded 2006", "category": "ai_company" },
+    { "name": "IBM WATSON", "description": "Enterprise AI, Founded 2011", "category": "ai_company" },
+    { "name": "ANYSCALE", "description": "Ray AI Framework, Founded 2019", "category": "ai_company" },
+    { "name": "PERPLEXITY", "description": "AI Search Engine, Founded 2022", "category": "ai_company" },
+    { "name": "CHARACTER.AI", "description": "AI Characters, Founded 2021", "category": "ai_company" },
+    { "name": "JASPER", "description": "AI Writing, Founded 2021", "category": "ai_company" },
+    { "name": "RUNWAY", "description": "Gen-2 Video AI, Founded 2018", "category": "ai_company" },
+    { "name": "SCALE AI", "description": "Data Annotation, Founded 2016", "category": "ai_company" },
+    { "name": "INFLECTION AI", "description": "Pi Assistant, Founded 2022", "category": "ai_company" },
+    { "name": "MISTRAL AI", "description": "Open Models, Founded 2023", "category": "ai_company" },
+    { "name": "DEEPSEEK", "description": "Chinese AI Research, Founded 2021", "category": "ai_company" },
+    { "name": "DATABRICKS", "description": "Dolly/AI Data Platform, Founded 2013", "category": "ai_company" },
+    { "name": "CEREBRAS", "description": "AI Hardware, Founded 2016", "category": "ai_company" },
+    { "name": "ADEPT AI", "description": "AI Actions, Founded 2022", "category": "ai_company" },
+    { "name": "AI21 LABS", "description": "Jurassic/Wordtune, Founded 2017", "category": "ai_company" },
+    { "name": "BAIDU", "description": "Ernie Bot, Founded 2000", "category": "ai_company" },
+    { "name": "TOGETHER AI", "description": "AI Infrastructure, Founded 2022", "category": "ai_company" },
+    { "name": "NVIDIA", "description": "CUDA/Deep Learning, Founded 1993", "category": "ai_company" },
+    { "name": "SAGEMAKER", "description": "AWS ML Platform, Founded 2017", "category": "ai_company" },
+    { "name": "PYTORCH", "description": "Deep Learning Framework, Founded 2016", "category": "ai_company" },
+    { "name": "TENSORFLOW", "description": "Google ML Framework, Founded 2015", "category": "ai_company" },
+    { "name": "WEIGHTS & BIASES", "description": "ML Tools, Founded 2017", "category": "ai_company" },
+    { "name": "HUGGING FACE", "description": "Transformers Library, Founded 2016", "category": "ai_company" },
+    { "name": "MODAL", "description": "Cloud Functions, Founded 2020", "category": "ai_company" },
+    { "name": "REPLICATE", "description": "ML Deployment, Founded 2019", "category": "ai_company" },
+    { "name": "JAX", "description": "Google ML Framework, Founded 2018", "category": "ai_company" }
+  ],
   "featured": [
     { "name": "ADA LOVELACE", "description": "First Programmer (1843)", "category": "tech" },
     { "name": "CHARLES BABBAGE", "description": "Analytical Engine Designer (1822)", "category": "tech" },
@@ -603,6 +641,161 @@
         "category": "credits", 
         "layout": "firstname-lastname",
         "effect": "electric"
+      }
+    ],
+    "logo_grids": [
+      {
+        "name": "EARLY COMPUTING",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Bell_system-1908.svg",
+          "/logos/Zuse-logo2.svg",
+          "/logos/IBM-Logo.wine.svg",
+          "/logos/AT&T_Bell_Laboratories_logo.webp",
+          "/logos/PARC Color Xerox.svg",
+          "/logos/Rank Xerox.svg"
+        ]
+      },
+      {
+        "name": "HARDWARE PIONEERS",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Intel Inside 1968-2003.svg",
+          "/logos/commodore.svg",
+          "/logos/Commodore_VIC_20_logo.svg.png",
+          "/logos/atari.svg",
+          "/logos/it-s-a-sony.svg",
+          "/logos/Foxconn New Black.svg"
+        ]
+      },
+      {
+        "name": "PERSONAL COMPUTING",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Apple-Logo-by-Rob-Janoff.svg",
+          "/logos/Microsoft_logo_(1987).svg",
+          "/logos/Microsoft Windows 98.svg",
+          "/logos/commodore-1257.svg",
+          "/logos/Commodore_Amiga_logo-03.svg",
+          "/logos/nintendo-2.svg"
+        ]
+      },
+      {
+        "name": "INTERNET PIONEERS",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/W3C World Wide Web.svg",
+          "/logos/Netscape Comunications Corporation.svg",
+          "/logos/AOL Old.svg",
+          "/logos/Yahoo.svg",
+          "/logos/Cisco_Systems_1996.svg",
+          "/logos/Cern_Logo_black.svg"
+        ]
+      },
+      {
+        "name": "MODERN WEB",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Google.svg",
+          "/logos/Facebook-5.svg",
+          "/logos/Twitter-Logo.wine.svg",
+          "/logos/YouTube-Logo.wine.svg",
+          "/logos/Meta_Platforms-Logo.wine.svg",
+          "/logos/Amazon.svg"
+        ]
+      },
+      {
+        "name": "DEVELOPER TOOLS",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/python-3.svg",
+          "/logos/PHP-Logo.wine.svg",
+          "/logos/GitHub-Logo.wine.svg",
+          "/logos/Node.js-Logo.wine.svg",
+          "/logos/jquery-2.svg",
+          "/logos/linux-2.svg"
+        ]
+      },
+      {
+        "name": "AI REVOLUTION",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/OpenAI GPT-4.5.svg",
+          "/logos/Claude Ai.svg",
+          "/logos/Google Ai Gemini.svg",
+          "/logos/Anthropic-Logo.wine.svg",
+          "/logos/Perplexity_AI-Logo.wine.svg",
+          "/logos/DeepSeek-Logo.wine.svg"
+        ]
+      }
+    ],
+    "fullscreen_logos": [
+      {
+        "name": "IBM",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/IBM-Logo.wine.svg"
+      },
+      {
+        "name": "APPLE",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Apple-Logo-by-Rob-Janoff.svg"
+      },
+      {
+        "name": "GOOGLE",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Google.svg"
+      },
+      {
+        "name": "MICROSOFT",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Microsoft_logo_(1987).svg"
+      },
+      {
+        "name": "AMAZON",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Amazon.svg"
+      },
+      {
+        "name": "META",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Meta_Platforms-Logo.wine.svg"
+      },
+      {
+        "name": "OPENAI",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/OpenAI GPT-4.5.svg"
+      },
+      {
+        "name": "ANTHROPIC",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Anthropic-Logo.wine.svg"
+      },
+      {
+        "name": "BELL LABS",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/AT&T_Bell_Laboratories_logo.webp"
+      },
+      {
+        "name": "CERN",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Cern_Logo_black.svg"
       }
     ]
   }

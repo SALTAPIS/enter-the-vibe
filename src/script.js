@@ -63,7 +63,10 @@ async function loadCredits() {
             ...(creditsData.writers || []),
             ...(creditsData.hackers || []),
             ...(creditsData.creative || []),
-            ...(creditsData.special || [])
+            ...(creditsData.special || []),
+            ...(creditsData.non_western || []),
+            ...(creditsData.companies || []),
+            ...(creditsData.ai_companies || [])
         ];
 
         console.log(`Loaded ${allCredits.length} credits from JSON`);
@@ -320,6 +323,34 @@ function buildAndStartCreditsSequence(creditsData) {
         }
     }
     
+    // Add some non-western pioneers
+    if (creditsData.non_western && creditsData.non_western.length > 0) {
+        const nonWesternCredits = shuffleArray([...creditsData.non_western]).slice(0, 6);
+        creditScreens.push({
+            credits: nonWesternCredits,
+            layout: "grid"
+        });
+    }
+    
+    // Add AI companies
+    if (creditsData.ai_companies && creditsData.ai_companies.length > 0) {
+        const aiCompanies = shuffleArray([...creditsData.ai_companies]).slice(0, 6);
+        creditScreens.push({
+            credits: aiCompanies,
+            layout: "grid"
+        });
+    }
+    
+    // Add logo grid layouts (add them toward the end of the sequence)
+    if (creditsData.layouts && creditsData.layouts.logo_grids) {
+        creditScreens.push(...creditsData.layouts.logo_grids);
+    }
+
+    // Add fullscreen logo layouts (add at the very end of the sequence)
+    if (creditsData.layouts && creditsData.layouts.fullscreen_logos) {
+        creditScreens.push(...creditsData.layouts.fullscreen_logos);
+    }
+    
     // Add more bilingual layouts to end strong
     if (creditsData.layouts && creditsData.layouts.bilingual) {
         // Add remaining bilingual layouts
@@ -382,6 +413,14 @@ function playCreditsSequence(screens) {
             // Group of credits - show them together
             // The layout property determines if we use grid or row layout
             showGridLayout(screenTimeline, credit.credits, credit.layout);
+        }
+        else if (credit.category === "logos" && credit.layout === "grid" && credit.logos) {
+            // Logo grid layout
+            showLogoGrid(screenTimeline, credit);
+        }
+        else if (credit.category === "logo" && credit.layout === "fullscreen" && credit.logo) {
+            // Fullscreen logo layout
+            showFullscreenLogo(screenTimeline, credit);
         }
         else if (credit.credits) {
             // Legacy packery layout - use grid layout
@@ -1458,8 +1497,8 @@ function showSpecialLayoutCredit(timeline, credit) {
                     if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
                         lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.heading;
                     } else {
-                        // Fallback to hardcoded value
-                        lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)';
+                        // Fallback to hardcoded value - 3x larger
+                        lineDiv.style.fontSize = 'clamp(7.5rem, 18vw, 12rem)';
                     }
                     
                     lineDiv.style.marginBottom = '1rem';
@@ -1472,8 +1511,8 @@ function showSpecialLayoutCredit(timeline, credit) {
                     if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
                         lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.text;
                     } else {
-                        // Fallback to hardcoded value
-                        lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)';
+                        // Fallback to hardcoded value - 3x larger
+                        lineDiv.style.fontSize = 'clamp(6rem, 15vw, 10.5rem)';
                     }
                     
                     lineDiv.style.marginBottom = '0.5rem';
@@ -1488,8 +1527,8 @@ function showSpecialLayoutCredit(timeline, credit) {
                     if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
                         lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.heading;
                     } else {
-                        // Fallback to hardcoded value
-                        lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)';
+                        // Fallback to hardcoded value - 3x larger
+                        lineDiv.style.fontSize = 'clamp(7.5rem, 18vw, 12rem)';
                     }
                     
                     lineDiv.style.marginBottom = '1rem';
@@ -1502,8 +1541,8 @@ function showSpecialLayoutCredit(timeline, credit) {
                     if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
                         lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.text;
                     } else {
-                        // Fallback to hardcoded value
-                        lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)';
+                        // Fallback to hardcoded value - 3x larger
+                        lineDiv.style.fontSize = 'clamp(6rem, 15vw, 10.5rem)';
                     }
                     
                     lineDiv.style.marginBottom = '0.5rem';
@@ -1518,8 +1557,8 @@ function showSpecialLayoutCredit(timeline, credit) {
                     if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
                         lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.heading;
                     } else {
-                        // Fallback to hardcoded value
-                        lineDiv.style.fontSize = 'clamp(2.5rem, 6vw, 4rem)';
+                        // Fallback to hardcoded value - 3x larger
+                        lineDiv.style.fontSize = 'clamp(7.5rem, 18vw, 12rem)';
                     }
                     
                     lineDiv.style.marginBottom = '1rem';
@@ -1532,8 +1571,8 @@ function showSpecialLayoutCredit(timeline, credit) {
                     if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.bilingual) {
                         lineDiv.style.fontSize = appConfig.display.fonts.layouts.bilingual.text;
                     } else {
-                        // Fallback to hardcoded value
-                        lineDiv.style.fontSize = 'clamp(2rem, 5vw, 3.5rem)';
+                        // Fallback to hardcoded value - 3x larger
+                        lineDiv.style.fontSize = 'clamp(6rem, 15vw, 10.5rem)';
                     }
                     
                     lineDiv.style.marginBottom = '0.5rem';
@@ -2211,3 +2250,123 @@ function showEndScene() {
         delay: 1.5
     });
 } 
+
+// Function to show a grid of logos
+function showLogoGrid(timeline, credit) {
+    const creditsContainer = document.querySelector('.credits-container');
+    
+    // Create a container for the logos
+    const container = document.createElement('div');
+    container.classList.add('logo-grid-container');
+    container.style.width = '90%';
+    container.style.height = '80%';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+    
+    // Add a heading if provided
+    if (credit.name) {
+        const heading = document.createElement('h2');
+        heading.textContent = credit.name;
+        heading.style.color = 'white';
+        heading.style.fontSize = 'clamp(2.5rem, 5vw, 4rem)';
+        heading.style.marginBottom = '2rem';
+        heading.style.textAlign = 'center';
+        container.appendChild(heading);
+    }
+    
+    // Create a grid for the logos
+    const logoGrid = document.createElement('div');
+    logoGrid.classList.add('logo-grid');
+    logoGrid.style.display = 'grid';
+    
+    // Determine grid layout based on number of logos
+    const numLogos = credit.logos.length;
+    let columns = 3;
+    
+    if (numLogos <= 2) {
+        columns = numLogos;
+    } else if (numLogos <= 4) {
+        columns = 2;
+    } else if (numLogos <= 9) {
+        columns = 3;
+    } else {
+        columns = 4;
+    }
+    
+    logoGrid.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+    logoGrid.style.gap = '2rem';
+    logoGrid.style.width = '100%';
+    logoGrid.style.justifyItems = 'center';
+    logoGrid.style.alignItems = 'center';
+    
+    // Add logos to the grid
+    credit.logos.forEach(logoPath => {
+        const logoContainer = document.createElement('div');
+        logoContainer.classList.add('logo-container');
+        logoContainer.style.width = '100%';
+        logoContainer.style.height = '100%';
+        logoContainer.style.display = 'flex';
+        logoContainer.style.alignItems = 'center';
+        logoContainer.style.justifyContent = 'center';
+        
+        const logo = document.createElement('img');
+        logo.src = logoPath;
+        logo.alt = 'Logo';
+        logo.style.maxWidth = '100%';
+        logo.style.maxHeight = '100px';
+        logo.style.objectFit = 'contain';
+        logo.style.filter = 'brightness(0) invert(1)'; // Make it white
+        
+        logoContainer.appendChild(logo);
+        logoGrid.appendChild(logoContainer);
+    });
+    
+    container.appendChild(logoGrid);
+    creditsContainer.appendChild(container);
+    
+    // Set visible immediately
+    gsap.set(container, { opacity: 1 });
+}
+
+// Function to show a fullscreen logo
+function showFullscreenLogo(timeline, credit) {
+    const creditsContainer = document.querySelector('.credits-container');
+    
+    // Create a container for the logo
+    const container = document.createElement('div');
+    container.classList.add('fullscreen-logo-container');
+    container.style.width = '100%';
+    container.style.height = '100%';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'center';
+    container.style.justifyContent = 'center';
+    
+    // Add the logo
+    const logo = document.createElement('img');
+    logo.src = credit.logo;
+    logo.alt = credit.name || 'Logo';
+    logo.style.maxWidth = '70%';
+    logo.style.maxHeight = '50vh';
+    logo.style.objectFit = 'contain';
+    logo.style.filter = 'brightness(0) invert(1)'; // Make it white
+    logo.style.marginBottom = '2rem';
+    
+    // Add the name if provided
+    if (credit.name) {
+        const name = document.createElement('h2');
+        name.textContent = credit.name;
+        name.style.color = 'white';
+        name.style.fontSize = 'clamp(2rem, 4vw, 3.5rem)';
+        name.style.textAlign = 'center';
+        container.appendChild(name);
+    }
+    
+    container.appendChild(logo);
+    creditsContainer.appendChild(container);
+    
+    // Set visible immediately
+    gsap.set(container, { opacity: 1 });
+}
