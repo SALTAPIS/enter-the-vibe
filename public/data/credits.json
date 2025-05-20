@@ -355,9 +355,35 @@
     { "name": "ISAAC ASIMOV", "description": "Three Laws of Robotics (1950s)", "category": "writer" },
     { "name": "KRAFTWERK", "description": "Electronic Music Pioneers (1970s)", "category": "creative" },
     { "name": "RICHARD STALLMAN", "description": "Free Software Movement (1983)", "category": "hacker" },
-    { "name": "MARGARET HAMILTON", "description": "Apollo Software Director (1969)", "category": "tech" },
-    { "name": "KATHERINE JOHNSON", "description": "NASA Mathematician (1960s)", "category": "tech" },
-    { "name": "GHOST IN THE MACHINE", "description": "Digital Consciousness", "category": "special" }
+    { "name": "MARGARET HAMILTON", "description": "Apollo Software Director", "category": "tech" },
+    { "name": "KATHERINE JOHNSON", "description": "NASA Mathematician", "category": "tech" },
+    { "name": "GHOST IN THE MACHINE", "description": "Digital Consciousness", "category": "special" },
+    
+    { "name": "SERGEY LEBEDEV", "description": "Soviet Computer Pioneer (1951)", "category": "non_western" },
+    { "name": "MOHAMED ATALLA", "description": "MOSFET Inventor (1959)", "category": "non_western" },
+    { "name": "AN WANG", "description": "Wang Labs Founder (1951)", "category": "non_western" },
+    { "name": "VICTOR GLUSHKOV", "description": "Soviet Cybernetics Pioneer (1961)", "category": "non_western" },
+    { "name": "BHASKARA II", "description": "12th Century Indian Mathematician", "category": "non_western" },
+    { "name": "WANG XUAN", "description": "Chinese Computing Pioneer (1975)", "category": "non_western" },
+    { "name": "CHARLES KUEN KAO", "description": "Fiber Optics Pioneer (1966)", "category": "non_western" },
+    { "name": "MASATOSHI SHIMA", "description": "Intel 4004 Co-designer (1971)", "category": "non_western" },
+    { "name": "FUJIO MASUOKA", "description": "Flash Memory Inventor (1980s)", "category": "non_western" },
+    { "name": "NARINDER SINGH KAPANY", "description": "Father of Fiber Optics (1952)", "category": "non_western" },
+    { "name": "FAQIR CHAND KOHLI", "description": "Indian IT Industry Father (1960s)", "category": "non_western" },
+    { "name": "MSTISLAV KELDYSH", "description": "Soviet Computing Leader (1950s)", "category": "non_western" },
+    { "name": "VLADIMIR VAPNIK", "description": "Statistical Learning Theory Creator (1990s)", "category": "non_western" },
+    { "name": "KAI-FU LEE", "description": "AI Pioneer & Former Google China Head", "category": "non_western" },
+    { "name": "ANDREW CHI-CHIH YAO", "description": "Turing Award Winner (2000)", "category": "non_western" },
+    { "name": "ILYA SUTSKEVER", "description": "OpenAI Co-founder & Scientific Director", "category": "non_western" },
+    { "name": "SERGE BELONGIE", "description": "Computer Vision Expert", "category": "tech" },
+    { "name": "RAJ REDDY", "description": "AI Pioneer & Turing Award Winner", "category": "non_western" },
+    { "name": "VINOD DHAM", "description": "Pentium Chip Father (1993)", "category": "non_western" },
+    { "name": "DEMIS HASSABIS", "description": "DeepMind Founder & AI Pioneer", "category": "tech" },
+    { "name": "AJAY BHATT", "description": "USB Co-inventor (1990s)", "category": "non_western" },
+    { "name": "JENSEN HUANG", "description": "NVIDIA Founder & AI Hardware Pioneer", "category": "non_western" },
+    { "name": "JACK MA", "description": "Alibaba Founder & AI Investor", "category": "non_western" },
+    { "name": "DARIO AMODEI", "description": "Anthropic Founder & AI Safety Pioneer", "category": "tech" },
+    { "name": "FEIYANG LYU", "description": "AI Ethics Researcher", "category": "non_western" }
   ],
   "layouts": {
     "title": [
@@ -401,6 +427,42 @@
         "category": "credits", 
         "layout": "bilingual",
         "language": "russian"
+      },
+      { 
+        "name": "コンピューター科学者\n嶋 正利 • MASATOSHI SHIMA\n舛岡 富士雄 • FUJIO MASUOKA\n坂村 健 • KEN SAKAMURA\nイノベーター\n佐々木 正 • TADASHI SASAKI\n森山 和道 • KAZUMICHI MORIYAMA", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "japanese"
+      },
+      { 
+        "name": "人工知能研究者\n李 開復 • KAI-FU LEE\n松尾 豊 • YUTAKA MATSUO\n深層学習先駆者\n hinton博士の同僚 • DR. HINTON'S COLLEAGUES\n全脳アーキテクチャ • WHOLE BRAIN ARCHITECTURE", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "japanese"
+      },
+      { 
+        "name": "创新企业家\n马云 • JACK MA\n马化腾 • PONY MA\n李彦宏 • ROBIN LI\n科技远见者\n任正非 • REN ZHENGFEI\n张一鸣 • ZHANG YIMING\n雷军 • LEI JUN", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "chinese"
+      },
+      { 
+        "name": "العلماء والمبتكرون\nمحمد عطا الله • MOHAMED ATALLA\nهاني فريد • HANY FARID\nفادي غندور • FADI GHANDOUR\nرجال الأعمال\nخالد بشارة • KHALED BICHARA\nأحمد الألفي • AHMED ALFI\nإياد القصار • EYAD ALKASSAR", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "arabic"
+      },
+      { 
+        "name": "PIONEROS LATINOAMERICANOS\nLUIS VON AHN • LUIS VON AHN\nMIGUEL DE ICAZA • MIGUEL DE ICAZA\nDIGITAL INNOVADORES\nMARCOS GALPERÍN • MARCOS GALPERIN\nDAVID VÉLEZ • DAVID VELEZ\nHENRIQUE DUBUGRAS • HENRIQUE DUBUGRAS", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "spanish"
+      },
+      { 
+        "name": "भारतीय प्रौद्योगिकी अग्रणी\nनरिंदर सिंह कपानी • NARINDER SINGH KAPANY\nफकीर चंद कोहली • FAQIR CHAND KOHLI\nकंप्यूटिंग नवप्रवर्तक\nविजय भटकर • VIJAY P. BHATKAR\nविनोद धाम • VINOD DHAM\nअजय भट्ट • AJAY BHATT", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "hindi"
       }
     ],
     "hierarchical": [
@@ -416,6 +478,56 @@
       },
       {
         "name": "CREATIVE VISION\nALEXANDER WILLIAMS\nZOE THOMPSON\nSTORY DEVELOPMENT\nBENJAMIN HARRIS\nEMILY TAYLOR", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "EARLY COMPUTING GIANTS\nIBM\nBELL LABS\nXEROX PARC\nPIONEER HARDWARE\nDIGITAL EQUIPMENT CORP\nFAIRCHILD SEMICONDUCTOR\nINTEL", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "PERSONAL COMPUTER ERA\nMICROSOFT\nAPPLE\nATARI\nCOLLABORATIVE SYSTEMS\nSUN MICROSYSTEMS\nADOBE\nORACLE", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "INTERNET PIONEERS\nCERN\nNETSCAPE\nYAHOO\nAMAZON\nINTERNET EVOLUTION\nCISCO\nAOL\nEBAY", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "SOCIAL MEDIA REVOLUTION\nFACEBOOK\nTWITTER\nYOUTUBE\nINSTAGRAM\nCONTENT PLATFORMS\nWIKIPEDIA\nSPOTIFY\nGITHUB", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "AI RESEARCH LEADERS\nOPENAI\nDEEPMIND\nANTHROPIC\nRESEARCH DIRECTIONS\nCOMPUTER VISION\nNATURAL LANGUAGE\nREINFORCEMENT LEARNING", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "SOVIET COMPUTING\nSERGEY LEBEDEV\nVICTOR GLUSHKOV\nMSTISLAV KELDYSH\nRUSSIAN INNOVATORS\nVLADIMIR VAPNIK\nEUGENE KASPERSKY\nPAVEL DUROV", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "ASIAN TECH GIANTS\nTSMC\nSAMSUNG\nTENCENT\nALIBABA\nGROWTH LEADERS\nXIAOMI\nHUAWEI\nBYTEDANCE", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "INDIAN TECH LEADERS\nINFOSYS\nWIPRO\nTCS\nINNOVATION DRIVERS\nAJAY BHATT\nVINOD DHAM\nSUNDAR PICHAI", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "CYBERPUNK VISIONARIES\nWILLIAM GIBSON\nNEAL STEPHENSON\nBRUCE STERLING\nCREATIVE INFLUENCES\nRIDLEY SCOTT\nMAMORU OSHII\nDENIS VILLENEUVE", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "ELECTRONIC MUSIC PIONEERS\nKRAFTWERK\nBRIAN ENO\nAPHEX TWIN\nINNOVATIVE SOUNDS\nYELLOW MAGIC ORCHESTRA\nDAFT PUNK\nBJÖRK", 
         "category": "credits", 
         "layout": "hierarchical"
       }
@@ -436,6 +548,61 @@
         "name": "RICHARD\nDORMAN", 
         "category": "credits", 
         "layout": "firstname-lastname"
+      },
+      {
+        "name": "GRACE\nHOPPER", 
+        "category": "credits", 
+        "layout": "firstname-lastname",
+        "effect": "electric"
+      },
+      {
+        "name": "ALAN\nTURING", 
+        "category": "credits", 
+        "layout": "firstname-lastname"
+      },
+      {
+        "name": "ADA\nLOVELACE", 
+        "category": "credits", 
+        "layout": "firstname-lastname",
+        "effect": "neon" 
+      },
+      {
+        "name": "STEVE\nJOBS", 
+        "category": "credits", 
+        "layout": "firstname-lastname"
+      },
+      {
+        "name": "TIM\nBERNERS-LEE", 
+        "category": "credits", 
+        "layout": "firstname-lastname",
+        "effect": "electric"
+      },
+      {
+        "name": "DOUGLAS\nENGELBART", 
+        "category": "credits", 
+        "layout": "firstname-lastname"
+      },
+      {
+        "name": "MARGARET\nHAMILTON", 
+        "category": "credits", 
+        "layout": "firstname-lastname",
+        "effect": "neon"
+      },
+      {
+        "name": "WILLIAM\nGIBSON", 
+        "category": "credits", 
+        "layout": "firstname-lastname"
+      },
+      {
+        "name": "SERGEY\nLEBEDEV", 
+        "category": "credits", 
+        "layout": "firstname-lastname"
+      },
+      {
+        "name": "RAJ\nREDDY", 
+        "category": "credits", 
+        "layout": "firstname-lastname",
+        "effect": "electric"
       }
     ]
   }
