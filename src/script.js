@@ -366,12 +366,12 @@ function playCreditsSequence(screens) {
         }
         else if (credit.layout === "grid" || credit.layout === "row") {
             // Group of credits - show them together
-            // The layout property determins if we use grid or row layout
-            showPackeryGroup(screenTimeline, credit.credits, credit.layout);
+            // The layout property determines if we use grid or row layout
+            showGridLayout(screenTimeline, credit.credits, credit.layout);
         }
         else if (credit.credits) {
-            // Legacy packery layout
-            showPackeryGroup(screenTimeline, credit.credits);
+            // Legacy packery layout - use grid layout
+            showGridLayout(screenTimeline, credit.credits, "grid");
         }
         
         // Increment index for next time
@@ -1512,76 +1512,140 @@ function showSpecialLayoutCredit(timeline, credit) {
     return timeline;
 }
 
-// Function to show packery group layout - multiple people in a more artistic layout
-function showPackeryGroup(timeline, screen) {
+// Function to show grid or row layout - multiple people in a more organized layout
+function showGridLayout(timeline, creditsInput, layout = "grid") {
     const creditsContainer = document.querySelector('.credits-container');
     
     // Clear the container first
-    gsap.set('.credit, .credit-description', { 
-        opacity: 0, 
-        onComplete: function() {
-            document.querySelectorAll('.credit, .credit-description').forEach(el => el.remove());
-        }
-    });
+    creditsContainer.innerHTML = '';
     
-    // Extract the credits array from the screen object
-    const credits = screen.credits || [];
+    // Handle both cases:
+    // 1. Passing an array of credits directly
+    // 2. Passing an object with a credits property
+    let credits = [];
+    if (Array.isArray(creditsInput)) {
+        credits = creditsInput;
+    } else if (creditsInput && creditsInput.credits) {
+        credits = creditsInput.credits;
+    }
     
     if (!credits.length) {
-        console.error("No credits provided for packery layout");
+        console.error("No credits provided for grid layout");
         return timeline;
     }
     
-    // Create and position credits with packery layout
-    credits.forEach((credit, i) => {
-        const creditEl = document.createElement('div');
-        creditEl.classList.add('credit', 'packery-item');
-        creditEl.textContent = credit.name;
+    console.log(`Displaying ${credits.length} credits in ${layout} layout`);
+    
+    // Create simple wrapper
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('credits-wrapper');
+    wrapper.style.position = 'absolute';
+    wrapper.style.width = '90%';
+    wrapper.style.maxWidth = '1200px';
+    wrapper.style.top = '50%';
+    wrapper.style.left = '50%';
+    wrapper.style.transform = 'translate(-50%, -50%)';
+    
+    if (layout === "row") {
+        // Create row layout - simple column flex
+        wrapper.style.display = 'flex';
+        wrapper.style.flexDirection = 'column';
+        wrapper.style.alignItems = 'center';
+        wrapper.style.justifyContent = 'center';
+        wrapper.style.gap = '30px';
         
-        // Randomize size a bit within constraints (3x3 to 5x5 grid)
-        const width = Math.floor(Math.random() * 3) + 3;
-        const height = Math.floor(Math.random() * 3) + 3;
+        // Add credits to row layout
+        credits.forEach(credit => {
+            const creditEl = createCreditElement(credit, "row");
+            wrapper.appendChild(creditEl);
+        });
+    } else {
+        // Create grid layout - use specific grid settings
+        wrapper.style.display = 'grid';
         
-        // Responsive sizing that maintains the grid feel
-        const gridSize = Math.min(window.innerWidth, window.innerHeight) / 12;
+        // Calculate grid dimensions
+        const totalCredits = credits.length;
+        let columns;
         
-        creditEl.style.width = `${width * gridSize}px`;
-        creditEl.style.height = `${height * gridSize}px`;
-        creditEl.style.fontSize = '2rem';
-        creditEl.style.fontWeight = 'bold';
+        if (totalCredits <= 2) columns = totalCredits;
+        else if (totalCredits <= 4) columns = 2;
+        else if (totalCredits <= 6) columns = 3;
+        else columns = 4;
         
-        // Position randomly but ensure it's within container bounds
-        const maxLeft = window.innerWidth - (width * gridSize);
-        const maxTop = window.innerHeight - (height * gridSize) - 100; // Account for possible description
+        // Set grid template columns with equal width columns
+        wrapper.style.gridTemplateColumns = `repeat(${columns}, 1fr)`;
+        wrapper.style.gap = '30px 40px';
+        wrapper.style.justifyItems = 'center';
+        wrapper.style.alignItems = 'center';
         
-        creditEl.style.left = `${Math.random() * maxLeft}px`;
-        creditEl.style.top = `${Math.random() * maxTop}px`;
+        // Add credits to grid layout
+        credits.forEach((credit, index) => {
+            const creditEl = createCreditElement(credit, "grid");
+            // Set explicit grid column and row
+            const col = (index % columns) + 1;
+            const row = Math.floor(index / columns) + 1;
+            creditEl.style.gridColumn = col;
+            creditEl.style.gridRow = row;
+            wrapper.appendChild(creditEl);
+        });
+    }
+    
+    // Add the wrapper to the container
+    creditsContainer.appendChild(wrapper);
+    
+    // Helper function to create credit element
+    function createCreditElement(credit, layoutType) {
+        const el = document.createElement('div');
+        el.classList.add('credit', `${layoutType}-credit`);
+        el.style.textAlign = 'center';
+        el.style.width = '100%';
         
-        // Assign a color
-        creditEl.style.color = colorPalette.white;
+        // Split name for better display
+        const splitName = splitNameIntoLines(credit.name);
+        const nameParts = splitName.split('\n');
         
-        creditsContainer.appendChild(creditEl);
+        if (nameParts.length === 2) {
+            const firstNameEl = document.createElement('div');
+            firstNameEl.classList.add('name-first');
+            firstNameEl.textContent = nameParts[0];
+            
+            const lastNameEl = document.createElement('div');
+            lastNameEl.classList.add('name-last');
+            lastNameEl.textContent = nameParts[1];
+            
+            // Set font sizes
+            firstNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+            lastNameEl.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+            
+            el.appendChild(firstNameEl);
+            el.appendChild(lastNameEl);
+        } else {
+            // Single line name
+            el.textContent = credit.name;
+            el.style.fontSize = 'clamp(2rem, 6vw, 4rem)';
+        }
+        
+        // Set color
+        el.style.color = colorPalette.white;
         
         // Add description if available
         if (credit.description) {
             const descEl = document.createElement('div');
-            descEl.classList.add('credit-description', 'packery-description');
+            descEl.classList.add('credit-description');
             descEl.textContent = credit.description;
+            descEl.style.fontSize = 'clamp(0.8rem, 2vw, 1.5rem)';
+            descEl.style.marginTop = '8px';
             
-            // Position description below the credit
-            const creditRect = creditEl.getBoundingClientRect();
-            descEl.style.left = `${creditRect.left}px`;
-            descEl.style.top = `${creditRect.bottom + 10}px`;
-            descEl.style.width = `${creditRect.width}px`;
-            
-            creditsContainer.appendChild(descEl);
+            el.appendChild(descEl);
         }
         
-        // Apply animations
-        if (credit.category === 'tech') creditEl.classList.add('electric');
-        else if (credit.category === 'artist') creditEl.classList.add('electric');
-        else creditEl.classList.add('flicker');
-    });
+        // Apply effect based on category
+        if (credit.category === 'tech') el.classList.add('electric');
+        else if (credit.category === 'artist') el.classList.add('electric');
+        else el.classList.add('flicker');
+        
+        return el;
+    }
     
     // Play glitch sound
     if (document.getElementById('glitch-sound')) {
@@ -1947,7 +2011,7 @@ function showEndScene() {
     
     // Animate in
     gsap.from(endScene, {
-        opacity: 0,
+        opacity: 0, 
         duration: 1.5
     });
     
@@ -1960,14 +2024,14 @@ function showEndScene() {
     
     gsap.from(subtitle, {
         y: -30,
-        opacity: 0,
+        opacity: 0, 
         duration: 1,
         delay: 1
     });
     
     gsap.from(restartBtn, {
         y: 30,
-        opacity: 0,
+        opacity: 0, 
         duration: 1,
         delay: 1.5
     });
