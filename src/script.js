@@ -100,16 +100,10 @@ async function init() {
     
     // Initialize UI elements
     const startButton = document.getElementById('start-button');
-    const skipButton = document.getElementById('skip-button');
     const beatIndicator = document.getElementById('beat-indicator');
     const mainSound = document.getElementById('main-sound');
     const glitchSound = document.getElementById('glitch-sound');
     const transitionSound = document.getElementById('transition-sound');
-    
-    // Set up event listeners
-    if (skipButton) {
-        skipButton.addEventListener('click', skipToPhase3);
-    }
     
     // Allow manual beat triggering by clicking on the beat indicator
     if (beatIndicator) {
@@ -122,12 +116,15 @@ async function init() {
         beatIndicator.style.pointerEvents = 'auto';
     }
 
-    // Allow triggering beats with spacebar
+    // Allow triggering beats with spacebar and toggle controls with 'c'
     document.addEventListener('keydown', (e) => {
         if (e.code === 'Space') {
             console.log("Manual beat triggered by spacebar");
             detectPeak(true);
             e.preventDefault(); // Prevent page scrolling
+        } else if (e.code === 'KeyC') {
+            // Toggle controls panel when 'c' is pressed
+            toggleControlsVisibility();
         }
     });
     
@@ -212,8 +209,10 @@ function buildAndStartCreditsSequence(creditsData) {
     // The main screens array for our sequence
     const creditScreens = [];
     
-    // 1. Start with the title screens
+    // 1. Start with the title screens - DOUBLED
     if (creditsData.layouts && creditsData.layouts.title) {
+        // Add title screens twice
+        creditScreens.push(...creditsData.layouts.title);
         creditScreens.push(...creditsData.layouts.title);
     }
     
@@ -222,17 +221,52 @@ function buildAndStartCreditsSequence(creditsData) {
     // Create a shuffled list of all regular credits
     const regularCredits = shuffleArray([...allCredits]);
     
-    // Create a function to get credits of a specific category
-    function getCreditsOfCategory(category, count = 4) {
+    // Create a function to get credits of a specific category - INCREASED COUNTS
+    function getCreditsOfCategory(category, count = 8) { // Doubled default count
         return regularCredits
             .filter(credit => credit.category === category)
             .slice(0, count);
     }
     
-    // We'll alternate between different layout types
+    // First, show a selection of AI CEOs as prominent single name displays - DOUBLED to 14
+    if (creditsData.ai_companies && creditsData.ai_companies.length > 0) {
+        // Get the first 14 AI CEOs for single name displays (doubled from 7)
+        const aiCeos = shuffleArray([...creditsData.ai_companies]).slice(0, 14);
+        
+        // Add each AI CEO as a single name display
+        for (const ceo of aiCeos) {
+            creditScreens.push({
+                ...ceo,
+                layout: "single"
+            });
+        }
+    }
     
-    // First, do single name showcases
-    for (let i = 0; i < 5; i++) {  // Show 5 individual prominent people
+    // Next, show early computing pioneers as single name displays - DOUBLED to 14
+    if (creditsData.technology && creditsData.technology.length > 0) {
+        // Filter for pioneers (those with years earlier than 1980)
+        const pioneers = creditsData.technology.filter(person => {
+            if (person.description && person.description.includes("19")) {
+                const yearMatch = person.description.match(/(19[0-7][0-9])/);
+                return yearMatch && parseInt(yearMatch[0]) < 1980;
+            }
+            return false;
+        });
+        
+        // Take a sample of 14 pioneers (doubled from 7)
+        const featuredPioneers = shuffleArray(pioneers).slice(0, 14);
+        
+        // Add each pioneer as a single name display
+        for (const pioneer of featuredPioneers) {
+            creditScreens.push({
+                ...pioneer,
+                layout: "single"
+            });
+        }
+    }
+    
+    // Now, do single name showcases from the featured section - DOUBLED to 10
+    for (let i = 0; i < 10; i++) {  // Show 10 individual prominent people (doubled from 5)
         const featuredCredit = creditsData.featured?.[i] || regularCredits[i];
         if (featuredCredit) {
             // For each featured credit, add it as a single name
@@ -243,124 +277,206 @@ function buildAndStartCreditsSequence(creditsData) {
         }
     }
     
-    // Add bilingual layouts
+    // Add non-western pioneers as single name displays - DOUBLED to 14
+    if (creditsData.non_western && creditsData.non_western.length > 0) {
+        // Take a sample of 14 non-western pioneers (doubled from 7)
+        const nonWesternPioneers = shuffleArray([...creditsData.non_western]).slice(0, 14);
+        
+        // Add each non-western pioneer as a single name display
+        for (const pioneer of nonWesternPioneers) {
+            creditScreens.push({
+                ...pioneer,
+                layout: "single"
+            });
+        }
+    }
+    
+    // Add bilingual layouts - DOUBLED
     if (creditsData.layouts && creditsData.layouts.bilingual) {
-        // Add all bilingual layouts - they look great
+        // Add all bilingual layouts twice
+        creditScreens.push(...creditsData.layouts.bilingual);
         creditScreens.push(...creditsData.layouts.bilingual);
     }
     
-    // Add tech people in grid layouts
-    const techCredits = getCreditsOfCategory('tech', 8);
+    // Add tech people in grid layouts - TRIPLED
+    const techCredits = getCreditsOfCategory('tech', 24); // Tripled from 8
     if (techCredits.length >= 4) {
-        // Add them in groups of 4
-        creditScreens.push({
-            credits: techCredits.slice(0, 4),
-            layout: "grid"
-        });
-        
-        if (techCredits.length >= 8) {
-            creditScreens.push({
-                credits: techCredits.slice(4, 8),
-                layout: "grid"
-            });
+        // Add tech grids in groups of 4 - creating 6 grids instead of 2
+        for (let i = 0; i < 6; i++) {
+            const startIdx = i * 4;
+            if (startIdx < techCredits.length) {
+                const endIdx = Math.min(startIdx + 4, techCredits.length);
+                creditScreens.push({
+                    credits: techCredits.slice(startIdx, endIdx),
+                    layout: "grid"
+                });
+            }
         }
     }
     
-    // Add more bilingual layouts
+    // Add more bilingual layouts - DOUBLED
     if (creditsData.layouts && creditsData.layouts.bilingual) {
-        // Add all bilingual layouts again - they're the focus
-        creditScreens.push(...creditsData.layouts.bilingual.slice(0, 2));
+        const firstTwo = creditsData.layouts.bilingual.slice(0, 2);
+        // Add first two bilingual layouts twice
+        creditScreens.push(...firstTwo);
+        creditScreens.push(...firstTwo);
     }
     
-    // Add artists in row layouts
-    const artistCredits = getCreditsOfCategory('artist', 6);
+    // Add artists in row layouts - TRIPLED
+    const artistCredits = getCreditsOfCategory('artist', 18); // Tripled from 6
     if (artistCredits.length >= 3) {
-        creditScreens.push({
-            credits: artistCredits.slice(0, 3),
-            layout: "row"
-        });
-        
-        if (artistCredits.length >= 6) {
-            creditScreens.push({
-                credits: artistCredits.slice(3, 6),
-                layout: "row"
-            });
+        // Add artist rows in groups of 3 - creating 6 rows instead of 2
+        for (let i = 0; i < 6; i++) {
+            const startIdx = i * 3;
+            if (startIdx < artistCredits.length) {
+                const endIdx = Math.min(startIdx + 3, artistCredits.length);
+                creditScreens.push({
+                    credits: artistCredits.slice(startIdx, endIdx),
+                    layout: "row"
+                });
+            }
         }
     }
     
-    // Add hierarchical layouts
+    // Add hierarchical layouts - DOUBLED
     if (creditsData.layouts && creditsData.layouts.hierarchical) {
+        // Add hierarchical layouts twice
+        creditScreens.push(...creditsData.layouts.hierarchical);
         creditScreens.push(...creditsData.layouts.hierarchical);
     }
     
-    // Add writers in grid layouts
-    const writerCredits = getCreditsOfCategory('writer', 4);
+    // Add writers in grid layouts - TRIPLED
+    const writerCredits = getCreditsOfCategory('writer', 12); // Tripled from 4
     if (writerCredits.length >= 4) {
-        creditScreens.push({
-            credits: writerCredits,
-            layout: "grid"
-        });
+        // Add writer grids in groups of 4 - creating 3 grids instead of 1
+        for (let i = 0; i < 3; i++) {
+            const startIdx = i * 4;
+            if (startIdx < writerCredits.length) {
+                const endIdx = Math.min(startIdx + 4, writerCredits.length);
+                creditScreens.push({
+                    credits: writerCredits.slice(startIdx, endIdx),
+                    layout: "grid"
+                });
+            }
+        }
     }
     
-    // Add firstname-lastname layouts
+    // Add firstname-lastname layouts - TRIPLED
     if (creditsData.layouts && creditsData.layouts["firstname-lastname"]) {
-        creditScreens.push(...creditsData.layouts["firstname-lastname"]);
-    }
-    
-    // Add hackers in row layouts
-    const hackerCredits = getCreditsOfCategory('hacker', 6);
-    if (hackerCredits.length >= 3) {
-        creditScreens.push({
-            credits: hackerCredits.slice(0, 3),
-            layout: "row"
-        });
+        // Add more firstname-lastname layouts by tripling the existing ones
+        const firstnameLastnameLayouts = [...creditsData.layouts["firstname-lastname"]];
         
-        if (hackerCredits.length >= 6) {
+        // First pass - add the original layouts
+        creditScreens.push(...firstnameLastnameLayouts);
+        
+        // Second pass - add duplicates with minor variations
+        for (const layout of firstnameLastnameLayouts) {
             creditScreens.push({
-                credits: hackerCredits.slice(3, 6),
-                layout: "row"
+                ...layout,
+                effect: layout.effect === 'neon' ? undefined : 'neon' // Toggle neon effect
+            });
+        }
+        
+        // Third pass - add more duplicates but in reverse order to create variety
+        const reversedLayouts = [...firstnameLastnameLayouts].reverse();
+        for (const layout of reversedLayouts) {
+            creditScreens.push({
+                ...layout
             });
         }
     }
     
-    // Add some non-western pioneers
+    // Add hackers in row layouts - TRIPLED
+    const hackerCredits = getCreditsOfCategory('hacker', 18); // Tripled from 6
+    if (hackerCredits.length >= 3) {
+        // Add hacker rows in groups of 3 - creating 6 rows instead of 2
+        for (let i = 0; i < 6; i++) {
+            const startIdx = i * 3;
+            if (startIdx < hackerCredits.length) {
+                const endIdx = Math.min(startIdx + 3, hackerCredits.length);
+                creditScreens.push({
+                    credits: hackerCredits.slice(startIdx, endIdx),
+                    layout: "row"
+                });
+            }
+        }
+    }
+    
+    // Add non-western pioneers in grid layouts - TRIPLED
     if (creditsData.non_western && creditsData.non_western.length > 0) {
-        const nonWesternCredits = shuffleArray([...creditsData.non_western]).slice(0, 6);
-        creditScreens.push({
-            credits: nonWesternCredits,
-            layout: "grid"
-        });
+        // Create 3 grid layouts with non-western pioneers
+        for (let i = 0; i < 3; i++) {
+            const startIdx = i * 6;
+            if (startIdx < creditsData.non_western.length) {
+                const nonWesternSlice = shuffleArray([...creditsData.non_western]).slice(startIdx, startIdx + 6);
+                creditScreens.push({
+                    credits: nonWesternSlice,
+                    layout: "grid"
+                });
+            }
+        }
     }
     
-    // Add AI companies
+    // Add AI companies in grid layouts - TRIPLED
     if (creditsData.ai_companies && creditsData.ai_companies.length > 0) {
-        const aiCompanies = shuffleArray([...creditsData.ai_companies]).slice(0, 6);
-        creditScreens.push({
-            credits: aiCompanies,
-            layout: "grid"
-        });
+        // Create 3 grid layouts with AI companies
+        for (let i = 0; i < 3; i++) {
+            const startIdx = i * 6;
+            if (startIdx < creditsData.ai_companies.length) {
+                const aiCompaniesSlice = shuffleArray([...creditsData.ai_companies]).slice(startIdx, startIdx + 6);
+                creditScreens.push({
+                    credits: aiCompaniesSlice,
+                    layout: "grid"
+                });
+            }
+        }
     }
     
-    // Add logo grid layouts (add them toward the end of the sequence)
+    // Add logo grid layouts - DOUBLED
     if (creditsData.layouts && creditsData.layouts.logo_grids) {
-        creditScreens.push(...creditsData.layouts.logo_grids);
+        // First, make sure they have the correct layout type
+        const fixedLogoGrids = creditsData.layouts.logo_grids.map(grid => ({
+            ...grid,
+            layout: "logo_grid",
+            category: "logos"
+        }));
+        
+        // Add logo grid layouts twice
+        creditScreens.push(...fixedLogoGrids);
+        creditScreens.push(...fixedLogoGrids);
     }
 
-    // Add fullscreen logo layouts (add at the very end of the sequence)
+    // Add fullscreen logo layouts - DOUBLED
     if (creditsData.layouts && creditsData.layouts.fullscreen_logos) {
-        creditScreens.push(...creditsData.layouts.fullscreen_logos);
+        // First, make sure they have the correct layout type
+        const fixedFullscreenLogos = creditsData.layouts.fullscreen_logos.map(logo => ({
+            ...logo,
+            layout: "fullscreen_logo",
+            category: "logo"
+        }));
+        
+        // Add fullscreen logo layouts twice
+        creditScreens.push(...fixedFullscreenLogos);
+        creditScreens.push(...fixedFullscreenLogos);
     }
     
-    // Add more bilingual layouts to end strong
+    // Add more bilingual layouts to end strong - DOUBLED
     if (creditsData.layouts && creditsData.layouts.bilingual) {
-        // Add remaining bilingual layouts
-        creditScreens.push(...creditsData.layouts.bilingual.slice(2));
+        const remainingLayouts = creditsData.layouts.bilingual.slice(2);
+        // Add remaining bilingual layouts twice
+        creditScreens.push(...remainingLayouts);
+        creditScreens.push(...remainingLayouts);
     }
     
-    // Add special credits at the end
-    const specialCredits = getCreditsOfCategory('special');
+    // Add special credits at the end - DOUBLED
+    const specialCredits = getCreditsOfCategory('special', 8); // Doubled from 4
     if (specialCredits.length > 0) {
+        // Add each special credit twice
         for (const credit of specialCredits) {
+            creditScreens.push({
+                ...credit,
+                layout: "single"
+            });
             creditScreens.push({
                 ...credit,
                 layout: "single"
@@ -414,11 +530,11 @@ function playCreditsSequence(screens) {
             // The layout property determines if we use grid or row layout
             showGridLayout(screenTimeline, credit.credits, credit.layout);
         }
-        else if (credit.category === "logos" && credit.layout === "grid" && credit.logos) {
+        else if (credit.layout === "logo_grid" || (credit.category === "logos" && credit.layout === "grid")) {
             // Logo grid layout
             showLogoGrid(screenTimeline, credit);
         }
-        else if (credit.category === "logo" && credit.layout === "fullscreen" && credit.logo) {
+        else if (credit.layout === "fullscreen_logo" || (credit.category === "logo" && credit.layout === "fullscreen")) {
             // Fullscreen logo layout
             showFullscreenLogo(screenTimeline, credit);
         }
@@ -838,11 +954,7 @@ function initBeatControls() {
     }
     
     toggleControlsBtn.addEventListener('click', () => {
-        const controlRows = beatControls.querySelectorAll('.control-row:not(:last-child)');
-        for (const row of controlRows) {
-            row.style.display = row.style.display === 'none' ? 'flex' : 'none';
-        }
-        toggleControlsBtn.textContent = toggleControlsBtn.textContent === 'Hide Controls' ? 'Show Controls' : 'Hide Controls';
+        toggleControlsVisibility();
     });
     
     // Make beat indicator clickable to manually trigger beats or toggle auto mode
@@ -1478,7 +1590,7 @@ function showSpecialLayoutCredit(timeline, credit) {
         }
         
         creditEl.style.letterSpacing = '10px';
-        creditEl.style.color = colorPalette.blue; // Blue for title text
+        creditEl.style.color = colorPalette.white; // Changed from blue to white
     }
     // For bilingual layout, format based on the language
     else if (credit.layout === 'bilingual') {
@@ -2231,7 +2343,7 @@ function showEndScene() {
     
     gsap.from(endTitle, {
         y: -50,
-        opacity: 0,
+                    opacity: 0, 
         duration: 1,
         delay: 0.5
     });
@@ -2254,6 +2366,9 @@ function showEndScene() {
 // Function to show a grid of logos
 function showLogoGrid(timeline, credit) {
     const creditsContainer = document.querySelector('.credits-container');
+    
+    // Clear container
+    creditsContainer.innerHTML = '';
     
     // Create a container for the logos
     const container = document.createElement('div');
@@ -2282,7 +2397,9 @@ function showLogoGrid(timeline, credit) {
     logoGrid.style.display = 'grid';
     
     // Determine grid layout based on number of logos
-    const numLogos = credit.logos.length;
+    // Make sure logos property exists, use empty array as fallback
+    const logos = credit.logos || [];
+    const numLogos = logos.length;
     let columns = 3;
     
     if (numLogos <= 2) {
@@ -2291,7 +2408,7 @@ function showLogoGrid(timeline, credit) {
         columns = 2;
     } else if (numLogos <= 9) {
         columns = 3;
-    } else {
+                } else {
         columns = 4;
     }
     
@@ -2301,38 +2418,56 @@ function showLogoGrid(timeline, credit) {
     logoGrid.style.justifyItems = 'center';
     logoGrid.style.alignItems = 'center';
     
-    // Add logos to the grid
-    credit.logos.forEach(logoPath => {
-        const logoContainer = document.createElement('div');
-        logoContainer.classList.add('logo-container');
-        logoContainer.style.width = '100%';
-        logoContainer.style.height = '100%';
-        logoContainer.style.display = 'flex';
-        logoContainer.style.alignItems = 'center';
-        logoContainer.style.justifyContent = 'center';
+    // Check if logos exist before trying to iterate
+    if (numLogos > 0) {
+        // Add logos to the grid
+        logos.forEach(logoPath => {
+            const logoContainer = document.createElement('div');
+            logoContainer.classList.add('logo-container');
+            logoContainer.style.width = '100%';
+            logoContainer.style.height = '100%';
+            logoContainer.style.display = 'flex';
+            logoContainer.style.alignItems = 'center';
+            logoContainer.style.justifyContent = 'center';
+            
+            const logo = document.createElement('img');
+            logo.src = logoPath;
+            logo.alt = 'Logo';
+            logo.style.maxWidth = '100%';
+            logo.style.maxHeight = '100px';
+            logo.style.objectFit = 'contain';
+            logo.style.filter = 'brightness(0) invert(1)'; // Make it white
+            
+            logoContainer.appendChild(logo);
+            logoGrid.appendChild(logoContainer);
+        });
+    } else {
+        console.warn('No logos provided for logo grid layout');
         
-        const logo = document.createElement('img');
-        logo.src = logoPath;
-        logo.alt = 'Logo';
-        logo.style.maxWidth = '100%';
-        logo.style.maxHeight = '100px';
-        logo.style.objectFit = 'contain';
-        logo.style.filter = 'brightness(0) invert(1)'; // Make it white
-        
-        logoContainer.appendChild(logo);
-        logoGrid.appendChild(logoContainer);
-    });
+        // Add a placeholder message
+        const placeholder = document.createElement('div');
+        placeholder.textContent = 'Logo Grid (Logos not specified)';
+        placeholder.style.color = 'white';
+        placeholder.style.fontSize = '2rem';
+        placeholder.style.opacity = '0.7';
+        logoGrid.appendChild(placeholder);
+    }
     
     container.appendChild(logoGrid);
     creditsContainer.appendChild(container);
     
     // Set visible immediately
     gsap.set(container, { opacity: 1 });
+    
+    return timeline;
 }
 
 // Function to show a fullscreen logo
 function showFullscreenLogo(timeline, credit) {
     const creditsContainer = document.querySelector('.credits-container');
+    
+    // Clear container
+    creditsContainer.innerHTML = '';
     
     // Create a container for the logo
     const container = document.createElement('div');
@@ -2344,15 +2479,31 @@ function showFullscreenLogo(timeline, credit) {
     container.style.alignItems = 'center';
     container.style.justifyContent = 'center';
     
-    // Add the logo
-    const logo = document.createElement('img');
-    logo.src = credit.logo;
-    logo.alt = credit.name || 'Logo';
-    logo.style.maxWidth = '70%';
-    logo.style.maxHeight = '50vh';
-    logo.style.objectFit = 'contain';
-    logo.style.filter = 'brightness(0) invert(1)'; // Make it white
-    logo.style.marginBottom = '2rem';
+    // Check if logo exists
+    if (credit.logo) {
+        // Add the logo
+        const logo = document.createElement('img');
+        logo.src = credit.logo;
+        logo.alt = credit.name || 'Logo';
+        logo.style.maxWidth = '70%';
+        logo.style.maxHeight = '50vh';
+        logo.style.objectFit = 'contain';
+        logo.style.filter = 'brightness(0) invert(1)'; // Make it white
+        logo.style.marginBottom = '2rem';
+        
+        container.appendChild(logo);
+            } else {
+        console.warn('No logo provided for fullscreen logo layout');
+        
+        // Add a placeholder message
+        const placeholder = document.createElement('div');
+        placeholder.textContent = 'Fullscreen Logo (Logo not specified)';
+        placeholder.style.color = 'white';
+        placeholder.style.fontSize = '3rem';
+        placeholder.style.opacity = '0.7';
+        placeholder.style.marginBottom = '2rem';
+        container.appendChild(placeholder);
+    }
     
     // Add the name if provided
     if (credit.name) {
@@ -2364,9 +2515,28 @@ function showFullscreenLogo(timeline, credit) {
         container.appendChild(name);
     }
     
-    container.appendChild(logo);
     creditsContainer.appendChild(container);
     
     // Set visible immediately
     gsap.set(container, { opacity: 1 });
+    
+    return timeline;
+}
+
+// Function to toggle control panel visibility
+function toggleControlsVisibility() {
+    if (!beatControls) return;
+    
+    // Toggle the entire panel's visibility
+    if (beatControls.style.display === 'none') {
+        beatControls.style.display = 'block';
+        if (toggleControlsBtn) {
+            toggleControlsBtn.textContent = 'Hide Controls';
+        }
+    } else {
+        beatControls.style.display = 'none';
+        if (toggleControlsBtn) {
+            toggleControlsBtn.textContent = 'Show Controls';
+        }
+    }
 }

@@ -1,163 +1,129 @@
 # ENTER THE VIBE - Credits List
 
 ## Technology Pioneers
-- KONRAD ZUSE - First Programmable Computer Creator
-- VANNEVAR BUSH - Memex Concept Pioneer
-- NORBERT WIENER - Cybernetics Founder
-- JOHN VON NEUMANN - Computer Architecture Pioneer
-- CLAUDE SHANNON - Information Theory Father
-- ALAN TURING - Computer Science Father
-- GRACE HOPPER - Compiler Pioneer
-- ADA LOVELACE - First Programmer
-- DOUGLAS ENGELBART - Interactive Computing Pioneer
-- DONALD DAVIES - Packet Switching Inventor
-- VINTON CERF - Internet Protocol Co-designer
-- BOB KAHN - TCP/IP Co-creator
-- TED NELSON - Hypertext Visionary
-- JANE SAMMET - Programming Language Pioneer
-- VITALIK BUTERIN - Ethereum Creator
-- LARRY PAGE - Google Co-founder
-- SERGEY BRIN - Google Co-founder
-- BILL GATES - Microsoft Founder
-- STEVE JOBS - Apple Visionary
-- STEVE WOZNIAK - Apple Co-founder
-- MARK ZUCKERBERG - Facebook Founder
-- DONALD KNUTH - Algorithms Pioneer
-- LESLIE LAMPORT - Distributed Systems Pioneer
-- EDSGER DIJKSTRA - Computer Science Pioneer
-- BARBARA LISKOV - Programming Language Pioneer
-- TIM BERNERS-LEE - World Wide Web Inventor
-- LINUS TORVALDS - Linux Creator
-- SATOSHI NAKAMOTO - Bitcoin Creator
-- RICHARD STALLMAN - Free Software Movement
-- JOHN McCARTHY - AI Pioneer
-- MARVIN MINSKY - Neural Network Pioneer
-- MARGARET HAMILTON - Apollo Software Director
-- IVAN SUTHERLAND - Computer Graphics Pioneer
-- KEN THOMPSON - Unix Co-creator
-- DENNIS RITCHIE - C Language Creator
-- BRIAN KERNIGHAN - Unix Pioneer
-- BJARNE STROUSTRUP - C++ Creator
-- LARRY WALL - Perl Creator
-- JAMES GOSLING - Java Creator
-- ANDERS HEJLSBERG - C# Creator
-- YUKIHIRO MATSUMOTO - Ruby Creator
-- BRENDAN EICH - JavaScript Creator
-- GUIDO VAN ROSSUM - Python Creator
-- JOHN RESIG - jQuery Creator
-- RASMUS LERDORF - PHP Creator
-- DHH - Ruby on Rails Creator
-- SOPHIE WILSON - ARM Architecture Designer
-- JOHN MCAFEE - McAfee Antivirus Founder
-- PHIL ZIMMERMANN - PGP Creator
-- WHITFIELD DIFFIE - Public Key Cryptography Pioneer
-- MARTIN HELLMAN - Cryptography Pioneer
-- GEOFFREY HINTON - Deep Learning Pioneer
-- YANN LECUN - Convolutional Networks Pioneer
-- YOSHUA BENGIO - Deep Learning Pioneer
-- ANDREW NG - AI Education Pioneer
-- IAN GOODFELLOW - GAN Inventor
-- DEMIS HASSABIS - DeepMind Founder
-- ANDREJ KARPATHY - AI Visionary
-- SAM ALTMAN - OpenAI CEO
-- DARIO AMODEI - Constitutional AI Pioneer
-- JOHN CARMACK - Game Engine Pioneer
-- ILYA SUTSKEVER - Transformer Architecture Pioneer
-- JENSEN HUANG - NVIDIA Founder
-- CHRIS LATTNER - LLVM & Swift Creator
-- MARK DEAN - PC Architecture Pioneer
-- PIERRE OMIDYAR - eBay Founder
-- SHAFI GOLDWASSER - Cryptography Pioneer
-- SILVIO MICALI - Cryptocurrency Pioneer
-- RAY KURZWEIL - Futurist & AI Pioneer
-- JARON LANIER - VR Pioneer
-- FRAN ALLEN - Compiler Optimization Pioneer
-- MURRAY CAMPBELL - Chess AI Pioneer
-- MARISSA MAYER - Yahoo CEO & Google Pioneer
-- MITCHELL BAKER - Mozilla Foundation Chair
-- HOWARD RHEINGOLD - Virtual Community Pioneer
-- ANITA BORG - Women in Tech Advocate
-- SALLY RIDE - First American Woman in Space
-- MAE JEMISON - First Black Woman in Space
-- HEDY LAMARR - Frequency Hopping Co-inventor
-- ANNIE EASLEY - NASA Computer Scientist
-- KAREN SPÄRCK JONES - NLP Pioneer
-- ADELE GOLDBERG - Smalltalk Pioneer
-- CAROL SHAW - First Female Game Designer
-- DONNA DUBINSKY - Palm Computing Founder
-- MICHAEL DELL - Dell Computers Founder
-- JIMMY WALES - Wikipedia Founder
-- ELIZABETH FEINLER - DNS Pioneer
-- NATALIE SILVANOVICH - Security Researcher
-- KATIE BOUMAN - Black Hole Imaging Pioneer
-- MEREDITH WHITTAKER - AI Ethics Pioneer
-- TIMNIT GEBRU - AI Ethics Researcher
-- JOY BUOLAMWINI - Algorithmic Bias Researcher
-- KYUNGHYUN CHO - Neural Translation Pioneer
-- ORIOL VINYALS - DeepMind Research Director
-- FRANCESCA ROSSI - AI Ethics Researcher
-- ROMAN YAMPOLSKIY - AI Safety Researcher
-- MIRA MURATI - OpenAI CTO
-- JEFF DEAN - Google AI Lead
-- MIGUEL WATTSON - Collaborative Intelligence
-- KATHY SIERRA - Learning Experience Pioneer
-- NATCHA ENGTRAKUL - Compiler Expert
-- SVEN BERGMANN - Blockchain Pioneer
-- SEYMOUR PAPERT - Educational Computing Pioneer
-- SHIGERU MIYAMOTO - Game Design Legend
-- IVAN SUTHERLAND - Computer Graphics Pioneer
-- TIM BERNERS-LEE - World Wide Web Inventor
-- BOB KAHN - TCP/IP Co-creator
-- TED NELSON - Hypertext Visionary
-- JANE SAMMET - Programming Language Pioneer
-- LYNN CONWAY - VLSI Design Pioneer
-- LARRY PAGE - Google Co-founder
-- SERGEY BRIN - Google Co-founder
-- STEVE WOZNIAK - Apple Co-founder
-- STEVE JOBS - Apple Visionary
-- BILL GATES - Microsoft Founder
-- MARK DEAN - PC Architecture Pioneer
-- PIERRE OMIDYAR - eBay Founder
-- SHAFI GOLDWASSER - Cryptography Pioneer
-- SILVIO MICALI - Cryptocurrency Pioneer
-- RAY KURZWEIL - Futurist & AI Pioneer
-- JARON LANIER - VR Pioneer
-- FRAN ALLEN - Compiler Optimization Pioneer
-- MURRAY CAMPBELL - Chess AI Pioneer
-- DONALD DAVIES - Packet Switching Inventor
-- MARISSA MAYER - Yahoo CEO & Google Pioneer
-- MITCHELL BAKER - Mozilla Foundation Chair
-- HOWARD RHEINGOLD - Virtual Community Pioneer
-- ANITA BORG - Women in Tech Advocate
-- SALLY RIDE - First American Woman in Space
-- MAE JEMISON - First Black Woman in Space
-- HEDY LAMARR - Frequency Hopping Co-inventor
-- ANNIE EASLEY - NASA Computer Scientist
-- KAREN SPÄRCK JONES - NLP Pioneer
-- ADELE GOLDBERG - Smalltalk Pioneer
-- CAROL SHAW - First Female Game Designer
-- DONNA DUBINSKY - Palm Computing Founder
-- MICHAEL DELL - Dell Computers Founder
-- JIMMY WALES - Wikipedia Founder
-- ELIZABETH FEINLER - DNS Pioneer
-- KEN THOMPSON - Unix Co-creator
-- DENNIS RITCHIE - C Language Creator
-- BRIAN KERNIGHAN - Unix Pioneer
-- BJARNE STROUSTRUP - C++ Creator
-- LARRY WALL - Perl Creator
-- JAMES GOSLING - Java Creator
-- ANDERS HEJLSBERG - C# Creator
-- YUKIHIRO MATSUMOTO - Ruby Creator
-- BRENDAN EICH - JavaScript Creator
-- GUIDO VAN ROSSUM - Python Creator
-- JOHN RESIG - jQuery Creator
-- RASMUS LERDORF - PHP Creator
-- DHH - Ruby on Rails Creator
-- SOPHIE WILSON - ARM Architecture Designer
-- JOHN MCAFEE - McAfee Antivirus Founder
-- PHIL ZIMMERMANN - PGP Creator
-- WHITFIELD DIFFIE - Public Key Cryptography Pioneer
-- MARTIN HELLMAN - Cryptography Pioneer
+- CHARLES BABBAGE - Analytical Engine Designer (1822)
+- ADA LOVELACE - First Programmer (1843)
+- GEORGE BOOLE - Boolean Algebra Creator (1854) 
+- HERMAN HOLLERITH - Tabulating Machine Inventor (1890)
+- ALAN TURING - Computing Theory Pioneer (1936)
+- KONRAD ZUSE - First Programmable Computer (1941)
+- JOHN ATANASOFF - ABC Computer Inventor (1942)
+- CLIFFORD BERRY - ABC Computer Co-creator (1942)
+- JOAN CLARKE - Bletchley Park Codebreaker (1942)
+- HEDY LAMARR - Frequency Hopping Co-inventor (1942)
+- JOHN VON NEUMANN - Computer Architecture Pioneer (1945)
+- VANNEVAR BUSH - Memex Concept Pioneer (1945)
+- JEAN JENNINGS BARTIK - ENIAC Programmer (1946)
+- BETTY HOLBERTON - ENIAC Programmer (1946)
+- KATHLEEN ANTONELLI - ENIAC Programmer (1946)
+- FRANCES SPENCE - ENIAC Programmer (1946)
+- MARLYN MELTZER - ENIAC Programmer (1946)
+- RUTH TEITELBAUM - ENIAC Programmer (1946)
+- WILLIAM SHOCKLEY - Transistor Co-inventor (1947)
+- JOHN BARDEEN - Transistor Co-inventor (1947)
+- WALTER BRATTAIN - Transistor Co-inventor (1947)
+- CLAUDE SHANNON - Information Theory Father (1948)
+- NORBERT WIENER - Cybernetics Founder (1948)
+- MAURICE WILKES - EDSAC Developer (1949)
+- GRACE HOPPER - Compiler Pioneer (1951)
+- KATHERINE JOHNSON - NASA Mathematician (1953)
+- MARVIN MINSKY - Neural Network Pioneer (1956)
+- JOHN MCCARTHY - AI Pioneer (1958)
+- JACK KILBY - Integrated Circuit Co-inventor (1958)
+- ROBERT NOYCE - Integrated Circuit Co-inventor (1959)
+- ARTHUR SAMUEL - Machine Learning Pioneer (1959)
+- J.C.R. LICKLIDER - Internet Visionary (1962)
+- IVAN SUTHERLAND - Sketchpad Creator (1963)
+- TED NELSON - Hypertext Visionary (1965)
+- GORDON MOORE - Moore's Law Formulator (1965)
+- DONALD DAVIES - Packet Switching Inventor (1965)
+- FRAN ALLEN - Compiler Optimization Pioneer (1966)
+- SEYMOUR PAPERT - Educational Computing Pioneer (1967)
+- DOUGLAS ENGELBART - Interactive Computing Pioneer (1968)
+- DONALD KNUTH - Algorithms Pioneer (1968)
+- EDSGER DIJKSTRA - Computer Science Pioneer (1968)
+- KEN THOMPSON - Unix Co-creator (1969)
+- MARGARET HAMILTON - Apollo Software Director (1969)
+- DENNIS RITCHIE - C Language Creator (1972)
+- ALAN KAY - Object-Oriented Pioneer (1972)
+- ELIZABETH FEINLER - DNS Pioneer (1972)
+- KAREN SPÄRCK JONES - NLP Pioneer (1972)
+- ADELE GOLDBERG - Smalltalk Pioneer (1973)
+- VINTON CERF - Internet Protocol Co-designer (1974)
+- BOB KAHN - TCP/IP Co-creator (1974)
+- BARBARA LISKOV - Programming Language Pioneer (1974)
+- BILL GATES - Microsoft Founder (1975)
+- PAUL ALLEN - Microsoft Co-founder (1975)
+- STEVE JOBS - Apple Visionary (1976)
+- STEVE WOZNIAK - Apple Co-founder (1976)
+- WHITFIELD DIFFIE - Public Key Cryptography Pioneer (1976)
+- MARTIN HELLMAN - Cryptography Pioneer (1976)
+- BRIAN KERNIGHAN - Unix Pioneer (1978)
+- CAROL SHAW - First Female Game Designer (1978)
+- LESLIE LAMPORT - Distributed Systems Pioneer (1978)
+- DAN BRICKLIN - VisiCalc Co-creator (1979)
+- BOB FRANKSTON - VisiCalc Co-creator (1979)
+- LYNN CONWAY - VLSI Pioneer (1979)
+- ROBERTA WILLIAMS - Adventure Games Pioneer (1980)
+- MARK DEAN - PC Architecture Pioneer (1981)
+- SHIGERU MIYAMOTO - Game Design Legend (1981)
+- SHAFI GOLDWASSER - Cryptography Pioneer (1982)
+- SILVIO MICALI - Cryptocurrency Pioneer (1982)
+- BJARNE STROUSTRUP - C++ Creator (1983)
+- JARON LANIER - VR Pioneer (1984)
+- RICHARD STALLMAN - Free Software Movement (1985)
+- SOPHIE WILSON - ARM Architecture Designer (1985)
+- RADIA PERLMAN - Spanning Tree Protocol Inventor (1985)
+- ANITA BORG - Women in Tech Advocate (1987)
+- LARRY WALL - Perl Creator (1987)
+- TIM BERNERS-LEE - World Wide Web Inventor (1989)
+- RAY KURZWEIL - Futurist & AI Pioneer (1990)
+- LINUS TORVALDS - Linux Creator (1991)
+- GUIDO VAN ROSSUM - Python Creator (1991)
+- JOHN CARMACK - Game Engine Pioneer (1991)
+- PHIL ZIMMERMANN - PGP Creator (1991)
+- MARC ANDREESSEN - Mosaic & Netscape Creator (1993)
+- JENSEN HUANG - NVIDIA Founder (1993)
+- HOWARD RHEINGOLD - Virtual Community Pioneer (1993)
+- JERRY YANG - Yahoo Co-founder (1994)
+- DAVID FILO - Yahoo Co-founder (1994)
+- JEFF BEZOS - Amazon Founder (1994)
+- PIERRE OMIDYAR - eBay Founder (1995)
+- RASMUS LERDORF - PHP Creator (1995)
+- BRENDAN EICH - JavaScript Creator (1995)
+- JAMES GOSLING - Java Creator (1995)
+- YUKIHIRO MATSUMOTO - Ruby Creator (1995)
+- LARRY PAGE - Google Co-founder (1998)
+- SERGEY BRIN - Google Co-founder (1998)
+- ANDERS HEJLSBERG - C# Creator (2000)
+- JIMMY WALES - Wikipedia Founder (2001)
+- CHRIS LATTNER - LLVM & Swift Creator (2003)
+- MARK ZUCKERBERG - Facebook Founder (2004)
+- DHH - Ruby on Rails Creator (2004)
+- KATHY SIERRA - Learning Experience Pioneer (2005)
+- JOHN RESIG - jQuery Creator (2006)
+- GEOFFREY HINTON - Deep Learning Pioneer (2006)
+- YOSHUA BENGIO - Deep Learning Pioneer (2006)
+- SATOSHI NAKAMOTO - Bitcoin Creator (2009)
+- DEMIS HASSABIS - DeepMind Founder (2010)
+- ANDREW NG - AI Education Pioneer (2011)
+- YANN LECUN - CNN Pioneer (2012)
+- ROMAN YAMPOLSKIY - AI Safety Researcher (2012)
+- JEFF DEAN - Google AI Lead (2012)
+- IAN GOODFELLOW - GAN Inventor (2014)
+- KYUNGHYUN CHO - Neural Translation Pioneer (2014)
+- ANGELICA ROSS - TransTech Founder (2014)
+- VITALIK BUTERIN - Ethereum Creator (2015)
+- SAM ALTMAN - OpenAI CEO (2015)
+- ANDREJ KARPATHY - AI Visionary (2015)
+- ORIOL VINYALS - DeepMind Research Director (2015)
+- FRANCESCA ROSSI - AI Ethics Researcher (2015)
+- MEREDITH WHITTAKER - AI Ethics Pioneer (2018)
+- TIMNIT GEBRU - AI Ethics Researcher (2018)
+- JOY BUOLAMWINI - Algorithmic Bias Researcher (2018)
+- MIRA MURATI - OpenAI CTO (2018)
+- KATIE BOUMAN - Black Hole Imaging Pioneer (2019)
+- DARIO AMODEI - Constitutional AI Pioneer (2021)
 
 ## Digital Artists & Designers
 - NAM JUNE PAIK - Video Art Pioneer
