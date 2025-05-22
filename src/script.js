@@ -15,6 +15,7 @@ let allCredits = [];
 let lastScreenChangeTime = Date.now();
 let beatDetected = null; // Will be defined by playCreditsSequence
 let minScreenDisplayTime = 300; // Minimum display time in milliseconds (0.3 seconds by default)
+let isTransitionInProgress = false; // Flag to track when a transition is in progress
 
 // Load app configuration from JSON file
 async function loadAppConfig() {
@@ -495,6 +496,9 @@ function playCreditsSequence(screens) {
     showNextScreen = () => {
         console.log(`Showing screen ${currentScreenIndex + 1} of ${screens.length}`);
         
+        // Set the transition flag
+        isTransitionInProgress = true;
+        
         // Clear containers immediately
         creditsContainer.innerHTML = '';
         singleCreditContainer.innerHTML = '';
@@ -534,6 +538,11 @@ function playCreditsSequence(screens) {
         // Increment index for next time
         currentScreenIndex = (currentScreenIndex + 1) % screens.length;
         lastScreenChangeTime = Date.now();
+        
+        // Reset the transition flag after a small delay to prevent immediate transitions
+        setTimeout(() => {
+            isTransitionInProgress = false;
+        }, 50);
     };
     
     // Show the first screen immediately
@@ -541,12 +550,12 @@ function playCreditsSequence(screens) {
     
     // Update the beat detection callback to show the next screen on beat
     beatDetected = () => {
-        // Only change screen if enough time has passed to prevent rapid changes
+        // Only change screen if enough time has passed AND no transition is in progress
         const now = Date.now();
         const timeSinceLastChange = now - lastScreenChangeTime;
         
         // Use the configurable minimum time between screen changes
-        if (timeSinceLastChange > minScreenDisplayTime) {
+        if (timeSinceLastChange >= minScreenDisplayTime && !isTransitionInProgress) {
             showNextScreen();
         } else {
             console.log(`Beat detected but screen shown for only ${timeSinceLastChange}ms (min: ${minScreenDisplayTime}ms)`);
@@ -1002,7 +1011,8 @@ function handleBeat(event) {
         const currentTime = Date.now();
         
         // Only advance if screen has been visible for at least the minimum time
-        if (currentTime - lastScreenChangeTime >= minScreenDisplayTime) {
+        // AND no transition is currently in progress
+        if (currentTime - lastScreenChangeTime >= minScreenDisplayTime && !isTransitionInProgress) {
             if (typeof showNextScreen === 'function') {
                 showNextScreen();
             }
@@ -2432,8 +2442,8 @@ function initHeroPanel() {
     // Function to render the Hero Panel
     function renderHeroPanel() {
         // Use actual values directly instead of reading from removed debug elements
-        const beatEnergy = signalEnergy.toFixed(2);
-        const cutoff = peakCutoff.toFixed(2);
+        const beatEnergy = typeof signalEnergy === 'number' ? signalEnergy : 0;
+        const cutoff = typeof peakCutoff === 'number' ? peakCutoff : 0;
         const beatsDetected = peakCount;
         
         // Set auto beats when toggled
