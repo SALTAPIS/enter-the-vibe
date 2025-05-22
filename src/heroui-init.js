@@ -10,11 +10,11 @@ window.HeroUI = {
   
   Card: function(props) {
     const style = Object.assign({
-      backgroundColor: props.bg || 'rgba(0, 0, 0, 0.95)',
+      backgroundColor: props.bg || 'rgba(22, 22, 22, 0.95)',
       borderRadius: '8px',
       overflow: 'hidden',
-      boxShadow: props.boxShadow || '0 4px 16px rgba(0, 0, 0, 0.2)',
-      border: props.borderWidth ? `${props.borderWidth} solid ${props.borderColor || 'rgba(30, 30, 30, 0.8)'}` : 'none'
+      boxShadow: props.boxShadow || '0 4px 16px rgba(0, 0, 0, 0.4)',
+      border: props.borderWidth ? `${props.borderWidth} solid ${props.borderColor || 'rgba(40, 40, 40, 0.8)'}` : 'none'
     }, props.style);
     
     return React.createElement('div', Object.assign({}, props, { style }));
@@ -24,7 +24,8 @@ window.HeroUI = {
     const style = Object.assign({
       padding: props.p || '16px',
       paddingBottom: props.pb,
-      borderBottom: '1px solid rgba(40, 40, 40, 0.9)'
+      borderBottom: '1px solid rgba(40, 40, 40, 0.9)',
+      background: 'rgba(20, 20, 20, 0.9)'
     }, props.style);
     
     return React.createElement('div', Object.assign({}, props, { style }));
@@ -76,24 +77,26 @@ window.HeroUI = {
       display: "inline-flex",
       alignItems: "center",
       justifyContent: "center",
-      fontSize: props.size === "sm" ? "14px" : "16px",
+      fontSize: props.size === "sm" ? "13px" : "14px",
       fontWeight: "500",
       padding: props.size === "sm" ? "6px 12px" : "8px 16px",
       borderRadius: "4px",
       cursor: "pointer",
       transition: "all 0.2s ease-out",
       outline: "none",
-      border: "none",
+      border: props.colorScheme === "blue" ? "none" : "1px solid rgba(60, 60, 60, 0.9)",
       width: props.fullWidth ? "100%" : "auto",
-      backgroundColor: props.colorScheme === "blue" ? "rgb(15, 128, 255)" : (props.bg || "rgba(50, 50, 50, 0.9)"),
+      backgroundColor: props.colorScheme === "blue" ? "rgb(15, 128, 255)" : (props.bg || "rgba(30, 30, 30, 0.9)"),
       color: "white",
-      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)"
+      boxShadow: props.colorScheme === "blue" ? "0 2px 8px rgba(15, 128, 255, 0.3)" : "0 2px 4px rgba(0, 0, 0, 0.2)",
+      margin: "4px 0"
     };
     
     // Define hover style
     const hoverStyle = {
-      backgroundColor: props.colorScheme === "blue" ? "rgb(30, 143, 255)" : (props._hover?.bg || "rgba(70, 70, 70, 0.9)"),
-      boxShadow: "0 3px 6px rgba(0, 0, 0, 0.3)"
+      backgroundColor: props.colorScheme === "blue" ? "rgb(30, 143, 255)" : (props._hover?.bg || "rgba(50, 50, 50, 0.9)"),
+      boxShadow: props.colorScheme === "blue" ? "0 4px 12px rgba(15, 128, 255, 0.4)" : "0 3px 6px rgba(0, 0, 0, 0.3)",
+      transform: "translateY(-1px)"
     };
     
     // Track hover state
@@ -147,7 +150,7 @@ window.HeroUI = {
       display: 'flex',
       flexDirection: 'column',
       alignItems: props.align || 'stretch',
-      gap: props.spacing || '8px'
+      gap: props.spacing || '12px'
     }, props.style);
     
     return React.createElement('div', Object.assign({}, props, { style }));
@@ -155,10 +158,12 @@ window.HeroUI = {
   
   Text: function(props) {
     const style = Object.assign({
-      fontSize: props.fontSize || '16px',
+      fontSize: props.fontSize || '12px',
       fontWeight: props.fontWeight || 'normal',
-      color: props.color || 'white',
-      marginBottom: props.mb
+      color: props.color || 'rgba(180, 180, 180, 0.9)',
+      marginBottom: props.mb,
+      letterSpacing: '-0.01em',
+      lineHeight: '1.4'
     }, props.style);
     
     return React.createElement('div', Object.assign({}, props, { style }));
@@ -187,7 +192,8 @@ window.HeroUI = {
         "rgba(40, 40, 40, 0.5)",
       borderRadius: "10px",
       transition: "0.2s ease-out",
-      boxShadow: props.isChecked ? "0 0 5px rgba(15, 128, 255, 0.5)" : "none"
+      boxShadow: props.isChecked ? "0 0 6px rgba(15, 128, 255, 0.6)" : "none",
+      border: props.isChecked ? "none" : "1px solid rgba(50, 50, 50, 0.9)"
     };
     
     // Create the thumb element
@@ -198,7 +204,7 @@ window.HeroUI = {
       width: "16px",
       left: props.isChecked ? "21px" : "3px",
       bottom: "2px",
-      backgroundColor: "white",
+      backgroundColor: props.isChecked ? "white" : "#e0e0e0",
       borderRadius: "50%",
       transition: "0.3s",
       boxShadow: "0 1px 3px rgba(0,0,0,0.3)"
@@ -235,10 +241,10 @@ window.HeroUI = {
     const style = Object.assign({
       fontSize: "14px",
       padding: "8px 10px",
-      background: "rgba(25, 25, 25, 0.9)",
+      background: "rgba(30, 30, 30, 0.9)",
       color: "white",
       width: "100%",
-      border: "1px solid rgba(60, 60, 60, 0.9)",
+      border: "1px solid rgba(50, 50, 50, 0.9)",
       borderRadius: "4px",
       cursor: "pointer",
       outline: "none",
@@ -246,7 +252,8 @@ window.HeroUI = {
       appearance: "none",
       backgroundImage: "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M6 9l6 6 6-6\"/></svg>')",
       backgroundRepeat: "no-repeat",
-      backgroundPosition: "right 10px center"
+      backgroundPosition: "right 10px center",
+      margin: "4px 0 8px 0"
     }, props.style);
     
     return React.createElement('select', Object.assign({}, props, { style }));
@@ -260,11 +267,12 @@ window.HeroUI = {
       WebkitAppearance: "none",
       appearance: "none",
       height: "4px",
-      borderRadius: "2px",
+      borderRadius: "4px",
       background: `linear-gradient(to right, rgb(15, 128, 255) ${valuePercent}%, rgba(40, 40, 40, 0.5) ${valuePercent}%)`,
       outline: "none",
       opacity: props.isDisabled ? "0.5" : "1",
-      transition: "background 0.2s ease-out"
+      transition: "background 0.2s ease-out",
+      margin: "8px 0"
     }, props.style);
     
     // Add styles for the thumb
@@ -272,33 +280,43 @@ window.HeroUI = {
       ::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
         background: white;
         cursor: pointer;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
         transition: all 0.2s;
+        border: 1px solid rgba(15, 128, 255, 0.6);
       }
       
       ::-webkit-slider-thumb:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 8px rgba(15, 128, 255, 0.5);
+        box-shadow: 0 0 8px rgba(15, 128, 255, 0.6);
+      }
+      
+      ::-webkit-slider-thumb:active {
+        background: rgba(15, 128, 255, 0.9);
       }
       
       ::-moz-range-thumb {
-        width: 14px;
-        height: 14px;
+        width: 16px;
+        height: 16px;
         border-radius: 50%;
         background: white;
         cursor: pointer;
         box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
         transition: all 0.2s;
+        border: 1px solid rgba(15, 128, 255, 0.6);
       }
       
       ::-moz-range-thumb:hover {
         transform: scale(1.1);
-        box-shadow: 0 0 8px rgba(15, 128, 255, 0.5);
+        box-shadow: 0 0 8px rgba(15, 128, 255, 0.6);
+      }
+      
+      ::-moz-range-thumb:active {
+        background: rgba(15, 128, 255, 0.9);
       }
     `;
     
@@ -470,23 +488,23 @@ window.HeroUI = {
 // Define the BeatIndicator component
 window.HeroUI.BeatIndicator = function(props) {
   const containerStyle = {
-    width: "40px",
-    height: "40px",
+    width: props.large ? "70px" : "40px",
+    height: props.large ? "70px" : "40px",
     borderRadius: "50%",
     background: props.active ? "rgb(15, 128, 255)" : "rgba(30, 30, 30, 0.8)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
-    transition: "all 0.1s ease-out",
-    boxShadow: props.active ? "0 0 15px rgba(15, 128, 255, 0.8)" : "none"
+    transition: "all 0.2s ease-out",
+    boxShadow: props.active ? "0 0 20px rgba(15, 128, 255, 0.8)" : "none"
   };
   
   const innerStyle = {
-    width: "26px",
-    height: "26px",
+    width: props.large ? "50px" : "26px",
+    height: props.large ? "50px" : "26px",
     borderRadius: "50%",
     background: props.active ? "rgb(15, 128, 255)" : "rgba(40, 40, 40, 0.9)",
-    boxShadow: props.active ? "0 0 10px rgba(15, 128, 255, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.5)" : "none"
+    boxShadow: props.active ? "0 0 15px rgba(15, 128, 255, 0.8), inset 0 0 5px rgba(255, 255, 255, 0.5)" : "none"
   };
   
   const inner = React.createElement('div', { style: innerStyle });

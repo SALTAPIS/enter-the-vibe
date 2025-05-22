@@ -177,7 +177,7 @@
                   padding: 0
                 }}
               >
-                <VStack p="10px" spacing={2} align="center">
+                <VStack p="14px" spacing={2} align="center">
                   <BeatIndicator active={isActive} />
                   <Button
                     onClick={toggleVisibility}
@@ -194,7 +194,7 @@
           // Main control panel
           return (
             <Card
-              width="300px"
+              width="320px"
               position="fixed"
               top="20px"
               right="20px"
@@ -204,37 +204,37 @@
               borderWidth="1px"
               boxShadow="0 0 15px rgba(0, 0, 0, 0.8)"
               style={{
-                maxWidth: "300px",
+                width: "320px",
                 boxSizing: "border-box",
                 margin: 0,
                 padding: 0
               }}
             >
-              <CardHeader p={2} pb={2.5} style={{backgroundColor: "rgba(0, 0, 0, 0.95)"}}>
+              <CardHeader p={3} pb={3} style={{backgroundColor: "rgba(22, 22, 22, 0.95)"}}>
                 <Flex justify="space-between" align="center">
-                  <VStack align="start" spacing={0}>
-                    <Text fontSize="16px" fontWeight="500">Beats Detected</Text>
+                  <VStack align="start" spacing={0} width="110px">
+                    <Text fontSize="14px" fontWeight="500" color="white">Beats Detected</Text>
                     <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">Beat Energy</Text>
                     <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">Cutoff</Text>
                   </VStack>
                   
-                  <BeatIndicator active={isActive} />
+                  <BeatIndicator active={isActive} large={true} />
                   
-                  <VStack align="end" spacing={0}>
-                    <Text fontSize="16px">{beatsDetected}</Text>
-                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">{typeof beatEnergy === 'number' ? beatEnergy.toFixed(2) : '0.00'}</Text>
-                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">{typeof cutoff === 'number' ? Math.round(cutoff) : 0}</Text>
+                  <VStack align="end" spacing={0} width="60px">
+                    <Text fontSize="14px" color="white" style={{width: "100%", textAlign: "right"}}>{beatsDetected}</Text>
+                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)" style={{width: "100%", textAlign: "right"}}>{typeof beatEnergy === 'number' ? beatEnergy.toFixed(2) : '0.00'}</Text>
+                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)" style={{width: "100%", textAlign: "right"}}>{typeof cutoff === 'number' ? Math.round(cutoff * 100) : 0}%</Text>
                   </VStack>
                 </Flex>
               </CardHeader>
               
-              <CardBody p={2} pt={0.5} style={{backgroundColor: "rgba(0, 0, 0, 0.95)"}}>
-                <VStack spacing={2} align="stretch">
-                  <Box>
-                    <Flex align="center" justify="space-between" mb="2px">
-                      <Text fontSize="14px">Peak Threshold</Text>
-                      <Text fontSize="14px">{typeof peakThreshold === 'number' ? peakThreshold.toFixed(2) : '0.05'}</Text>
-                    </Flex>
+              <CardBody p={3} pt={1} style={{backgroundColor: "rgba(22, 22, 22, 0.95)"}}>
+                <VStack spacing={3} align="stretch">
+                  <Box mb={1}>
+                                          <Flex align="center" justify="space-between" mb="2px">
+                        <Text>Peak Threshold</Text>
+                        <Text style={{width: "45px", textAlign: "right"}}>{typeof peakThreshold === 'number' ? peakThreshold.toFixed(2) : '0.05'}</Text>
+                      </Flex>
                     <Slider
                       min={0.01}
                       max={0.20}
@@ -244,11 +244,11 @@
                     />
                   </Box>
                   
-                  <Box>
-                    <Flex align="center" justify="space-between" mb="2px">
-                      <Text fontSize="14px">Noise Floor</Text>
-                      <Text fontSize="14px">{noiseFloor}</Text>
-                    </Flex>
+                  <Box mb={1}>
+                                          <Flex align="center" justify="space-between" mb="2px">
+                        <Text>Noise Floor</Text>
+                        <Text style={{width: "45px", textAlign: "right"}}>{noiseFloor}</Text>
+                      </Flex>
                     <Slider
                       min={30}
                       max={150}
@@ -258,8 +258,8 @@
                     />
                   </Box>
                   
-                  <Box>
-                    <Text fontSize="14px" mb="2px">Frequency Focus</Text>
+                  <Box mb={1}>
+                    <Text mb="2px">Frequency Focus</Text>
                     <Select
                       onChange={(e) => handleFreqRangeChange(e.target.value)}
                       value={
@@ -277,33 +277,27 @@
                     </Select>
                   </Box>
                   
-                  {/* Only show the custom range controls for custom range */}
-                  {(freqRangeStart !== 0 || freqRangeEnd !== 20) && 
-                   (freqRangeStart !== 10 || freqRangeEnd !== 60) && 
-                   (freqRangeStart !== 50 || freqRangeEnd !== 100) && 
-                   (freqRangeStart !== 0 || freqRangeEnd !== 120) && (
-                    <Box>
-                      <Flex justify="space-between" mb="2px">
-                        <Text fontSize="14px">Freq Range</Text>
-                        <Text fontSize="14px">{freqRangeStart}-{freqRangeEnd}</Text>
+                  <Box mb={1}>
+                                          <Flex justify="space-between" mb="2px">
+                        <Text>Freq Range</Text>
+                        <Text style={{width: "80px", textAlign: "right"}}>{freqRangeStart}-{freqRangeEnd} Hz</Text>
                       </Flex>
-                      <RangeSlider
-                        minValue={freqRangeStart}
-                        maxValue={freqRangeEnd}
-                        minLimit={0}
-                        maxLimit={120}
-                        step={1}
-                        onMinChange={setFreqRangeStart}
-                        onMaxChange={setFreqRangeEnd}
-                      />
-                    </Box>
-                  )}
+                    <RangeSlider
+                      minValue={freqRangeStart}
+                      maxValue={freqRangeEnd}
+                      minLimit={0}
+                      maxLimit={120}
+                      step={1}
+                      onMinChange={setFreqRangeStart}
+                      onMaxChange={setFreqRangeEnd}
+                    />
+                  </Box>
                   
-                  <Box>
-                    <Flex align="center" justify="space-between" mb="2px">
-                      <Text fontSize="14px">Display Time</Text>
-                      <Text fontSize="14px">{displayTime}ms</Text>
-                    </Flex>
+                  <Box mb={1}>
+                                          <Flex align="center" justify="space-between" mb="2px">
+                        <Text>Display Time</Text>
+                        <Text style={{width: "70px", textAlign: "right"}}>{displayTime}ms</Text>
+                      </Flex>
                     <Slider
                       min={100}
                       max={2000}
@@ -313,19 +307,20 @@
                     />
                   </Box>
                   
-                  <Flex align="center" justify="space-between" mt="2px">
-                    <Text fontSize="14px">Auto Beats:</Text>
+                  <Flex align="center" justify="space-between" mt="4px" mb="4px">
+                    <Text>Auto Beats:</Text>
                     <Switch 
                       isChecked={autoBeats}
                       onChange={(e) => setAutoBeats(e.target.checked)}
                     />
                   </Flex>
                   
-                  <Box mt={1} mb={0.5}>
+                  <Box mt={2} mb={0.5}>
                     <Button
                       onClick={toggleVisibility}
                       size="sm"
                       width="100%"
+                      colorScheme="blue"
                     >
                       Hide Controls
                     </Button>
