@@ -756,27 +756,84 @@ function setupAudioVisualization(audioElement) {
         }
     }
     
-    // Create audio context
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Create analyzer node
-    analyser = audioContext.createAnalyser();
-    analyser.fftSize = 512; // Higher value for more detailed analysis
-    analyser.smoothingTimeConstant = 0.7; // Better for detecting distinct beats
-    
-    // Connect audio element to analyzer
-    audioSource = audioContext.createMediaElementSource(audioElement);
-    audioSource.connect(analyser);
-    analyser.connect(audioContext.destination);
-    
-    // Create frequency data array
-    frequencyData = new Uint8Array(analyser.frequencyBinCount);
-    
-    // Log setup success
-    console.log("Audio visualization setup complete");
-    
-    // Start visualization loop
-    drawVisualization();
+    try {
+        // Create audio context if it doesn't exist
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        
+        // Create analyzer node
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 512; // Higher value for more detailed analysis
+        analyser.smoothingTimeConstant = 0.7; // Better for detecting distinct beats
+        
+        // Create and connect audio source safely
+        try {
+            // Connect audio element to analyzer
+            audioSource = audioContext.createMediaElementSource(audioElement);
+            audioSource.connect(analyser);
+            analyser.connect(audioContext.destination);
+        } catch (error) {
+            console.warn("Error connecting audio element, may already be connected:", error);
+            
+            // If audio is already connected, try to recreate the audio context
+            if (error.name === 'InvalidStateError' && error.message.includes('already connected')) {
+                console.log("Audio element already connected, trying to reconnect...");
+                
+                // Try to disconnect everything and recreate
+                if (audioSource) {
+                    try {
+                        audioSource.disconnect();
+                    } catch (e) {
+                        console.log("Error disconnecting audio source:", e);
+                    }
+                }
+                
+                if (analyser) {
+                    try {
+                        analyser.disconnect();
+                    } catch (e) {
+                        console.log("Error disconnecting analyser:", e);
+                    }
+                }
+                
+                // Create new audio context and analyser
+                audioContext.close().then(() => {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    analyser = audioContext.createAnalyser();
+                    analyser.fftSize = 512;
+                    analyser.smoothingTimeConstant = 0.7;
+                    
+                    // Try connecting again with the new context
+                    try {
+                        audioSource = audioContext.createMediaElementSource(audioElement);
+                        audioSource.connect(analyser);
+                        analyser.connect(audioContext.destination);
+                        console.log("Successfully reconnected audio element");
+                    } catch (e) {
+                        console.error("Failed to reconnect audio element:", e);
+                    }
+                }).catch(err => {
+                    console.error("Failed to close and recreate audio context:", err);
+                });
+            }
+        }
+        
+        // Create frequency data array
+        frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        
+        // Log setup success
+        console.log("Audio visualization setup complete");
+        
+        // Start visualization loop
+        drawVisualization();
+    } catch (error) {
+        console.error("Error setting up audio visualization:", error);
+        // Even if visualization fails, ensure fallback beats are running
+        if (useFallbackBeats) {
+            startFallbackBeatTimer();
+        }
+    }
 }
 
 // Check if audio contains actual content (not silence)
@@ -957,30 +1014,15 @@ function restartAnimation() {
     // Stop all sounds and timers
     if (mainSound) {
         mainSound.pause();
-        mainSound.currentTime = 0;
-        // Remove the ended event listener to prevent multiple triggers
         mainSound.removeEventListener('ended', showEndScene);
-    } else {
-        mainSound = document.getElementById('main-sound');
-        if (mainSound) {
-            mainSound.pause();
-            mainSound.currentTime = 0;
-            mainSound.removeEventListener('ended', showEndScene);
-        }
     }
     
     if (glitchSound) {
         glitchSound.pause();
-    } else {
-        glitchSound = document.getElementById('glitch-sound');
-        if (glitchSound) glitchSound.pause();
     }
     
     if (transitionSound) {
         transitionSound.pause();
-    } else {
-        transitionSound = document.getElementById('transition-sound');
-        if (transitionSound) transitionSound.pause();
     }
     
     stopFallbackBeatTimer();
@@ -997,8 +1039,9 @@ function restartAnimation() {
         endScene.remove();
     }
     
-    // Reset audio context if it exists
+    // Reset audio context and disconnect all nodes
     if (audioContext) {
+        // Close the audio context to clean up resources
         audioContext.close().then(() => {
             console.log("Audio context closed");
             audioContext = null;
@@ -1014,18 +1057,81 @@ function restartAnimation() {
         phase.classList.add('hidden');
     });
     
-    // Show start screen
-    const startScreen = document.getElementById('start-screen');
-    if (startScreen) {
-        startScreen.classList.remove('hidden');
-        gsap.set(startScreen, { opacity: 1, display: 'flex' });
-    }
+    // Show phase 1 immediately rather than showing the start screen
+    const phase1 = document.getElementById('phase1');
+    phase1.classList.remove('hidden');
+    gsap.set(phase1, { opacity: 1 });
     
     // Reset beat counter and detection
     peakCount = 0;
     resetPeakDetection();
     
-    console.log("Animation restarted, ready for user to press start");
+    // Replace the audio elements with fresh clones to prevent connection issues
+    const originalMainSound = document.getElementById('main-sound');
+    const originalGlitchSound = document.getElementById('glitch-sound');
+    const originalTransitionSound = document.getElementById('transition-sound');
+    
+    if (originalMainSound) {
+        // Create a clone of the main sound element
+        const clone = originalMainSound.cloneNode(true);
+        // Replace the original with the clone
+        originalMainSound.parentNode.replaceChild(clone, originalMainSound);
+        // Update our reference
+        mainSound = clone;
+    }
+    
+    if (originalGlitchSound) {
+        // Create a clone of the glitch sound element
+        const clone = originalGlitchSound.cloneNode(true);
+        // Replace the original with the clone
+        originalGlitchSound.parentNode.replaceChild(clone, originalGlitchSound);
+        // Update our reference
+        glitchSound = clone;
+    }
+    
+    if (originalTransitionSound) {
+        // Create a clone of the transition sound element
+        const clone = originalTransitionSound.cloneNode(true);
+        // Replace the original with the clone
+        originalTransitionSound.parentNode.replaceChild(clone, originalTransitionSound);
+        // Update our reference
+        transitionSound = clone;
+    }
+    
+    // Create a new audio context
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Initialize audio and visualization
+    if (mainSound) {
+        // Make sure audio is ready to play
+        mainSound.volume = 1.0;
+        mainSound.currentTime = 0;
+        
+        // Add event listener for when audio ends
+        mainSound.addEventListener('ended', showEndScene);
+        
+        // Play the sound
+        mainSound.play().then(() => {
+            console.log("Main sound started playing");
+            setupAudioVisualization(mainSound);
+            
+            // Ensure fallback beats are running (even if audio analysis is working)
+            startFallbackBeatTimer();
+        }).catch(err => {
+            console.error("Error playing main sound:", err);
+            // If audio fails to play, still start fallback beats
+            startFallbackBeatTimer();
+        });
+    } else {
+        console.error("Main sound element not found!");
+        // Even without sound, start fallback beats
+        startFallbackBeatTimer();
+    }
+    
+    // Start the experience directly
+    startPhase1();
+    
+    console.log("Animation restarted and immediately started");
 }
 
 // Function to handle beat events during credits sequence
