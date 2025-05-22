@@ -690,8 +690,7 @@ function startFallbackBeatTimer() {
         fallbackBeatTimer = setInterval(() => {
             // Only trigger fallback beats if audio is actually playing
             if (useFallbackBeats && isAudioActuallyPlaying) {
-                console.log("Fallback beat triggered");
-                // Force a peak detection
+                // Force a peak detection - removed console log to reduce spam
                 detectPeak(true);
             }
         }, fallbackBeatInterval);
@@ -989,7 +988,6 @@ function restartAnimation() {
     
     // Reset beat counter and detection
     peakCount = 0;
-    if (debugCountEl) debugCountEl.textContent = "0";
     resetPeakDetection();
     
     console.log("Animation restarted, ready for user to press start");
@@ -1005,12 +1003,9 @@ function handleBeat(event) {
         
         // Only advance if screen has been visible for at least the minimum time
         if (currentTime - lastScreenChangeTime >= minScreenDisplayTime) {
-            console.log("Beat detected - advancing to next screen");
             if (typeof showNextScreen === 'function') {
                 showNextScreen();
             }
-        } else {
-            console.log(`Beat detected but ignoring (too soon - ${currentTime - lastScreenChangeTime}ms < ${minScreenDisplayTime}ms)`);
         }
     }
 }
@@ -1204,8 +1199,10 @@ function detectPeak(forcePeak = false) {
             window.requestHeroPanelUpdate();
         }
         
-        // Log peak detection
-        console.log(`Peak detected! (${forcePeak ? 'forced' : 'detected'}) Count: ${peakCount}`);
+        // Log peak detection only if it's forced (less spam)
+        if (forcePeak) {
+            console.log(`Peak detected! (forced) Count: ${peakCount}`);
+        }
         
         // Create and dispatch a custom event for peak detection (reusing the same event name)
         const peakEvent = new CustomEvent('audiobeat', { 
@@ -2365,14 +2362,13 @@ function showFullscreenLogo(timeline, credit) {
 // Function to toggle control panel visibility
 function toggleControlsVisibility() {
     const beatControls = document.getElementById('beat-controls');
-    const debugPanel = document.getElementById('debug-panel');
     
-    // Update both panels - original and React
+    // Update React panel
     if (typeof window.updateHeroPanelVisibility === 'function') {
         window.updateHeroPanelVisibility(); // Toggle the React panel
     }
     
-    // Toggle the original panels
+    // Toggle the original panel if it exists
     if (beatControls) {
         if (beatControls.style.display === 'none') {
             beatControls.style.display = 'block';
@@ -2385,11 +2381,6 @@ function toggleControlsVisibility() {
                 toggleControlsBtn.textContent = 'Show Controls';
             }
         }
-    }
-    
-    // Toggle debug panel to match beat controls
-    if (debugPanel) {
-        debugPanel.style.display = beatControls.style.display;
     }
 }
 
@@ -2467,9 +2458,10 @@ function initHeroPanel() {
     
     // Function to render the Hero Panel
     function renderHeroPanel() {
-        const beatEnergy = document.getElementById('debug-energy')?.textContent || '0';
-        const cutoff = document.getElementById('debug-cutoff')?.textContent || '0';
-        const beatsDetected = document.getElementById('debug-count')?.textContent || '0';
+        // Use actual values directly instead of reading from removed debug elements
+        const beatEnergy = signalEnergy.toFixed(2);
+        const cutoff = peakCutoff.toFixed(2);
+        const beatsDetected = peakCount;
         
         // Set auto beats when toggled
         const setAutoBeats = (value) => {
