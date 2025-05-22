@@ -150,7 +150,7 @@ window.HeroUI = {
       display: 'flex',
       flexDirection: 'column',
       alignItems: props.align || 'stretch',
-      gap: props.spacing || '12px'
+      gap: props.spacing || '18px'
     }, props.style);
     
     return React.createElement('div', Object.assign({}, props, { style }));
@@ -161,7 +161,7 @@ window.HeroUI = {
       fontSize: props.fontSize || '12px',
       fontWeight: props.fontWeight || 'normal',
       color: props.color || 'rgba(180, 180, 180, 0.9)',
-      marginBottom: props.mb,
+      marginBottom: props.mb || '8px',
       letterSpacing: '-0.01em',
       lineHeight: '1.4'
     }, props.style);
@@ -239,10 +239,10 @@ window.HeroUI = {
   
   Select: function(props) {
     const style = Object.assign({
-      fontSize: "14px",
+      fontSize: "12px",
       padding: "8px 10px",
       background: "rgba(30, 30, 30, 0.9)",
-      color: "white",
+      color: "rgba(180, 180, 180, 0.9)",
       width: "100%",
       border: "1px solid rgba(50, 50, 50, 0.9)",
       borderRadius: "4px",
@@ -345,144 +345,147 @@ window.HeroUI = {
   },
   
   RangeSlider: function(props) {
-  // Track
-  const trackStyle = {
-    position: "absolute",
-    width: "100%",
-    height: "4px",
-    background: "rgba(40, 40, 40, 0.5)",
-    borderRadius: "2px",
-    top: "50%",
-    transform: "translateY(-50%)"
-  };
-  
-  // Selected range
-  const rangeStyle = {
-    position: "absolute",
-    left: `${(props.minValue / props.maxLimit) * 100}%`,
-    width: `${((props.maxValue - props.minValue) / props.maxLimit) * 100}%`,
-    height: "4px",
-    background: "rgb(15, 128, 255)",
-    borderRadius: "2px",
-    top: "50%",
-    transform: "translateY(-50%)",
-    boxShadow: "0 0 10px rgba(15, 128, 255, 0.3)"
-  };
-  
-  // Min handle dot
-  const minDotStyle = {
-    position: "absolute",
-    left: `${(props.minValue / props.maxLimit) * 100}%`,
-    top: "50%",
-    width: "14px",
-    height: "14px",
-    background: "white",
-    borderRadius: "50%",
-    transform: "translate(-50%, -50%)",
-    pointerEvents: "none",
-    boxShadow: "0 0 5px rgba(0,0,0,0.3)",
-    transition: "transform 0.2s"
-  };
-  
-  // Max handle dot
-  const maxDotStyle = {
-    position: "absolute",
-    left: `${(props.maxValue / props.maxLimit) * 100}%`,
-    top: "50%",
-    width: "14px",
-    height: "14px",
-    background: "white",
-    borderRadius: "50%",
-    transform: "translate(-50%, -50%)",
-    pointerEvents: "none",
-    boxShadow: "0 0 5px rgba(0,0,0,0.3)",
-    transition: "transform 0.2s"
-  };
-  
-  // Handler functions
-  const handleMinChange = (e) => {
-    let value = parseInt(e.target.value);
-    if (value >= props.maxValue) {
-      value = props.maxValue - props.step;
-    }
-    props.onMinChange(value);
-  };
-  
-  const handleMaxChange = (e) => {
-    let value = parseInt(e.target.value);
-    if (value <= props.minValue) {
-      value = props.minValue + props.step;
-    }
-    props.onMaxChange(value);
-  };
-  
-  return React.createElement(
-    'div',
-    {
-      style: {
-        position: 'relative',
-        width: '100%',
-        height: '30px',
-        margin: '15px 0'
-      }
-    },
-    [
+    const containerStyle = {
+      position: 'relative',
+      width: '100%',
+      height: '30px',
+      margin: '15px 0'
+    };
+
+    // Simple track
+    const trackStyle = {
+      position: 'absolute',
+      width: '100%',
+      height: '4px',
+      background: 'rgba(40, 40, 40, 0.5)',
+      borderRadius: '4px',
+      top: '50%',
+      transform: 'translateY(-50%)'
+    };
+
+    // Selected range
+    const selectedRangeStyle = {
+      position: 'absolute',
+      left: `${(props.minValue / props.maxLimit) * 100}%`,
+      width: `${((props.maxValue - props.minValue) / props.maxLimit) * 100}%`,
+      height: '4px',
+      background: 'rgb(15, 128, 255)',
+      borderRadius: '4px',
+      top: '50%',
+      transform: 'translateY(-50%)'
+    };
+
+    // Handle styles
+    const minHandleStyle = {
+      position: 'absolute',
+      left: `${(props.minValue / props.maxLimit) * 100}%`,
+      top: '50%',
+      width: '16px',
+      height: '16px',
+      background: 'white',
+      borderRadius: '50%',
+      transform: 'translate(-50%, -50%)',
+      border: '1px solid rgba(15, 128, 255, 0.6)',
+      boxShadow: '0 0 5px rgba(0, 0, 0, 0.3)',
+      pointerEvents: 'none'
+    };
+
+    const maxHandleStyle = {
+      position: 'absolute',
+      left: `${(props.maxValue / props.maxLimit) * 100}%`,
+      top: '50%',
+      width: '16px',
+      height: '16px',
+      background: 'white',
+      borderRadius: '50%',
+      transform: 'translate(-50%, -50%)',
+      border: '1px solid rgba(15, 128, 255, 0.6)',
+      boxShadow: '0 0 5px rgba(0, 0, 0, 0.3)',
+      pointerEvents: 'none'
+    };
+
+    // Range input style
+    const rangeInputStyle = {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      margin: 0,
+      opacity: 0,
+      cursor: 'pointer'
+    };
+
+    // Min value change handler
+    const handleMinChange = (e) => {
+      const value = parseInt(e.target.value);
+      props.onMinChange(Math.min(value, props.maxValue - props.step));
+    };
+
+    // Max value change handler
+    const handleMaxChange = (e) => {
+      const value = parseInt(e.target.value);
+      props.onMaxChange(Math.max(value, props.minValue + props.step));
+    };
+
+    return React.createElement('div', { style: containerStyle }, [
       // Track
       React.createElement('div', { style: trackStyle }),
       
-      // Active range
-      React.createElement('div', { style: rangeStyle }),
+      // Selected range
+      React.createElement('div', { style: selectedRangeStyle }),
       
-      // Min handle dot
-      React.createElement('div', { style: minDotStyle }),
+      // Min handle visual
+      React.createElement('div', { style: minHandleStyle }),
       
-      // Max handle dot
-      React.createElement('div', { style: maxDotStyle }),
+      // Max handle visual
+      React.createElement('div', { style: maxHandleStyle }),
       
-      // Min input range (hidden but functional)
-      React.createElement('input', {
-        type: 'range',
-        min: props.minLimit,
-        max: props.maxLimit,
-        step: props.step,
-        value: props.minValue,
-        onChange: handleMinChange,
+      // Min value input - covers left half
+      React.createElement('div', {
         style: {
           position: 'absolute',
-          width: '100%',
-          height: '7px',
-          WebkitAppearance: 'none',
-          appearance: 'none',
-          background: 'transparent',
-          pointerEvents: 'auto',
-          zIndex: 1,
-          outline: 'none'
+          top: 0,
+          left: 0,
+          width: '50%',
+          height: '100%',
+          overflow: 'hidden'
         }
-      }),
+      }, 
+        React.createElement('input', {
+          type: 'range',
+          min: props.minLimit,
+          max: props.maxLimit,
+          step: props.step,
+          value: props.minValue,
+          onChange: handleMinChange,
+          style: rangeInputStyle
+        })
+      ),
       
-      // Max input range (hidden but functional)
-      React.createElement('input', {
-        type: 'range',
-        min: props.minLimit,
-        max: props.maxLimit,
-        step: props.step,
-        value: props.maxValue,
-        onChange: handleMaxChange,
+      // Max value input - covers right half
+      React.createElement('div', {
         style: {
           position: 'absolute',
-          width: '100%',
-          height: '7px',
-          WebkitAppearance: 'none',
-          appearance: 'none',
-          background: 'transparent',
-          pointerEvents: 'auto',
-          zIndex: 1,
-          outline: 'none'
+          top: 0,
+          right: 0,
+          width: '50%',
+          height: '100%',
+          overflow: 'hidden'
         }
-      })
-    ]
-  );
-}
+      }, 
+        React.createElement('input', {
+          type: 'range',
+          min: props.minLimit,
+          max: props.maxLimit,
+          step: props.step,
+          value: props.maxValue,
+          onChange: handleMaxChange,
+          style: rangeInputStyle
+        })
+      )
+    ]);
+  },
 };
 
 // Define the BeatIndicator component
