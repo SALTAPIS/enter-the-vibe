@@ -827,6 +827,15 @@ body {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     font-weight: normal;
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: 10000;
+    pointer-events: none;
+}
+
+#hero-panel-root > div {
+    pointer-events: auto;
 }
 
 /* Make sure slider thumbs are easier to grab */

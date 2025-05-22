@@ -17,7 +17,7 @@
     <link href="https://api.fontshare.com/v2/css?f[]=melodrama@700,400&display=swap" rel="stylesheet">
     <link href="https://api.fontshare.com/v2/css?f[]=tanker@700,400&display=swap" rel="stylesheet">
     
-    <!-- React and ReactDOM from CDN -->
+    <!-- React Dependencies -->
     <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin></script>
     
@@ -26,6 +26,13 @@
     
     <!-- Import custom HeroUI components -->
     <script src="./src/heroui-init.js"></script>
+    
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        console.log('HeroUI components available:', window.HeroUI ? Object.keys(window.HeroUI) : 'Not loaded');
+        console.log('HeroPanel component available:', window.HeroPanel ? 'Yes' : 'No');
+      });
+    </script>
     
     <link rel="stylesheet" href="./src/style.css">
 </head>
@@ -101,7 +108,7 @@
     <div id="freq-range-highlight" class="freq-range-highlight"></div>
     
     <!-- Hero Panel Component -->
-    <script type="text/babel">
+    <script type="text/babel" data-presets="react">
         // Define the HeroPanel component
         const HeroPanel = ({
           peakThreshold,
@@ -159,6 +166,16 @@
                 top="20px"
                 right="20px"
                 zIndex={10000}
+                bg="rgba(0, 0, 0, 0.95)"
+                borderColor="rgba(20, 20, 20, 1)"
+                borderWidth="1px"
+                boxShadow="0 0 15px rgba(0, 0, 0, 0.8)"
+                style={{
+                  maxWidth: "50px",
+                  boxSizing: "border-box",
+                  margin: 0,
+                  padding: 0
+                }}
               >
                 <VStack p="10px" spacing={2} align="center">
                   <BeatIndicator active={isActive} />
@@ -182,33 +199,41 @@
               top="20px"
               right="20px"
               zIndex={10000}
-              bg="rgba(0, 0, 0, 0.85)"
-              borderColor="rgba(255, 255, 255, 0.2)"
+              bg="rgba(0, 0, 0, 0.95)"
+              borderColor="rgba(20, 20, 20, 1)"
               borderWidth="1px"
-              boxShadow="0 0 10px rgba(0, 0, 0, 0.5)"
+              boxShadow="0 0 15px rgba(0, 0, 0, 0.8)"
+              style={{
+                maxWidth: "300px",
+                boxSizing: "border-box",
+                margin: 0,
+                padding: 0
+              }}
             >
-              <CardHeader>
+              <CardHeader p={2} pb={2.5} style={{backgroundColor: "rgba(0, 0, 0, 0.95)"}}>
                 <Flex justify="space-between" align="center">
-                  <Text>Beat Controls</Text>
-                  <Box ml="8px"><BeatIndicator active={isActive} /></Box>
-                  <Box flex="1" />
-                  <Button
-                    onClick={toggleVisibility}
-                    size="sm"
-                    colorScheme="blue"
-                  >
-                    Hide
-                  </Button>
+                  <VStack align="start" spacing={0}>
+                    <Text fontSize="16px" fontWeight="500">Beats Detected</Text>
+                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">Beat Energy</Text>
+                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">Cutoff</Text>
+                  </VStack>
+                  
+                  <BeatIndicator active={isActive} />
+                  
+                  <VStack align="end" spacing={0}>
+                    <Text fontSize="16px">{beatsDetected}</Text>
+                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">{typeof beatEnergy === 'number' ? beatEnergy.toFixed(2) : '0.00'}</Text>
+                    <Text fontSize="12px" color="rgba(180, 180, 180, 0.8)">{typeof cutoff === 'number' ? Math.round(cutoff) : 0}</Text>
+                  </VStack>
                 </Flex>
               </CardHeader>
               
-              <CardBody>
-                <VStack spacing={3} align="stretch">
+              <CardBody p={2} pt={0.5} style={{backgroundColor: "rgba(0, 0, 0, 0.95)"}}>
+                <VStack spacing={2} align="stretch">
                   <Box>
-                    <Flex align="center" mb="4px">
-                      <Text fontSize="14px">Peak Threshold: {typeof peakThreshold === 'number' ? peakThreshold.toFixed(2) : '0.05'}</Text>
-                      <Box flex="1" />
-                      <Badge colorScheme="blue">{typeof beatEnergy === 'number' ? Math.round(beatEnergy * 100) : 0}</Badge>
+                    <Flex align="center" justify="space-between" mb="2px">
+                      <Text fontSize="14px">Peak Threshold</Text>
+                      <Text fontSize="14px">{typeof peakThreshold === 'number' ? peakThreshold.toFixed(2) : '0.05'}</Text>
                     </Flex>
                     <Slider
                       min={0.01}
@@ -220,7 +245,10 @@
                   </Box>
                   
                   <Box>
-                    <Text fontSize="14px" mb="4px">Noise Floor: {noiseFloor}</Text>
+                    <Flex align="center" justify="space-between" mb="2px">
+                      <Text fontSize="14px">Noise Floor</Text>
+                      <Text fontSize="14px">{noiseFloor}</Text>
+                    </Flex>
                     <Slider
                       min={30}
                       max={150}
@@ -231,7 +259,7 @@
                   </Box>
                   
                   <Box>
-                    <Text fontSize="14px" mb="4px">Frequency Focus:</Text>
+                    <Text fontSize="14px" mb="2px">Frequency Focus</Text>
                     <Select
                       onChange={(e) => handleFreqRangeChange(e.target.value)}
                       value={
@@ -249,12 +277,15 @@
                     </Select>
                   </Box>
                   
-                  {/* Only show the custom range controls in expanded view */}
-                  {!isSimplifiedView && (
+                  {/* Only show the custom range controls for custom range */}
+                  {(freqRangeStart !== 0 || freqRangeEnd !== 20) && 
+                   (freqRangeStart !== 10 || freqRangeEnd !== 60) && 
+                   (freqRangeStart !== 50 || freqRangeEnd !== 100) && 
+                   (freqRangeStart !== 0 || freqRangeEnd !== 120) && (
                     <Box>
-                      <Flex justify="space-between" mb="4px">
-                        <Text fontSize="12px">Start: {freqRangeStart}</Text>
-                        <Text fontSize="12px">End: {freqRangeEnd}</Text>
+                      <Flex justify="space-between" mb="2px">
+                        <Text fontSize="14px">Freq Range</Text>
+                        <Text fontSize="14px">{freqRangeStart}-{freqRangeEnd}</Text>
                       </Flex>
                       <RangeSlider
                         minValue={freqRangeStart}
@@ -268,31 +299,11 @@
                     </Box>
                   )}
                   
-                  <Divider />
-                  
-                  <Flex align="center" justify="space-between">
-                    <Text fontSize="14px">Auto Beats:</Text>
-                    <Switch 
-                      isChecked={autoBeats}
-                      onChange={(e) => setAutoBeats(e.target.checked)}
-                    />
-                  </Flex>
-                  
-                  {autoBeats && (
-                    <Box>
-                      <Text fontSize="14px" mb="4px">Interval: {beatInterval}ms</Text>
-                      <Slider
-                        min={100}
-                        max={1000}
-                        step={50}
-                        value={beatInterval}
-                        onChange={(e) => setBeatInterval(parseInt(e.target.value))}
-                      />
-                    </Box>
-                  )}
-                  
                   <Box>
-                    <Text fontSize="14px" mb="4px">Display Time: {(displayTime/1000).toFixed(1)}s</Text>
+                    <Flex align="center" justify="space-between" mb="2px">
+                      <Text fontSize="14px">Display Time</Text>
+                      <Text fontSize="14px">{displayTime}ms</Text>
+                    </Flex>
                     <Slider
                       min={100}
                       max={2000}
@@ -302,13 +313,22 @@
                     />
                   </Box>
                   
-                  <Divider />
+                  <Flex align="center" justify="space-between" mt="2px">
+                    <Text fontSize="14px">Auto Beats:</Text>
+                    <Switch 
+                      isChecked={autoBeats}
+                      onChange={(e) => setAutoBeats(e.target.checked)}
+                    />
+                  </Flex>
                   
-                  {/* Debug Info */}
-                  <Box fontSize="12px" color="rgba(255, 255, 255, 0.6)">
-                    <Text>Energy: {typeof beatEnergy === 'number' ? beatEnergy.toFixed(2) : '0.00'}</Text>
-                    <Text>Cutoff: {typeof cutoff === 'number' ? cutoff.toFixed(2) : '0.00'}</Text>
-                    <Text>Beats: {beatsDetected}</Text>
+                  <Box mt={1} mb={0.5}>
+                    <Button
+                      onClick={toggleVisibility}
+                      size="sm"
+                      width="100%"
+                    >
+                      Hide Controls
+                    </Button>
                   </Box>
                 </VStack>
               </CardBody>
@@ -318,6 +338,9 @@
         
         // Make it globally available
         window.HeroPanel = HeroPanel;
+        
+        // Add debugging
+        console.log('%c React HeroPanel Component Loaded Successfully', 'background: #4299e1; color: white; font-size: 14px; padding: 4px;');
     </script>
     
     <!-- Main Script -->

@@ -2369,251 +2369,219 @@ function toggleControlsVisibility() {
 // Initialize the React HeroPanel
 function initHeroPanel() {
     // Only initialize if React and ReactDOM are available
-    if (!window.React || !window.ReactDOM || !window.HeroPanel) {
-        console.error('React, ReactDOM or HeroPanel not available');
+    if (!window.React || !window.ReactDOM) {
+        console.error('React or ReactDOM not available - cannot initialize HeroPanel');
         return;
     }
     
-    console.log("Initializing HeroPanel with React", window.React.version);
-    
-    const root = document.getElementById('hero-panel-root');
-    if (!root) {
-        console.error('Hero panel root element not found');
-        return;
-    }
-    
-    let panelVisible = true; // Start with panel visible
-    let needsUpdate = true; // Always do initial render
-    
-    // Function to toggle panel visibility - exposed to window for keyboard shortcuts
-    window.updateHeroPanelVisibility = function() {
-        panelVisible = !panelVisible;
-        needsUpdate = true;
-        console.log("HeroPanel visibility toggled:", panelVisible);
-    };
-    
-    // Function to request a panel update for beat detection
-    window.requestHeroPanelUpdate = function() {
-        needsUpdate = true;
-    };
-    
-    // Function to handle frequency range change
-    function handleFreqRangeChange(e) {
-        // For HeroPanel integration, handle both direct value and event target
-        const range = e.target ? e.target.value : e;
-        
-        console.log("Frequency range changed to:", range);
-        switch (range) {
-            case 'bass':
-                freqRangeStart = 0;
-                freqRangeEnd = 20;
-                break;
-            case 'mid':
-                freqRangeStart = 10;
-                freqRangeEnd = 60;
-                break;
-            case 'high':
-                freqRangeStart = 50;
-                freqRangeEnd = 100;
-                break;
-            case 'full':
-                freqRangeStart = 0;
-                freqRangeEnd = 120;
-                break;
+    // Give more time for Babel to transpile the JSX and make HeroPanel available
+    const checkForHeroPanel = () => {
+        if (!window.HeroPanel) {
+            console.warn('HeroPanel component not available yet, waiting for Babel transpilation...');
+            setTimeout(checkForHeroPanel, 500); // Increased timeout to ensure transpilation completes
+            return;
         }
         
-        // Reset the peak detection values when changing ranges
-        resetPeakDetection();
-        saveSettings();
+        console.log("Initializing HeroPanel with React", window.React.version);
         
-        // Remove references to DOM elements that might not exist
-        // Update the UI elements for frequency ranges
-        // if (freqStartSlider) freqStartSlider.value = freqRangeStart;
-        // if (freqStartValue) freqStartValue.textContent = freqRangeStart.toString();
-        // if (freqEndSlider) freqEndSlider.value = freqRangeEnd;
-        // if (freqEndValue) freqEndValue.textContent = freqRangeEnd.toString();
-        
-        // Flag for update
-        if (typeof window.requestHeroPanelUpdate === 'function') {
-            window.requestHeroPanelUpdate();
+        const root = document.getElementById('hero-panel-root');
+        if (!root) {
+            console.error('Hero panel root element not found');
+            return;
         }
-    }
-    
-    // Function to render the Hero Panel
-    function renderHeroPanel() {
-        // Use actual values directly instead of reading from removed debug elements
-        const beatEnergy = typeof signalEnergy === 'number' ? signalEnergy : 0;
-        const cutoff = typeof peakCutoff === 'number' ? peakCutoff : 0;
-        const beatsDetected = peakCount;
         
-        // Set auto beats when toggled
-        const setAutoBeats = (value) => {
-            useFallbackBeats = value;
-            // Remove reference to DOM element that might not exist
-            // if (fallbackToggle) {
-            //     fallbackToggle.checked = value;
-            // }
-            
-            if (useFallbackBeats) {
-                startFallbackBeatTimer();
-            } else {
-                stopFallbackBeatTimer();
-            }
-            saveSettings();
+        let panelVisible = true; // Start with panel visible
+        let needsUpdate = true; // Always do initial render
+        
+        // Function to toggle panel visibility - exposed to window for keyboard shortcuts
+        window.updateHeroPanelVisibility = function() {
+            panelVisible = !panelVisible;
+            needsUpdate = true;
+            console.log("HeroPanel visibility toggled:", panelVisible);
+        };
+        
+        // Function to request a panel update for beat detection
+        window.requestHeroPanelUpdate = function() {
             needsUpdate = true;
         };
         
-        const props = {
-            peakThreshold,
-            setPeakThreshold: (value) => {
-                peakThreshold = value;
-                // Remove references to DOM elements that might not exist
-                // if (thresholdValue) {
-                //     thresholdValue.textContent = peakThreshold.toFixed(2);
-                // }
-                // if (thresholdSlider) {
-                //     thresholdSlider.value = peakThreshold;
-                // }
-                saveSettings();
-                needsUpdate = true;
-            },
-            noiseFloor: noiseFloor,
-            setNoiseFloor: (value) => {
-                noiseFloor = value;
-                // Remove references to DOM elements that might not exist
-                // if (noiseFloorValue) {
-                //     noiseFloorValue.textContent = noiseFloor.toString();
-                // }
-                // if (noiseFloorSlider) {
-                //     noiseFloorSlider.value = noiseFloor;
-                // }
-                saveSettings();
-                needsUpdate = true;
-            },
-            freqRangeStart,
-            setFreqRangeStart: (value) => {
-                freqRangeStart = value;
-                // Ensure start is less than end
-                if (freqRangeStart >= freqRangeEnd) {
-                    freqRangeStart = freqRangeEnd - 1;
-                }
-                // Remove references to DOM elements that might not exist
-                // if (freqStartValue) {
-                //     freqStartValue.textContent = freqRangeStart.toString();
-                // }
-                // if (freqStartSlider) {
-                //     freqStartSlider.value = freqRangeStart;
-                // }
-                resetPeakDetection();
-                saveSettings();
-                needsUpdate = true;
-            },
-            freqRangeEnd,
-            setFreqRangeEnd: (value) => {
-                freqRangeEnd = value;
-                // Ensure end is greater than start
-                if (freqRangeEnd <= freqRangeStart) {
-                    freqRangeEnd = freqRangeStart + 1;
-                }
-                // Remove references to DOM elements that might not exist
-                // if (freqEndValue) {
-                //     freqEndValue.textContent = freqRangeEnd.toString();
-                // }
-                // if (freqEndSlider) {
-                //     freqEndSlider.value = freqRangeEnd;
-                // }
-                resetPeakDetection();
-                saveSettings();
-                needsUpdate = true;
-            },
-            autoBeats: useFallbackBeats,
-            setAutoBeats,
-            beatInterval: fallbackBeatInterval,
-            setBeatInterval: (value) => {
-                fallbackBeatInterval = value;
-                // Remove references to DOM elements that might not exist
-                // if (intervalValue) {
-                //     intervalValue.textContent = fallbackBeatInterval.toString();
-                // }
-                // if (fallbackInterval) {
-                //     fallbackInterval.value = fallbackBeatInterval;
-                // }
-                if (useFallbackBeats) {
-                    startFallbackBeatTimer(); // Restart with new interval
-                }
-                saveSettings();
-                needsUpdate = true;
-            },
-            displayTime: minScreenDisplayTime,
-            setDisplayTime: (value) => {
-                minScreenDisplayTime = value;
-                // Remove references to DOM elements that might not exist
-                // if (displayTimeValue) {
-                //     displayTimeValue.textContent = (minScreenDisplayTime / 1000).toFixed(1) + 's';
-                // }
-                // if (displayTimeSlider) {
-                //     displayTimeSlider.value = minScreenDisplayTime;
-                // }
-                saveSettings();
-                needsUpdate = true;
-            },
-            beatEnergy,
-            cutoff,
-            beatsDetected,
-            peakDetected, // Pass the peak detected state
-            onRestart: restartAnimation,
-            onReset: () => {
-                resetToDefaultSettings();
-                needsUpdate = true;
-            },
-            handleFreqRangeChange,
-            visible: panelVisible,
-            toggleVisibility: () => {
-                panelVisible = !panelVisible;
-                needsUpdate = true;
-            }
-        };
-        
-        try {
-            ReactDOM.render(
-                React.createElement(window.HeroPanel, props),
-                root
-            );
-            console.log("HeroPanel rendered successfully");
-        } catch (error) {
-            console.error("Error rendering HeroPanel:", error);
-        }
-    }
-    
-    // Do the initial render
-    renderHeroPanel();
-    
-    // Add keyboard shortcut for showing/hiding the panel
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'c' || e.key === 'C') {
-            window.updateHeroPanelVisibility();
-        }
-    });
-    
-    // Set up continuous panel updates using requestAnimationFrame for smoother updates
-    function updatePanelLoop() {
-        // Only re-render if the panel is visible and metrics have changed or panel needs update
-        if (needsUpdate) {
-            // Update the panel
-            renderHeroPanel();
+        // Function to handle frequency range change
+        function handleFreqRangeChange(e) {
+            // For HeroPanel integration, handle both direct value and event target
+            const range = e.target ? e.target.value : e;
             
-            // Reset the update flag
-            needsUpdate = false;
+            console.log("Frequency range changed to:", range);
+            switch (range) {
+                case 'bass':
+                    freqRangeStart = 0;
+                    freqRangeEnd = 20;
+                    break;
+                case 'mid':
+                    freqRangeStart = 10;
+                    freqRangeEnd = 60;
+                    break;
+                case 'high':
+                    freqRangeStart = 50;
+                    freqRangeEnd = 100;
+                    break;
+                case 'full':
+                    freqRangeStart = 0;
+                    freqRangeEnd = 120;
+                    break;
+            }
+            
+            // Reset the peak detection values when changing ranges
+            resetPeakDetection();
+            saveSettings();
+            
+            // Remove references to DOM elements that might not exist
+            // Update the UI elements for frequency ranges
+            // if (freqStartSlider) freqStartSlider.value = freqRangeStart;
+            // if (freqStartValue) freqStartValue.textContent = freqRangeStart.toString();
+            // if (freqEndSlider) freqEndSlider.value = freqRangeEnd;
+            // if (freqEndValue) freqEndValue.textContent = freqRangeEnd.toString();
+            
+            // Flag for update
+            if (typeof window.requestHeroPanelUpdate === 'function') {
+                window.requestHeroPanelUpdate();
+            }
         }
         
-        // Request next frame for continuous updates
-        requestAnimationFrame(updatePanelLoop);
-    }
+        // Function to render the Hero Panel
+        function renderHeroPanel() {
+            // Use actual values directly instead of reading from removed debug elements
+            const beatEnergy = typeof signalEnergy === 'number' ? signalEnergy : 0;
+            const cutoff = typeof peakCutoff === 'number' ? peakCutoff : 0;
+            const beatsDetected = peakCount;
+            
+            // Set auto beats when toggled
+            const setAutoBeats = (value) => {
+                useFallbackBeats = value;
+                
+                if (useFallbackBeats) {
+                    startFallbackBeatTimer();
+                } else {
+                    stopFallbackBeatTimer();
+                }
+                saveSettings();
+                needsUpdate = true;
+            };
+            
+            const props = {
+                peakThreshold,
+                setPeakThreshold: (value) => {
+                    peakThreshold = value;
+                    resetPeakDetection();
+                    saveSettings();
+                    needsUpdate = true;
+                },
+                noiseFloor,
+                setNoiseFloor: (value) => {
+                    noiseFloor = value;
+                    resetPeakDetection();
+                    saveSettings();
+                    needsUpdate = true;
+                },
+                freqRangeStart,
+                setFreqRangeStart: (value) => {
+                    freqRangeStart = value;
+                    // Ensure start is less than end
+                    if (freqRangeStart >= freqRangeEnd) {
+                        freqRangeStart = freqRangeEnd - 1;
+                    }
+                    resetPeakDetection();
+                    saveSettings();
+                    needsUpdate = true;
+                },
+                freqRangeEnd,
+                setFreqRangeEnd: (value) => {
+                    freqRangeEnd = value;
+                    // Ensure end is greater than start
+                    if (freqRangeEnd <= freqRangeStart) {
+                        freqRangeEnd = freqRangeStart + 1;
+                    }
+                    resetPeakDetection();
+                    saveSettings();
+                    needsUpdate = true;
+                },
+                autoBeats: useFallbackBeats,
+                setAutoBeats,
+                beatInterval: fallbackBeatInterval,
+                setBeatInterval: (value) => {
+                    fallbackBeatInterval = value;
+                    if (useFallbackBeats) {
+                        startFallbackBeatTimer(); // Restart with new interval
+                    }
+                    saveSettings();
+                    needsUpdate = true;
+                },
+                displayTime: minScreenDisplayTime,
+                setDisplayTime: (value) => {
+                    minScreenDisplayTime = value;
+                    saveSettings();
+                    needsUpdate = true;
+                },
+                beatEnergy,
+                cutoff,
+                beatsDetected,
+                peakDetected, // Pass the peak detected state
+                onRestart: restartAnimation,
+                onReset: () => {
+                    resetToDefaultSettings();
+                    needsUpdate = true;
+                },
+                handleFreqRangeChange,
+                visible: panelVisible,
+                toggleVisibility: () => {
+                    panelVisible = !panelVisible;
+                    needsUpdate = true;
+                }
+            };
+            
+            try {
+                ReactDOM.render(
+                    React.createElement(window.HeroPanel, props),
+                    root
+                );
+                console.log("HeroPanel rendered successfully");
+            } catch (error) {
+                console.error("Error rendering HeroPanel:", error);
+            }
+        }
+        
+        // Do the initial render
+        renderHeroPanel();
+        
+        // Add keyboard shortcut for showing/hiding the panel
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'c' || e.key === 'C') {
+                window.updateHeroPanelVisibility();
+            }
+        });
+        
+        // Set up continuous panel updates using requestAnimationFrame for smoother updates
+        function updatePanelLoop() {
+            // Only re-render if the panel is visible and metrics have changed or panel needs update
+            if (needsUpdate) {
+                // Update the panel
+                renderHeroPanel();
+                
+                // Reset the update flag
+                needsUpdate = false;
+            }
+            
+            // Request next frame for continuous updates
+            requestAnimationFrame(updatePanelLoop);
+        }
+        
+        // Start the continuous update loop
+        updatePanelLoop();
+        
+        console.log("HeroPanel initialization complete");
+    };
     
-    // Start the continuous update loop
-    updatePanelLoop();
-    
-    console.log("HeroPanel initialization complete");
+    // Start checking for HeroPanel component - give Babel time to transpile
+    setTimeout(checkForHeroPanel, 100);
 }
 
 // ... existing code ...
