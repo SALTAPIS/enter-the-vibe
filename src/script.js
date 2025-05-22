@@ -112,39 +112,9 @@ async function init() {
     
     // Initialize UI elements
     const startButton = document.getElementById('start-button');
-    const beatIndicator = document.getElementById('beat-indicator');
     const mainSound = document.getElementById('main-sound');
     const glitchSound = document.getElementById('glitch-sound');
     const transitionSound = document.getElementById('transition-sound');
-    const debugPanel = document.getElementById('debug-panel');
-    
-    // Show the debug panel - important for displaying metrics
-    if (debugPanel) {
-        debugPanel.style.display = 'block'; // Show debug panel
-    }
-    
-    // Allow manual beat triggering by clicking on the beat indicator
-    if (beatIndicator) {
-        beatIndicator.addEventListener('click', (e) => {
-            e.stopPropagation();
-            console.log("Manual beat triggered by click");
-            detectPeak(true);
-        });
-        // Make it clickable
-        beatIndicator.style.pointerEvents = 'auto';
-    }
-
-    // Allow triggering beats with spacebar and toggle controls with 'c'
-    document.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-            console.log("Manual beat triggered by spacebar");
-            detectPeak(true);
-            e.preventDefault(); // Prevent page scrolling
-        } else if (e.code === 'KeyC') {
-            // Toggle HeroPanel visibility when 'c' is pressed
-            toggleHeroPanelVisibility();
-        }
-    });
     
     // Setup start button
     if (startButton) {
@@ -672,40 +642,44 @@ let audioSource;
 let analyser;
 let frequencyData;
 
-// Peak detection (replacing beat detection)
-let peakDetected = false;
-let lastPeakTime = 0;
-let signalEnergy = 0;
-let peakThreshold = 0.05; // Updated default sensitivity threshold
-let noiseFloor = 70; // Noise gate threshold
-let peakHoldTime = 250; // Minimum time between peaks
+// Global variables for visualization 
+let peakCutoff = 100; // Default threshold for detecting peaks
+let peakThreshold = 0.05; // Multiplier for peakCutoff (user adjustable)
+let noiseFloor = 60; // Noise gate threshold (user adjustable)
+let peakCount = 0; // Count of detected peaks
+let lastPeakTime = 0; // Time of last detected peak
+let peakDetected = false; // Flag for active peak state
+let isAudioActuallyPlaying = false; // Flag to check if audio is actually playing
+let signalEnergy = 0; // Running average of signal energy
 let energyDecay = 0.95; // Decay rate for energy smoothing
-let peakCutoff = 0;
 let cutoffDecay = 0.95; // Decay rate for dynamic threshold
-let isAudioActuallyPlaying = false; // Flag to check if audio has real content
+let peakHoldTime = 250; // Minimum time between peaks in ms
 
-// Frequency range for peak detection
-let freqRangeStart = 10; // Start bin index
-let freqRangeEnd = 60;   // End bin index
+// Frequency range for analysis
+let freqRangeStart = 0; // Default start (lower frequency)
+let freqRangeEnd = 20; // Default end (higher frequency)
+let freqRangeHighlight = null; // Element to highlight the frequency range
+
+// Auto beat settings
+let autoBeatsEnabled = false; // Flag for automatic beats
+let autoBeatInterval = 500; // Interval for automatic beats in ms
+let autoBeatTimer = null; // Timer reference for automatic beats
+let displayTime = 500; // How long to display beat visuals in ms
+
+// Credits settings
+let credits = []; // Loaded from JSON
+
+// Preload images array
+const preloadedImages = [];
 
 // Fallback beat timer
 let useFallbackBeats = false; // Default to OFF
 let fallbackBeatInterval = 300; // Updated interval
 let fallbackBeatTimer = null;
-let peakCount = 0; // Counter for detected peaks
-let beatIndicator; // The separate beat indicator element
-let debugPanel; // Debug panel element
-let debugEnergyEl, debugCutoffEl, debugCountEl; // Debug elements
 
-// Beat control elements
-let thresholdSlider, thresholdValue;
-let noiseFloorSlider, noiseFloorValue;
-let freqRangeSelect, freqStartSlider, freqEndSlider;
-let freqStartValue, freqEndValue;
-let fallbackToggle, fallbackInterval, intervalValue;
-let displayTimeSlider, displayTimeValue; // New control elements for display time
+// Controls elements
+let displayTimeSlider, displayTimeValue; // Control elements for display time
 let toggleControlsBtn, beatControls;
-let freqRangeHighlight; // Element to highlight the selected frequency range
 
 // Function to start fallback beat timer
 function startFallbackBeatTimer() {
@@ -737,14 +711,8 @@ function stopFallbackBeatTimer() {
 function setupAudioVisualization(audioElement) {
     console.log("Setting up audio visualization...");
     
-    // Initialize beat indicator
-    beatIndicator = document.getElementById('beat-indicator');
-    
-    // Initialize debug panel
-    debugPanel = document.getElementById('debug-panel');
-    debugEnergyEl = document.getElementById('debug-energy');
-    debugCutoffEl = document.getElementById('debug-cutoff');
-    debugCountEl = document.getElementById('debug-count');
+    // Initialize frequency range highlight
+    freqRangeHighlight = document.getElementById('freq-range-highlight');
     
     // Initialize beat controls
     initBeatControls();
@@ -866,13 +834,12 @@ function initBeatControls() {
 function saveSettings() {
     const settings = {
         peakThreshold,
-        noiseFloor, // Using noiseFloor instead of minimumThreshold
+        noiseFloor,
         freqRangeStart,
         freqRangeEnd,
         useFallbackBeats,
         fallbackBeatInterval,
-        minScreenDisplayTime, // Save display time setting
-        freqRangeType: freqRangeSelect ? freqRangeSelect.value : 'mid'
+        displayTime
     };
     
     try {
@@ -1220,11 +1187,6 @@ function drawVisualizationBars(ctx, canvas, frequencyData) {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-    
-    // Update debug info
-    if (debugEnergyEl) debugEnergyEl.textContent = Math.round(signalEnergy);
-    if (debugCutoffEl) debugCutoffEl.textContent = Math.round(peakCutoff);
-    if (debugCountEl) debugCountEl.textContent = peakCount;
 }
 
 // Function to manually trigger a peak detection event
@@ -1235,12 +1197,6 @@ function detectPeak(forcePeak = false) {
         
         // Update peak detected state
         peakDetected = true;
-        
-        // Update UI - Show the original beat indicator while we're also using the blue square in the panel
-        if (beatIndicator) {
-            beatIndicator.style.display = 'block'; // Make sure it's visible
-            beatIndicator.classList.add('active'); // Add active class for styling
-        }
         
         // Ensure the HeroPanel is updated with beat detection
         if (typeof window.requestHeroPanelUpdate === 'function') {
@@ -1263,9 +1219,6 @@ function detectPeak(forcePeak = false) {
         // Reset peak detected flag after a short delay
         setTimeout(() => {
             peakDetected = false;
-            if (beatIndicator) {
-                beatIndicator.classList.remove('active');
-            }
             
             // Update HeroPanel again to remove the beat effect
             if (typeof window.requestHeroPanelUpdate === 'function') {
