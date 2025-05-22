@@ -132,7 +132,8 @@
           handleFreqRangeChange,
           visible,
           toggleVisibility,
-          peakDetected
+          peakDetected,
+          onShowEndScene
         }) => {
           // Create state for simplified view
           const [isSimplifiedView, setIsSimplifiedView] = React.useState(false);
@@ -230,114 +231,131 @@
               <CardBody p={16} pt={16} style={{backgroundColor: "rgba(22, 22, 22, 0.95)"}}>
                 <VStack spacing={3} align="stretch">
                   <Box mb={1}>
-                                          <Flex align="center" justify="space-between" mb="2px">
-                        <Text>Peak Threshold</Text>
-                        <Text style={{width: "45px", textAlign: "right"}}>{typeof peakThreshold === 'number' ? peakThreshold.toFixed(2) : '0.05'}</Text>
-                      </Flex>
-                    <Slider
-                      min={0.01}
-                      max={0.20}
-                      step={0.01}
-                      value={peakThreshold}
-                      onChange={(e) => setPeakThreshold(parseFloat(e.target.value))}
-                    />
-                  </Box>
-                  
-                  <Box mb={1}>
-                                          <Flex align="center" justify="space-between" mb="2px">
-                        <Text>Noise Floor</Text>
-                        <Text style={{width: "45px", textAlign: "right"}}>{noiseFloor}</Text>
-                      </Flex>
-                    <Slider
-                      min={30}
-                      max={150}
-                      step={1}
-                      value={noiseFloor}
-                      onChange={(e) => setNoiseFloor(parseInt(e.target.value))}
-                    />
-                  </Box>
-                  
-                  <Box mb={1}>
-                    <Text mb="2px">Frequency Focus</Text>
-                    <Select
-                      onChange={(e) => handleFreqRangeChange(e.target.value)}
-                      value={
-                        freqRangeStart === 0 && freqRangeEnd === 20 ? "bass" :
-                        freqRangeStart === 10 && freqRangeEnd === 60 ? "mid" :
-                        freqRangeStart === 50 && freqRangeEnd === 100 ? "high" :
-                        freqRangeStart === 0 && freqRangeEnd === 120 ? "full" : "custom"
-                      }
-                    >
-                      <option value="bass">Bass (Low)</option>
-                      <option value="mid">Mids</option>
-                      <option value="high">Highs</option>
-                      <option value="full">Full Spectrum</option>
-                      <option value="custom">Custom Range</option>
-                    </Select>
-                  </Box>
-                  
-                  <Box mb={1}>
-                                          <Flex justify="space-between" mb="2px">
-                        <Text>Freq Range</Text>
-                        <Text style={{width: "80px", textAlign: "right"}}>{freqRangeStart}-{freqRangeEnd} Hz</Text>
-                      </Flex>
-                    <RangeSlider
-                      minValue={freqRangeStart}
-                      maxValue={freqRangeEnd}
-                      minLimit={0}
-                      maxLimit={120}
-                      step={1}
-                      onMinChange={setFreqRangeStart}
-                      onMaxChange={setFreqRangeEnd}
-                    />
-                  </Box>
-                  
-                  <Box mb={1}>
-                                          <Flex align="center" justify="space-between" mb="2px">
-                        <Text>Display Time</Text>
-                        <Text style={{width: "70px", textAlign: "right"}}>{displayTime}ms</Text>
-                      </Flex>
-                    <Slider
-                      min={10}
-                      max={2000}
-                      step={10}
-                      value={displayTime}
-                      onChange={(e) => setDisplayTime(parseInt(e.target.value))}
-                    />
-                  </Box>
-                  
-                  <Flex align="center" justify="space-between" mt="4px" mb="4px">
-                    <Text>Auto Beats:</Text>
-                    <Switch 
-                      isChecked={autoBeats}
-                      onChange={(e) => setAutoBeats(e.target.checked)}
-                    />
-                  </Flex>
-                  
-                  <Box mt={2} mb={0.5}>
-                    <Button
-                      onClick={toggleVisibility}
-                      size="sm"
-                      width="100%"
-                      colorScheme="blue"
-                    >
-                      Hide Controls
-                    </Button>
-                  </Box>
-                </VStack>
-              </CardBody>
-            </Card>
-          );
-        };
-        
-        // Make it globally available
-        window.HeroPanel = HeroPanel;
-        
-        // Add debugging
-        console.log('%c React HeroPanel Component Loaded Successfully', 'background: #4299e1; color: white; font-size: 14px; padding: 4px;');
-    </script>
-    
-    <!-- Main Script -->
-    <script type="module" src="./src/script.js"></script>
+                                        <Flex align="center" justify="space-between" mb="2px">
+                          <Text>Peak Threshold</Text>
+                          <Text style={{width: "45px", textAlign: "right"}}>{typeof peakThreshold === 'number' ? peakThreshold.toFixed(2) : '0.05'}</Text>
+                        </Flex>
+                      <Slider
+                        min={0.01}
+                        max={0.20}
+                        step={0.01}
+                        value={peakThreshold}
+                        onChange={(e) => setPeakThreshold(parseFloat(e.target.value))}
+                      />
+                    </Box>
+                    
+                    <Box mb={1}>
+                                        <Flex align="center" justify="space-between" mb="2px">
+                          <Text>Noise Floor</Text>
+                          <Text style={{width: "45px", textAlign: "right"}}>{noiseFloor}</Text>
+                        </Flex>
+                      <Slider
+                        min={30}
+                        max={150}
+                        step={1}
+                        value={noiseFloor}
+                        onChange={(e) => setNoiseFloor(parseInt(e.target.value))}
+                      />
+                    </Box>
+                    
+                    <Box mb={1}>
+                      <Text mb="2px">Frequency Focus</Text>
+                      <Select
+                        onChange={(e) => handleFreqRangeChange(e.target.value)}
+                        value={
+                          freqRangeStart === 0 && freqRangeEnd === 20 ? "bass" :
+                          freqRangeStart === 10 && freqRangeEnd === 60 ? "mid" :
+                          freqRangeStart === 50 && freqRangeEnd === 100 ? "high" :
+                          freqRangeStart === 0 && freqRangeEnd === 120 ? "full" : "custom"
+                        }
+                      >
+                        <option value="bass">Bass (Low)</option>
+                        <option value="mid">Mids</option>
+                        <option value="high">Highs</option>
+                        <option value="full">Full Spectrum</option>
+                        <option value="custom">Custom Range</option>
+                      </Select>
+                    </Box>
+                    
+                    <Box mb={1}>
+                                        <Flex justify="space-between" mb="2px">
+                          <Text>Freq Range</Text>
+                          <Text style={{width: "80px", textAlign: "right"}}>{freqRangeStart}-{freqRangeEnd} Hz</Text>
+                        </Flex>
+                      <RangeSlider
+                        minValue={freqRangeStart}
+                        maxValue={freqRangeEnd}
+                        minLimit={0}
+                        maxLimit={120}
+                        step={1}
+                        onMinChange={setFreqRangeStart}
+                        onMaxChange={setFreqRangeEnd}
+                      />
+                    </Box>
+                    
+                    <Box mb={1}>
+                                        <Flex align="center" justify="space-between" mb="2px">
+                          <Text>Display Time</Text>
+                          <Text style={{width: "70px", textAlign: "right"}}>{displayTime}ms</Text>
+                        </Flex>
+                      <Slider
+                        min={10}
+                        max={2000}
+                        step={10}
+                        value={displayTime}
+                        onChange={(e) => setDisplayTime(parseInt(e.target.value))}
+                      />
+                    </Box>
+                    
+                    <Flex align="center" justify="space-between" mt="4px" mb="4px">
+                      <Text>Auto Beats:</Text>
+                      <Switch 
+                        isChecked={autoBeats}
+                        onChange={(e) => setAutoBeats(e.target.checked)}
+                      />
+                    </Flex>
+                    
+                    <HStack spacing={2} mt={2}>
+                      <Button onClick={onRestart} size="sm" width="100%" colorScheme="blue">
+                        Restart
+                      </Button>
+                      <Button 
+                        onClick={() => {
+                          if (typeof onShowEndScene === 'function') {
+                            onShowEndScene();
+                          } else {
+                            console.error("onShowEndScene is not a function");
+                          }
+                        }} 
+                        size="sm" 
+                        width="100%" 
+                        colorScheme="green"
+                      >
+                        Show End Scene
+                      </Button>
+                    </HStack>
+                    
+                    <Box mt={2} mb={0.5}>
+                      <Button
+                        onClick={toggleVisibility}
+                        size="sm"
+                        width="100%"
+                        colorScheme="blue"
+                      >
+                        Hide Controls
+                      </Button>
+                    </Box>
+                  </VStack>
+                </CardBody>
+              </Card>
+            );
+          };
+          
+          // Make it globally available
+          window.HeroPanel = HeroPanel;
+      </script>
+      
+      <!-- Main Script -->
+      <script type="module" src="./src/script.js"></script>
 </body>
 </html> 

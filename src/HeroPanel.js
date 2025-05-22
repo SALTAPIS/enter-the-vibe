@@ -42,7 +42,8 @@ const HeroPanel = ({
   handleFreqRangeChange,
   visible,
   toggleVisibility,
-  peakDetected
+  peakDetected,
+  onShowEndScene
 }) => {
   // Create state for simplified view
   const [isSimplifiedView, setIsSimplifiedView] = useState(false);
@@ -338,6 +339,20 @@ const HeroPanel = ({
         <HStack spacing={2}>
           <Button onClick={onRestart} flex="1" size="sm">Restart</Button>
           <Button onClick={onReset} flex="1" size="sm" variant="outline">Reset Settings</Button>
+          <Button 
+            onClick={() => {
+              if (typeof onShowEndScene === 'function') {
+                onShowEndScene();
+              } else {
+                console.error("onShowEndScene is not a function");
+              }
+            }} 
+            flex="1" 
+            size="sm" 
+            variant="outline"
+          >
+            Show End Scene
+          </Button>
         </HStack>
       </CardFooter>
     </Card>

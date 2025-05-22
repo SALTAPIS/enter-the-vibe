@@ -17,6 +17,11 @@ let beatDetected = null; // Will be defined by playCreditsSequence
 let minScreenDisplayTime = 300; // Minimum display time in milliseconds (0.3 seconds by default)
 let isTransitionInProgress = false; // Flag to track when a transition is in progress
 
+// Audio elements
+let mainSound = null;
+let glitchSound = null;
+let transitionSound = null;
+
 // Load app configuration from JSON file
 async function loadAppConfig() {
     try {
@@ -113,9 +118,9 @@ async function init() {
     
     // Initialize UI elements
     const startButton = document.getElementById('start-button');
-    const mainSound = document.getElementById('main-sound');
-    const glitchSound = document.getElementById('glitch-sound');
-    const transitionSound = document.getElementById('transition-sound');
+    mainSound = document.getElementById('main-sound');
+    glitchSound = document.getElementById('glitch-sound');
+    transitionSound = document.getElementById('transition-sound');
     
     // Setup start button
     if (startButton) {
@@ -150,7 +155,9 @@ async function init() {
                         mainSound.currentTime = 0;
                         
                         // Add event listener for when audio ends
+                        mainSound.removeEventListener('ended', showEndScene); // Remove any existing listener first
                         mainSound.addEventListener('ended', showEndScene);
+                        console.log("Added 'ended' event listener to mainSound");
                         
                         // Play the sound
                         mainSound.play().then(() => {
@@ -494,7 +501,7 @@ function playCreditsSequence(screens) {
     
     // Function to show the next screen
     showNextScreen = () => {
-        console.log(`Showing screen ${currentScreenIndex + 1} of ${screens.length}`);
+        // Removed console log to reduce spam
         
         // Set the transition flag
         isTransitionInProgress = true;
@@ -695,7 +702,7 @@ function startFallbackBeatTimer() {
     stopFallbackBeatTimer(); // First stop any existing timer
     
     if (useFallbackBeats && !fallbackBeatTimer) {
-        console.log(`Starting fallback beat timer with interval ${fallbackBeatInterval}ms`);
+        // Removed console log to reduce spam
         fallbackBeatTimer = setInterval(() => {
             // Only trigger fallback beats if audio is actually playing
             if (useFallbackBeats && isAudioActuallyPlaying) {
@@ -709,7 +716,7 @@ function startFallbackBeatTimer() {
 // Function to stop fallback beat timer
 function stopFallbackBeatTimer() {
     if (fallbackBeatTimer) {
-        console.log("Stopping fallback beat timer");
+        // Removed console log to reduce spam
         clearInterval(fallbackBeatTimer);
         fallbackBeatTimer = null;
     }
@@ -953,9 +960,28 @@ function restartAnimation() {
         mainSound.currentTime = 0;
         // Remove the ended event listener to prevent multiple triggers
         mainSound.removeEventListener('ended', showEndScene);
+    } else {
+        mainSound = document.getElementById('main-sound');
+        if (mainSound) {
+            mainSound.pause();
+            mainSound.currentTime = 0;
+            mainSound.removeEventListener('ended', showEndScene);
+        }
     }
-    if (glitchSound) glitchSound.pause();
-    if (transitionSound) transitionSound.pause();
+    
+    if (glitchSound) {
+        glitchSound.pause();
+    } else {
+        glitchSound = document.getElementById('glitch-sound');
+        if (glitchSound) glitchSound.pause();
+    }
+    
+    if (transitionSound) {
+        transitionSound.pause();
+    } else {
+        transitionSound = document.getElementById('transition-sound');
+        if (transitionSound) transitionSound.pause();
+    }
     
     stopFallbackBeatTimer();
     
@@ -2112,10 +2138,18 @@ function startPhase1() {
     
 // Function to show the end scene when audio finishes
 function showEndScene() {
+    console.log("Showing end scene");
+    
+    // Remove any existing end scene
+    const existingEndScene = document.querySelector('.end-scene');
+    if (existingEndScene) {
+        existingEndScene.remove();
+    }
+    
     // Create end scene container
     const endScene = document.createElement('div');
     endScene.classList.add('end-scene');
-    endScene.style.position = 'absolute';
+    endScene.style.position = 'fixed'; // Changed from absolute to fixed
     endScene.style.top = '0';
     endScene.style.left = '0';
     endScene.style.width = '100%';
@@ -2124,6 +2158,8 @@ function showEndScene() {
     endScene.style.flexDirection = 'column';
     endScene.style.alignItems = 'center';
     endScene.style.justifyContent = 'center';
+    endScene.style.zIndex = '1000'; // Ensure it's above other elements
+    endScene.style.backgroundColor = 'rgba(0, 0, 0, 0.9)'; // Add background color
     
     // Create main title
     const endTitle = document.createElement('h1');
@@ -2144,36 +2180,67 @@ function showEndScene() {
     subtitle.style.color = '#4495F1';
     subtitle.style.marginBottom = '3rem';
     
-    // Removed restart button
+    // Add restart button
+    const restartButton = document.createElement('button');
+    restartButton.textContent = 'RESTART';
+    restartButton.style.padding = '12px 30px';
+    restartButton.style.fontSize = '1.5rem';
+    restartButton.style.fontFamily = "'Anton', sans-serif";
+    restartButton.style.backgroundColor = 'transparent';
+    restartButton.style.color = '#33FF33';
+    restartButton.style.border = '2px solid #33FF33';
+    restartButton.style.cursor = 'pointer';
+    restartButton.style.transition = 'all 0.3s ease';
+    restartButton.style.textShadow = '0 0 10px rgba(51, 255, 51, 0.8)';
+    restartButton.style.boxShadow = '0 0 10px rgba(51, 255, 51, 0.8)';
+    
+    // Add hover effect for the button
+    restartButton.onmouseover = function() {
+        this.style.backgroundColor = 'rgba(51, 255, 51, 0.2)';
+    };
+    restartButton.onmouseout = function() {
+        this.style.backgroundColor = 'transparent';
+    };
+    
+    // Add event listener to restart button
+    restartButton.addEventListener('click', function() {
+        console.log("Restart button clicked");
+        restartAnimation();
+    });
     
     // Append elements
     endScene.appendChild(endTitle);
     endScene.appendChild(subtitle);
+    endScene.appendChild(restartButton);
     
-    // Add to phase 3
-    const phase3 = document.getElementById('phase3');
-    if (phase3) {
-        phase3.appendChild(endScene);
-    }
+    // Add to body directly to ensure it's visible
+    document.body.appendChild(endScene);
     
     // Animate in
     gsap.from(endScene, {
-                    opacity: 0, 
+        opacity: 0, 
         duration: 1.5
     });
     
     gsap.from(endTitle, {
         y: -50,
-                    opacity: 0, 
+        opacity: 0, 
         duration: 1,
         delay: 0.5
     });
     
     gsap.from(subtitle, {
         y: -30,
-                    opacity: 0, 
+        opacity: 0, 
         duration: 1,
         delay: 1
+    });
+    
+    gsap.from(restartButton, {
+        y: -20,
+        opacity: 0, 
+        duration: 1,
+        delay: 1.5
     });
 } 
 
@@ -2526,6 +2593,7 @@ function initHeroPanel() {
                     resetToDefaultSettings();
                     needsUpdate = true;
                 },
+                onShowEndScene: showEndScene, // Add function to show end scene
                 handleFreqRangeChange,
                 visible: panelVisible,
                 toggleVisibility: () => {
@@ -2539,7 +2607,7 @@ function initHeroPanel() {
                     React.createElement(window.HeroPanel, props),
                     root
                 );
-                console.log("HeroPanel rendered successfully");
+                // Removed console.log to prevent spam
             } catch (error) {
                 console.error("Error rendering HeroPanel:", error);
             }
