@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENTER THE VIBE</title>
+    
+    <!-- Base Font Anton from Fontshare -->
+    <link href="https://api.fontshare.com/v2/css?f[]=anton@400&display=swap" rel="stylesheet">
+    
+    <!-- Additional Fontshare Display Fonts for random variation -->
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,400,700,500,600,300&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@800,700,500,400,900,100,300,200,600&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=satoshi@900,700,500,300,400&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=general-sans@500,300,600,400,700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=switzer@400,300,500,600,700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=melodrama@700,400&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=tanker@700,400&display=swap" rel="stylesheet">
+    
+    <!-- React and ReactDOM from CDN -->
+    <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Include Babel for JSX transpilation -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <link rel="stylesheet" href="./src/style.css">
+</head>
+<body>
+    <!-- Audio Visualizer -->
+    <canvas id="audio-visualizer" class="audio-visualizer"></canvas>
+    
+    <!-- Beat Debug Indicator -->
+    <div id="beat-indicator" class="beat-indicator">BEAT</div>
+    
+    <!-- Hero UI Controls Mount Point -->
+    <div id="hero-panel-root"></div>
+    
+    <!-- Debug Info Panel -->
+    <div id="debug-panel" class="debug-panel">
+        <div>Beat Energy: <span id="debug-energy">0</span></div>
+        <div>Cutoff: <span id="debug-cutoff">0</span></div>
+        <div>Beats Detected: <span id="debug-count">0</span></div>
+    </div>
+    
+    <!-- Start Screen -->
+    <div id="start-screen" class="phase">
+        <div class="start-container">
+            <h1 class="start-title">ENTER THE VIBE</h1>
+            <button id="start-button">START EXPERIENCE</button>
+        </div>
+    </div>
+
+    <!-- Phase 1: Optimized Credits Sequence -->
+    <div id="phase1" class="phase hidden">
+        <div class="cursor"></div>
+        <div class="credits-container">
+            <!-- Credits will be dynamically inserted here -->
+        </div>
+        <div class="single-credit-container">
+            <!-- Single focused credits will appear here -->
+        </div>
+    </div>
+    
+    <!-- Phase 2: Main Title (Enter the Void style) -->
+    <div id="phase2" class="phase hidden">
+        <div class="title-container">
+            <div class="title-word" id="title-enter">ENTER</div>
+            <div class="title-word" id="title-the">THE</div>
+            <div class="title-word" id="title-vibe">VIBE</div>
+        </div>
+    </div>
+    
+    <!-- Phase 3: Digital Landscape -->
+    <div id="phase3" class="phase hidden">
+        <div class="particles-container"></div>
+        <div class="digital-landscape">
+            <div class="grid"></div>
+            <div class="sun"></div>
+            <div class="vibe-coding">
+                <span class="letter font-anton">V</span>
+                <span class="letter font-anton">I</span>
+                <span class="letter font-anton">B</span>
+                <span class="letter font-anton">E</span>
+                <span class="letter space">&nbsp;</span>
+                <span class="letter font-anton">C</span>
+                <span class="letter font-anton">O</span>
+                <span class="letter font-anton">D</span>
+                <span class="letter font-anton">I</span>
+                <span class="letter font-anton">N</span>
+                <span class="letter font-anton">G</span>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Audio Elements -->
+    <audio id="main-sound" preload="auto">
+        <source src="./sounds/Enter-the-Void.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="glitch-sound" preload="auto">
+        <source src="./sounds/glitch-sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="transition-sound" preload="auto">
+        <source src="./sounds/transition-sound.mp3" type="audio/mpeg">
+    </audio>
+    
+    <!-- Frequency Range Highlight -->
+    <div id="freq-range-highlight" class="freq-range-highlight"></div>
+    
+    <!-- Inline Hero Panel Component -->
+    <script type="text/babel">
+        // Define the HeroPanel component directly in the HTML file
+        const HeroPanel = ({
+          peakThreshold,
+          setPeakThreshold,
+          noiseFloor,
+          setNoiseFloor,
+          freqRangeStart,
+          setFreqRangeStart,
+          freqRangeEnd,
+          setFreqRangeEnd,
+          autoBeats,
+          setAutoBeats,
+          beatInterval,
+          setBeatInterval,
+          displayTime,
+          setDisplayTime,
+          beatEnergy,
+          cutoff,
+          beatsDetected,
+          onRestart,
+          onReset,
+          handleFreqRangeChange,
+          visible,
+          toggleVisibility,
+          peakDetected
+        }) => {
+          // Create state for simplified view
+          const [isSimplifiedView, setIsSimplifiedView] = React.useState(false);
+          const [isActive, setIsActive] = React.useState(peakDetected || false);
+          
+          // Update the view mode when autoBeats changes
+          React.useEffect(() => {
+            setIsSimplifiedView(autoBeats);
+          }, [autoBeats]);
+          
+          // Update active state when peakDetected changes
+          React.useEffect(() => {
+            setIsActive(peakDetected);
+          }, [peakDetected]);
+          
+          // Simplified Range Slider component
+          const RangeSlider = ({ minValue, maxValue, minLimit, maxLimit, step, onMinChange, onMaxChange }) => {
+            const handleMinChange = (e) => {
+              const newValue = Math.min(parseInt(e.target.value, 10), maxValue - step);
+              onMinChange(newValue);
+            };
+            
+            const handleMaxChange = (e) => {
+              const newValue = Math.max(parseInt(e.target.value, 10), minValue + step);
+              onMaxChange(newValue);
+            };
+            
+            return (
+              <div style={{ position: "relative", height: "24px", width: "100%", marginTop: "8px" }}>
+                {/* Slider track */}
+                <div
+                  style={{
+                    position: "absolute",
+                    width: "100%",
+                    height: "4px",
+                    background: "rgba(255, 255, 255, 0.2)",
+                    borderRadius: "2px",
+                    top: "50%",
+                    transform: "translateY(-50%)"
+                  }}
+                />
+                
+                {/* Selected range */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: `${(minValue / maxLimit) * 100}%`,
+                    width: `${((maxValue - minValue) / maxLimit) * 100}%`,
+                    height: "4px",
+                    background: "rgba(66, 153, 225, 0.6)",
+                    borderRadius: "2px",
+                    top: "50%",
+                    transform: "translateY(-50%)"
+                  }}
+                />
+                
+                {/* Min handle */}
+                <input
+                  type="range"
+                  min={minLimit}
+                  max={maxLimit}
+                  step={step}
+                  value={minValue}
+                  onChange={handleMinChange}
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '7px',
+                    WebkitAppearance: 'none',
+                    appearance: 'none',
+                    background: 'transparent',
+                    pointerEvents: 'auto',
+                    zIndex: 2,
+                    outline: 'none'
+                  }}
+                />
+                
+                {/* Max handle */}
+                <input
+                  type="range"
+                  min={minLimit}
+                  max={maxLimit}
+                  step={step}
+                  value={maxValue}
+                  onChange={handleMaxChange}
+                  style={{
+                    position: 'absolute',
+                    width: '100%',
+                    height: '7px',
+                    WebkitAppearance: 'none',
+                    appearance: 'none',
+                    background: 'transparent',
+                    pointerEvents: 'auto',
+                    zIndex: 1,
+                    outline: 'none'
+                  }}
+                />
+              </div>
+            );
+          };
+          
+          // Custom beat indicator component
+          const BeatIndicator = ({ active }) => {
+            return (
+              <div
+                style={{
+                  width: "40px",
+                  height: "40px",
+                  borderRadius: "50%",
+                  background: active ? "rgba(66, 153, 225, 0.8)" : "rgba(255, 255, 255, 0.2)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  transition: "all 0.1s",
+                  boxShadow: active ? "0 0 15px rgba(66, 153, 225, 0.8)" : "none"
+                }}
+              >
+                <div
+                  style={{
+                    width: "30px",
+                    height: "30px",
+                    borderRadius: "50%",
+                    background: active ? "rgba(66, 153, 225, 1)" : "rgba(255, 255, 255, 0.1)",
+                    boxShadow: active ? "0 0 10px rgba(66, 153, 225, 1)" : "none"
+                  }}
+                />
+              </div>
+            );
+          };
+          
+          // If not visible, just show the collapsed control
+          if (!visible) {
+            return (
+              <div
+                style={{
+                  position: "fixed",
+                  top: "20px",
+                  right: "20px",
+                  width: "50px",
+                  background: "rgba(0, 0, 0, 0.6)",
+                  borderColor: "rgba(255, 255, 255, 0.2)",
+                  borderWidth: "1px",
+                  borderStyle: "solid",
+                  boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+                  zIndex: "10",
+                  padding: "10px",
+                  borderRadius: "4px",
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  gap: "8px"
+                }}
+              >
+                <BeatIndicator active={isActive} />
+                <button
+                  onClick={toggleVisibility}
+                  style={{
+                    fontSize: "12px",
+                    padding: "4px 8px",
+                    background: "rgba(66, 153, 225, 0.6)",
+                    border: "none",
+                    borderRadius: "4px",
+                    color: "white",
+                    cursor: "pointer"
+                  }}
+                >
+                  Show
+                </button>
+              </div>
+            );
+          }
+          
+          // Main control panel
+          return (
+            <div
+              style={{
+                position: "fixed",
+                top: "20px",
+                right: "20px",
+                width: "300px",
+                background: "rgba(0, 0, 0, 0.6)",
+                borderColor: "rgba(255, 255, 255, 0.2)",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                boxShadow: "0 0 10px rgba(0, 0, 0, 0.5)",
+                zIndex: "10",
+                padding: "10px",
+                borderRadius: "4px",
+                color: "white"
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+                <span>Beat Controls</span>
+                <div style={{ marginLeft: "8px" }}><BeatIndicator active={isActive} /></div>
+                <div style={{ flex: "1" }} />
+                <button
+                  onClick={toggleVisibility}
+                  style={{
+                    fontSize: "12px",
+                    padding: "4px 8px",
+                    background: "rgba(66, 153, 225, 0.6)",
+                    border: "none",
+                    borderRadius: "4px",
+                    color: "white",
+                    cursor: "pointer"
+                  }}
+                >
+                  Hide
+                </button>
+              </div>
+              
+              <div style={{ paddingBottom: "10px" }}>
+                <div style={{ marginBottom: "12px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "4px" }}>
+                    <span style={{ fontSize: "14px" }}>Peak Threshold: {peakThreshold.toFixed(2)}</span>
+                    <span style={{ 
+                      fontSize: "12px", 
+                      background: "rgba(66, 153, 225, 0.6)", 
+                      padding: "2px 6px", 
+                      borderRadius: "4px"
+                    }}>
+                      {Math.round(beatEnergy * 100)}
+                    </span>
+                  </div>
+                  <input
+                    type="range"
+                    min={0.01}
+                    max={0.20}
+                    step={0.01}
+                    value={peakThreshold}
+                    onChange={(e) => setPeakThreshold(parseFloat(e.target.value))}
+                    style={{
+                      width: "100%",
+                      WebkitAppearance: "none",
+                      appearance: "none",
+                      height: "6px",
+                      borderRadius: "3px",
+                      background: "rgba(255, 255, 255, 0.2)",
+                      outline: "none",
+                      opacity: "0.8",
+                      transition: "opacity .2s"
+                    }}
+                  />
+                </div>
+                
+                <div style={{ marginBottom: "12px" }}>
+                  <span style={{ fontSize: "14px" }}>Noise Floor: {noiseFloor}</span>
+                  <input
+                    type="range"
+                    min={30}
+                    max={150}
+                    step={1}
+                    value={noiseFloor}
+                    onChange={(e) => setNoiseFloor(parseInt(e.target.value))}
+                    style={{
+                      width: "100%",
+                      WebkitAppearance: "none",
+                      appearance: "none",
+                      height: "6px",
+                      borderRadius: "3px",
+                      background: "rgba(255, 255, 255, 0.2)",
+                      outline: "none",
+                      opacity: "0.8",
+                      transition: "opacity .2s"
+                    }}
+                  />
+                </div>
+                
+                <div style={{ marginBottom: "12px" }}>
+                  <span style={{ fontSize: "14px" }}>Frequency Focus:</span>
+                  <select
+                    style={{
+                      fontSize: "12px",
+                      padding: "4px",
+                      background: "rgba(0, 0, 0, 0.4)",
+                      borderColor: "rgba(255, 255, 255, 0.2)",
+                      color: "white",
+                      width: "100%",
+                      marginTop: "4px"
+                    }}
+                    onChange={(e) => handleFreqRangeChange(e.target.value)}
+                    value={
+                      freqRangeStart === 0 && freqRangeEnd === 20 ? "bass" :
+                      freqRangeStart === 10 && freqRangeEnd === 60 ? "mid" :
+                      freqRangeStart === 50 && freqRangeEnd === 100 ? "high" :
+                      freqRangeStart === 0 && freqRangeEnd === 120 ? "full" : "custom"
+                    }
+                  >
+                    <option value="bass">Bass (Low)</option>
+                    <option value="mid">Mids</option>
+                    <option value="high">Highs</option>
+                    <option value="full">Full Spectrum</option>
+                    <option value="custom">Custom Range</option>
+                  </select>
+                </div>
+                
+                {/* Only show the custom range controls in expanded view */}
+                {!isSimplifiedView && (
+                  <div style={{ marginBottom: "12px" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                      <span style={{ fontSize: "12px" }}>Start: {freqRangeStart}</span>
+                      <span style={{ fontSize: "12px" }}>End: {freqRangeEnd}</span>
+                    </div>
+                    <RangeSlider
+                      minValue={freqRangeStart}
+                      maxValue={freqRangeEnd}
+                      minLimit={0}
+                      maxLimit={120}
+                      step={1}
+                      onMinChange={setFreqRangeStart}
+                      onMaxChange={setFreqRangeEnd}
+                    />
+                  </div>
+                )}
+                
+                <hr style={{ borderColor: "rgba(255, 255, 255, 0.2)", margin: "10px 0" }} />
+                
+                <div style={{ display: "flex", alignItems: "center", marginBottom: "12px" }}>
+                  <span style={{ fontSize: "14px" }}>Auto Beats:</span>
+                  <div style={{ flex: "1" }} />
+                  <label className="switch">
+                    <input
+                      type="checkbox"
+                      checked={autoBeats}
+                      onChange={(e) => setAutoBeats(e.target.checked)}
+                    />
+                    <span className="slider round"></span>
+                  </label>
+                </div>
+                
+                {autoBeats && (
+                  <div style={{ marginBottom: "12px" }}>
+                    <span style={{ fontSize: "14px" }}>Interval: {beatInterval}ms</span>
+                    <input
+                      type="range"
+                      min={100}
+                      max={1000}
+                      step={50}
+                      value={beatInterval}
+                      onChange={(e) => setBeatInterval(parseInt(e.target.value))}
+                      style={{
+                        width: "100%",
+                        WebkitAppearance: "none",
+                        appearance: "none",
+                        height: "6px",
+                        borderRadius: "3px",
+                        background: "rgba(255, 255, 255, 0.2)",
+                        outline: "none",
+                        opacity: "0.8",
+                        transition: "opacity .2s"
+                      }}
+                    />
+                  </div>
+                )}
+                
+                <div style={{ marginBottom: "12px" }}>
+                  <span style={{ fontSize: "14px" }}>Display Time: {(displayTime/1000).toFixed(1)}s</span>
+                  <input
+                    type="range"
+                    min={100}
+                    max={2000}
+                    step={50}
+                    value={displayTime}
+                    onChange={(e) => setDisplayTime(parseInt(e.target.value))}
+                    style={{
+                      width: "100%",
+                      WebkitAppearance: "none",
+                      appearance: "none",
+                      height: "6px",
+                      borderRadius: "3px",
+                      background: "rgba(255, 255, 255, 0.2)",
+                      outline: "none",
+                      opacity: "0.8",
+                      transition: "opacity .2s"
+                    }}
+                  />
+                </div>
+                
+                <hr style={{ borderColor: "rgba(255, 255, 255, 0.2)", margin: "10px 0" }} />
+                
+                {/* Debug Info */}
+                <div style={{ fontSize: "12px", color: "rgba(255, 255, 255, 0.6)" }}>
+                  <div>Energy: {beatEnergy}</div>
+                  <div>Cutoff: {cutoff}</div>
+                  <div>Beats: {beatsDetected}</div>
+                </div>
+              </div>
+              
+              <div style={{ display: "flex", gap: "8px" }}>
+                <button
+                  onClick={onRestart}
+                  style={{
+                    flex: "1",
+                    padding: "6px",
+                    background: "rgba(66, 153, 225, 0.6)",
+                    border: "none",
+                    borderRadius: "4px",
+                    color: "white",
+                    cursor: "pointer"
+                  }}
+                >
+                  Restart
+                </button>
+                <button
+                  onClick={onReset}
+                  style={{
+                    flex: "1",
+                    padding: "6px",
+                    background: "transparent",
+                    border: "1px solid rgba(255, 255, 255, 0.3)",
+                    borderRadius: "4px",
+                    color: "white",
+                    cursor: "pointer"
+                  }}
+                >
+                  Reset Settings
+                </button>
+              </div>
+            </div>
+          );
+        };
+
+        // Make it globally available
+        window.HeroPanel = HeroPanel;
+    </script>
+    
+    <!-- Main Script -->
+    <script type="module" src="./src/script.js"></script>
+</body>
+</html> 

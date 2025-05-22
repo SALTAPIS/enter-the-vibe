@@ -18,7 +18,7 @@
     <link href="https://api.fontshare.com/v2/css?f[]=tanker@900,700,400&display=swap" rel="stylesheet">
     
     <!-- Inter font for descriptions -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
     
     <!-- Multi-language support -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
@@ -30,6 +30,10 @@
     <audio id="glitch-sound" src="/sounds/glitch-sound.mp3" preload="auto"></audio>
     <audio id="transition-sound" src="/sounds/transition-sound.mp3" preload="auto"></audio>
     
+    <!-- React and ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -39,7 +43,10 @@
     <!-- Beat Debug Indicator -->
     <div id="beat-indicator" class="beat-indicator">BEAT</div>
     
-    <!-- Beat Control Panel -->
+    <!-- Hero UI Controls Mount Point -->
+    <div id="hero-panel-root"></div>
+    
+    <!-- Beat Control Panel (Original - will be replaced by React) -->
     <div id="beat-controls" class="beat-controls">
         <div class="control-row">
             <label for="threshold-slider">Peak Threshold: <span id="threshold-value">0.05</span></label>
@@ -143,6 +150,9 @@
             </div>
         </div>
     </div>
+    
+    <!-- HeroPanel script -->
+    <script src="HeroPanel.js"></script>
     
     <script type="module" src="script.js"></script>
 </body>

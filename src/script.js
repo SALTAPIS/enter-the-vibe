@@ -82,6 +82,14 @@ async function loadCredits() {
     }
 }
 
+// Function to toggle HeroPanel visibility - defined early so it's available for event listeners
+function toggleHeroPanelVisibility() {
+    // Update HeroPanel visibility if the function exists
+    if (typeof window.updateHeroPanelVisibility === 'function') {
+        window.updateHeroPanelVisibility();
+    }
+}
+
 // Main initialization function
 async function init() {
     // First load app configuration
@@ -95,8 +103,12 @@ async function init() {
     // Then load credits and continue initialization
     await loadCredits();
     
-    // Initialize user controls after config is loaded
-    initBeatControls();
+    // Initialize HeroPanel controls directly (no need to load script as it's now inline)
+    try {
+        initHeroPanel();
+    } catch (e) {
+        console.error('Failed to initialize HeroPanel component:', e);
+    }
     
     // Initialize UI elements
     const startButton = document.getElementById('start-button');
@@ -104,6 +116,12 @@ async function init() {
     const mainSound = document.getElementById('main-sound');
     const glitchSound = document.getElementById('glitch-sound');
     const transitionSound = document.getElementById('transition-sound');
+    const debugPanel = document.getElementById('debug-panel');
+    
+    // Show the debug panel - important for displaying metrics
+    if (debugPanel) {
+        debugPanel.style.display = 'block'; // Show debug panel
+    }
     
     // Allow manual beat triggering by clicking on the beat indicator
     if (beatIndicator) {
@@ -123,8 +141,8 @@ async function init() {
             detectPeak(true);
             e.preventDefault(); // Prevent page scrolling
         } else if (e.code === 'KeyC') {
-            // Toggle controls panel when 'c' is pressed
-            toggleControlsVisibility();
+            // Toggle HeroPanel visibility when 'c' is pressed
+            toggleHeroPanelVisibility();
         }
     });
     
@@ -659,7 +677,7 @@ let peakDetected = false;
 let lastPeakTime = 0;
 let signalEnergy = 0;
 let peakThreshold = 0.05; // Updated default sensitivity threshold
-let minimumThreshold = 70; // Updated noise gate threshold
+let noiseFloor = 70; // Noise gate threshold
 let peakHoldTime = 250; // Minimum time between peaks
 let energyDecay = 0.95; // Decay rate for energy smoothing
 let peakCutoff = 0;
@@ -790,8 +808,8 @@ function checkForAudioContent() {
             totalEnergy += frequencyData[i];
         }
         
-        // If we detect energy above our minimum threshold, consider audio to be playing
-        if (totalEnergy > minimumThreshold * 10) {
+        // If we detect energy above our noise floor threshold, consider audio to be playing
+        if (totalEnergy > noiseFloor * 10) { // Use noiseFloor consistently
             isAudioActuallyPlaying = true;
             console.log("Audio content detected!");
             clearInterval(checkTimer); // Stop checking once we've detected audio
@@ -803,206 +821,52 @@ function checkForAudioContent() {
 
 // Initialize beat controls
 function initBeatControls() {
-    // Get control elements
-    thresholdSlider = document.getElementById('threshold-slider');
-    thresholdValue = document.getElementById('threshold-value');
-    noiseFloorSlider = document.getElementById('noise-floor-slider');
-    noiseFloorValue = document.getElementById('noise-floor-value');
-    freqRangeSelect = document.getElementById('freq-range');
-    freqStartSlider = document.getElementById('freq-start');
-    freqEndSlider = document.getElementById('freq-end');
-    freqStartValue = document.getElementById('freq-start-value');
-    freqEndValue = document.getElementById('freq-end-value');
-    fallbackToggle = document.getElementById('fallback-toggle');
-    fallbackInterval = document.getElementById('fallback-interval');
-    intervalValue = document.getElementById('interval-value');
-    displayTimeSlider = document.getElementById('display-time-slider'); // Get display time slider
-    displayTimeValue = document.getElementById('display-time-value'); // Get display time value
-    toggleControlsBtn = document.getElementById('toggle-controls');
-    beatControls = document.getElementById('beat-controls');
-    
-    // Load saved settings or use defaults
+    // Load saved settings
     loadSettings();
     
-    // Initialize values in UI
-    updateUIFromSettings();
-    
-    // Add event listeners
-    thresholdSlider.addEventListener('input', (e) => {
-        peakThreshold = parseFloat(e.target.value);
-        thresholdValue.textContent = peakThreshold.toFixed(2);
-        saveSettings();
-    });
-    
-    if (noiseFloorSlider) {
-        noiseFloorSlider.addEventListener('input', (e) => {
-            minimumThreshold = parseInt(e.target.value);
-            noiseFloorValue.textContent = minimumThreshold.toString();
-            saveSettings();
-        });
-    }
-    
-    // Add display time slider listener
-    if (displayTimeSlider) {
-        displayTimeSlider.addEventListener('input', (e) => {
-            minScreenDisplayTime = parseInt(e.target.value);
-            displayTimeValue.textContent = (minScreenDisplayTime / 1000).toFixed(1) + 's';
-            saveSettings();
-        });
-    }
-    
-    // Add frequency range controls
-    if (freqRangeSelect) {
-        freqRangeSelect.addEventListener('change', (e) => {
-            const range = e.target.value;
-            switch (range) {
-                case 'bass':
-                    freqRangeStart = 0;
-                    freqRangeEnd = 20;
-                    break;
-                case 'mid':
-                    freqRangeStart = 10;
-                    freqRangeEnd = 60;
-                    break;
-                case 'high':
-                    freqRangeStart = 50;
-                    freqRangeEnd = 100;
-                    break;
-                case 'full':
-                    freqRangeStart = 0;
-                    freqRangeEnd = 120;
-                    break;
-            }
-            
-            // Update sliders to match the preset
-            freqStartSlider.value = freqRangeStart;
-            freqEndSlider.value = freqRangeEnd;
-            freqStartValue.textContent = freqRangeStart.toString();
-            freqEndValue.textContent = freqRangeEnd.toString();
-            
-            // Reset the peak detection values when changing ranges
-            resetPeakDetection();
-            saveSettings();
-        });
-    }
-    
-    if (freqStartSlider) {
-        freqStartSlider.addEventListener('input', (e) => {
-            freqRangeStart = parseInt(e.target.value);
-            // Ensure start is less than end
-            if (freqRangeStart >= freqRangeEnd) {
-                freqRangeStart = freqRangeEnd - 1;
-                freqStartSlider.value = freqRangeStart;
-            }
-            freqStartValue.textContent = freqRangeStart.toString();
-            
-            // Reset the peak detection values when changing ranges
-            resetPeakDetection();
-            saveSettings();
-        });
-    }
-    
-    if (freqEndSlider) {
-        freqEndSlider.addEventListener('input', (e) => {
-            freqRangeEnd = parseInt(e.target.value);
-            // Ensure end is greater than start
-            if (freqRangeEnd <= freqRangeStart) {
-                freqRangeEnd = freqRangeStart + 1;
-                freqEndSlider.value = freqRangeEnd;
-            }
-            freqEndValue.textContent = freqRangeEnd.toString();
-            
-            // Reset the peak detection values when changing ranges
-            resetPeakDetection();
-            saveSettings();
-        });
-    }
-    
-    fallbackToggle.addEventListener('change', (e) => {
-        useFallbackBeats = e.target.checked;
-        if (useFallbackBeats) {
-            startFallbackBeatTimer();
-        } else {
-            stopFallbackBeatTimer();
-        }
-        saveSettings();
-    });
-    
-    fallbackInterval.addEventListener('input', (e) => {
-        fallbackBeatInterval = parseInt(e.target.value);
-        intervalValue.textContent = fallbackBeatInterval.toString();
-        if (useFallbackBeats) {
-            startFallbackBeatTimer(); // Restart with new interval
-        }
-        saveSettings();
-    });
-    
-    // Add restart button listener
-    const restartButton = document.getElementById('restart-button');
-    if (restartButton) {
-        restartButton.addEventListener('click', () => {
-            restartAnimation();
-        });
-    }
-    
-    // Add reset settings button listener
-    const resetSettingsButton = document.getElementById('reset-settings');
-    if (resetSettingsButton) {
-        resetSettingsButton.addEventListener('click', () => {
-            resetToDefaultSettings();
-        });
-    }
-    
-    toggleControlsBtn.addEventListener('click', () => {
-        toggleControlsVisibility();
-    });
-    
-    // Make beat indicator clickable to manually trigger beats or toggle auto mode
-    if (beatIndicator) {
-        beatIndicator.style.pointerEvents = 'auto';
+    // Set initial state based on app config
+    if (appConfig && appConfig.audio && appConfig.audio.beatDetection) {
+        const beatConfig = appConfig.audio.beatDetection;
         
-        // Double click to toggle auto beats
-        beatIndicator.addEventListener('dblclick', () => {
-            useFallbackBeats = !useFallbackBeats;
-            fallbackToggle.checked = useFallbackBeats;
-            
-            if (useFallbackBeats) {
-                startFallbackBeatTimer();
-                beatIndicator.textContent = "AUTO";
-                setTimeout(() => { beatIndicator.textContent = "BEAT"; }, 1000);
-            } else {
-                stopFallbackBeatTimer();
-                beatIndicator.textContent = "MANUAL";
-                setTimeout(() => { beatIndicator.textContent = "BEAT"; }, 1000);
-            }
-            saveSettings();
-        });
+        // Set default values if not already set in settings
+        if (peakThreshold === undefined && beatConfig.peakThreshold) {
+            peakThreshold = beatConfig.peakThreshold.default;
+        }
         
-        // Single click to trigger manual beat
-        beatIndicator.addEventListener('click', (e) => {
-            if (e.detail === 1) { // Only for single clicks (not part of double click)
-                // Manual peak triggering
-                setTimeout(() => {
-                    if (e.detail === 1) { // Still a single click after timeout
-                        console.log("Manual peak triggered");
-                        detectPeak(true);
-                    }
-                }, 200);
-            }
-        });
+        if (noiseFloor === undefined && beatConfig.noiseFloor) {
+            noiseFloor = beatConfig.noiseFloor.default;
+        }
+        
+        if (freqRangeStart === undefined && beatConfig.frequencies && beatConfig.frequencies.custom) {
+            freqRangeStart = beatConfig.frequencies.custom.start.default;
+        }
+        
+        if (freqRangeEnd === undefined && beatConfig.frequencies && beatConfig.frequencies.custom) {
+            freqRangeEnd = beatConfig.frequencies.custom.end.default;
+        }
+        
+        if (useFallbackBeats === undefined && beatConfig.fallbackBeats) {
+            useFallbackBeats = beatConfig.fallbackBeats.enabled;
+        }
+        
+        if (fallbackBeatInterval === undefined && beatConfig.fallbackBeats) {
+            fallbackBeatInterval = beatConfig.fallbackBeats.interval.default;
+        }
+        
+        if (minScreenDisplayTime === undefined && appConfig.display && appConfig.display.timing) {
+            minScreenDisplayTime = appConfig.display.timing.minDisplayTime;
+        }
     }
     
-    // Create a frequency range highlight element
-    freqRangeHighlight = document.createElement('div');
-    freqRangeHighlight.classList.add('freq-range-highlight');
-    document.body.appendChild(freqRangeHighlight);
+    // Save settings
+    saveSettings();
 }
 
 // Save settings to localStorage
 function saveSettings() {
     const settings = {
         peakThreshold,
-        minimumThreshold,
+        noiseFloor, // Using noiseFloor instead of minimumThreshold
         freqRangeStart,
         freqRangeEnd,
         useFallbackBeats,
@@ -1028,7 +892,7 @@ function loadSettings() {
             
             // Apply saved settings
             peakThreshold = settings.peakThreshold || 0.05;
-            minimumThreshold = settings.minimumThreshold || 70;
+            noiseFloor = settings.noiseFloor || 70; // Use noiseFloor consistently
             freqRangeStart = settings.freqRangeStart || 10;
             freqRangeEnd = settings.freqRangeEnd || 60;
             useFallbackBeats = settings.useFallbackBeats || false;
@@ -1050,8 +914,8 @@ function updateUIFromSettings() {
     thresholdSlider.value = peakThreshold;
     thresholdValue.textContent = peakThreshold.toFixed(2);
     
-    noiseFloorSlider.value = minimumThreshold;
-    noiseFloorValue.textContent = minimumThreshold.toString();
+    noiseFloorSlider.value = noiseFloor;
+    noiseFloorValue.textContent = noiseFloor.toString();
     
     freqStartSlider.value = freqRangeStart;
     freqStartValue.textContent = freqRangeStart.toString();
@@ -1088,7 +952,7 @@ function updateUIFromSettings() {
 // Reset to default settings
 function resetToDefaultSettings(saveAfterReset = true) {
     peakThreshold = 0.05;
-    minimumThreshold = 70;
+    noiseFloor = 70; // Use noiseFloor consistently
     freqRangeStart = 10;
     freqRangeEnd = 60;
     useFallbackBeats = false;
@@ -1202,13 +1066,23 @@ function drawVisualization() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
         // Get frequency data
-        analyser.getByteFrequencyData(frequencyData);
-        
-        // Check for peaks
-        detectPeak();
-        
-        // Draw visualization based on frequency data
-        drawVisualizationBars(ctx, canvas, frequencyData);
+        if (analyser) {
+            analyser.getByteFrequencyData(frequencyData);
+            
+            // Check for peaks - this is critical for beat detection
+            detectPeak(); // Call detectPeak on every frame
+            
+            // Draw visualization based on frequency data
+            drawVisualizationBars(ctx, canvas, frequencyData);
+            
+            // Request an update of the HeroPanel with the latest information if available
+            if (typeof window.requestHeroPanelUpdate === 'function') {
+                window.requestHeroPanelUpdate();
+            }
+        } else {
+            // No audio analyzer yet - just draw empty visualization
+            drawVisualizationBars(ctx, canvas, new Uint8Array(128)); // Empty array as placeholder
+        }
     }
     
     // Start animation loop
@@ -1253,7 +1127,7 @@ function drawVisualizationBars(ctx, canvas, frequencyData) {
     }
     
     // Draw silence threshold line (noise gate)
-    const noiseGateHeight = minimumThreshold * heightMultiplier;
+    const noiseGateHeight = noiseFloor * heightMultiplier; // Use noiseFloor consistently
     ctx.strokeStyle = 'rgba(0, 255, 0, 0.6)';
     ctx.lineWidth = 2;
     ctx.setLineDash([5, 5]);
@@ -1314,7 +1188,7 @@ function drawVisualizationBars(ctx, canvas, frequencyData) {
         
         // Highlight frequencies that are beyond threshold
         if (isInRange && frequencyData[i] > peakCutoff * (1 + peakThreshold) && 
-            frequencyData[i] > minimumThreshold) {
+            frequencyData[i] > noiseFloor) { // Use noiseFloor consistently
             ctx.fillStyle = `rgba(255, 50, 50, 0.7)`;
             ctx.fillRect(i * barWidth, -barHeight, barWidth - 1, barHeight);
             ctx.fillRect(i * barWidth, 0, barWidth - 1, barHeight);
@@ -1362,9 +1236,16 @@ function detectPeak(forcePeak = false) {
         // Update peak detected state
         peakDetected = true;
         
-        // Update UI
+        // Update UI - Show the original beat indicator while we're also using the blue square in the panel
         if (beatIndicator) {
-            beatIndicator.classList.add('active');
+            beatIndicator.style.display = 'block'; // Make sure it's visible
+            beatIndicator.classList.add('active'); // Add active class for styling
+        }
+        
+        // Ensure the HeroPanel is updated with beat detection
+        if (typeof window.requestHeroPanelUpdate === 'function') {
+            // Make this call synchronous to ensure it happens immediately
+            window.requestHeroPanelUpdate();
         }
         
         // Log peak detection
@@ -1384,6 +1265,11 @@ function detectPeak(forcePeak = false) {
             peakDetected = false;
             if (beatIndicator) {
                 beatIndicator.classList.remove('active');
+            }
+            
+            // Update HeroPanel again to remove the beat effect
+            if (typeof window.requestHeroPanelUpdate === 'function') {
+                window.requestHeroPanelUpdate();
             }
         }, 200); // Keep it visible a bit longer (200ms)
         
@@ -1432,7 +1318,7 @@ function shouldTriggerPeak() {
     }
     
     // Check if we're above the noise floor (silence threshold)
-    if (currentEnergy < minimumThreshold) {
+    if (currentEnergy < noiseFloor) {
         return false; // Ignore signal below the noise gate
     }
     
@@ -2525,18 +2411,274 @@ function showFullscreenLogo(timeline, credit) {
 
 // Function to toggle control panel visibility
 function toggleControlsVisibility() {
-    if (!beatControls) return;
+    const beatControls = document.getElementById('beat-controls');
+    const debugPanel = document.getElementById('debug-panel');
     
-    // Toggle the entire panel's visibility
-    if (beatControls.style.display === 'none') {
-        beatControls.style.display = 'block';
-        if (toggleControlsBtn) {
-            toggleControlsBtn.textContent = 'Hide Controls';
-        }
-    } else {
-        beatControls.style.display = 'none';
-        if (toggleControlsBtn) {
-            toggleControlsBtn.textContent = 'Show Controls';
+    // Update both panels - original and React
+    if (typeof window.updateHeroPanelVisibility === 'function') {
+        window.updateHeroPanelVisibility(); // Toggle the React panel
+    }
+    
+    // Toggle the original panels
+    if (beatControls) {
+        if (beatControls.style.display === 'none') {
+            beatControls.style.display = 'block';
+            if (toggleControlsBtn) {
+                toggleControlsBtn.textContent = 'Hide Controls';
+            }
+        } else {
+            beatControls.style.display = 'none';
+            if (toggleControlsBtn) {
+                toggleControlsBtn.textContent = 'Show Controls';
+            }
         }
     }
+    
+    // Toggle debug panel to match beat controls
+    if (debugPanel) {
+        debugPanel.style.display = beatControls.style.display;
+    }
 }
+
+// Initialize the React HeroPanel
+function initHeroPanel() {
+    // Only initialize if React and ReactDOM are available
+    if (!window.React || !window.ReactDOM || !window.HeroPanel) {
+        console.error('React, ReactDOM or HeroPanel not available');
+        return;
+    }
+    
+    console.log("Initializing HeroPanel with React", window.React.version);
+    
+    const root = document.getElementById('hero-panel-root');
+    if (!root) {
+        console.error('Hero panel root element not found');
+        return;
+    }
+    
+    let panelVisible = true; // Start with panel visible
+    let needsUpdate = true; // Always do initial render
+    
+    // Function to toggle panel visibility - exposed to window for keyboard shortcuts
+    window.updateHeroPanelVisibility = function() {
+        panelVisible = !panelVisible;
+        needsUpdate = true;
+        console.log("HeroPanel visibility toggled:", panelVisible);
+    };
+    
+    // Function to request a panel update for beat detection
+    window.requestHeroPanelUpdate = function() {
+        needsUpdate = true;
+    };
+    
+    // Function to handle frequency range change
+    function handleFreqRangeChange(e) {
+        // For HeroPanel integration, handle both direct value and event target
+        const range = e.target ? e.target.value : e;
+        
+        console.log("Frequency range changed to:", range);
+        switch (range) {
+            case 'bass':
+                freqRangeStart = 0;
+                freqRangeEnd = 20;
+                break;
+            case 'mid':
+                freqRangeStart = 10;
+                freqRangeEnd = 60;
+                break;
+            case 'high':
+                freqRangeStart = 50;
+                freqRangeEnd = 100;
+                break;
+            case 'full':
+                freqRangeStart = 0;
+                freqRangeEnd = 120;
+                break;
+        }
+        
+        // Reset the peak detection values when changing ranges
+        resetPeakDetection();
+        saveSettings();
+        
+        // Update the UI elements for frequency ranges
+        if (freqStartSlider) freqStartSlider.value = freqRangeStart;
+        if (freqStartValue) freqStartValue.textContent = freqRangeStart.toString();
+        if (freqEndSlider) freqEndSlider.value = freqRangeEnd;
+        if (freqEndValue) freqEndValue.textContent = freqRangeEnd.toString();
+        
+        // Flag for update
+        if (typeof window.requestHeroPanelUpdate === 'function') {
+            window.requestHeroPanelUpdate();
+        }
+    }
+    
+    // Function to render the Hero Panel
+    function renderHeroPanel() {
+        const beatEnergy = document.getElementById('debug-energy')?.textContent || '0';
+        const cutoff = document.getElementById('debug-cutoff')?.textContent || '0';
+        const beatsDetected = document.getElementById('debug-count')?.textContent || '0';
+        
+        // Set auto beats when toggled
+        const setAutoBeats = (value) => {
+            useFallbackBeats = value;
+            if (fallbackToggle) {
+                fallbackToggle.checked = value;
+            }
+            
+            if (useFallbackBeats) {
+                startFallbackBeatTimer();
+            } else {
+                stopFallbackBeatTimer();
+            }
+            saveSettings();
+            needsUpdate = true;
+        };
+        
+        const props = {
+            peakThreshold,
+            setPeakThreshold: (value) => {
+                peakThreshold = value;
+                if (thresholdValue) {
+                    thresholdValue.textContent = peakThreshold.toFixed(2);
+                }
+                if (thresholdSlider) {
+                    thresholdSlider.value = peakThreshold;
+                }
+                saveSettings();
+                needsUpdate = true;
+            },
+            noiseFloor: noiseFloor,
+            setNoiseFloor: (value) => {
+                noiseFloor = value;
+                if (noiseFloorValue) {
+                    noiseFloorValue.textContent = noiseFloor.toString();
+                }
+                if (noiseFloorSlider) {
+                    noiseFloorSlider.value = noiseFloor;
+                }
+                saveSettings();
+                needsUpdate = true;
+            },
+            freqRangeStart,
+            setFreqRangeStart: (value) => {
+                freqRangeStart = value;
+                // Ensure start is less than end
+                if (freqRangeStart >= freqRangeEnd) {
+                    freqRangeStart = freqRangeEnd - 1;
+                }
+                if (freqStartValue) {
+                    freqStartValue.textContent = freqRangeStart.toString();
+                }
+                if (freqStartSlider) {
+                    freqStartSlider.value = freqRangeStart;
+                }
+                resetPeakDetection();
+                saveSettings();
+                needsUpdate = true;
+            },
+            freqRangeEnd,
+            setFreqRangeEnd: (value) => {
+                freqRangeEnd = value;
+                // Ensure end is greater than start
+                if (freqRangeEnd <= freqRangeStart) {
+                    freqRangeEnd = freqRangeStart + 1;
+                }
+                if (freqEndValue) {
+                    freqEndValue.textContent = freqRangeEnd.toString();
+                }
+                if (freqEndSlider) {
+                    freqEndSlider.value = freqRangeEnd;
+                }
+                resetPeakDetection();
+                saveSettings();
+                needsUpdate = true;
+            },
+            autoBeats: useFallbackBeats,
+            setAutoBeats,
+            beatInterval: fallbackBeatInterval,
+            setBeatInterval: (value) => {
+                fallbackBeatInterval = value;
+                if (intervalValue) {
+                    intervalValue.textContent = fallbackBeatInterval.toString();
+                }
+                if (fallbackInterval) {
+                    fallbackInterval.value = fallbackBeatInterval;
+                }
+                if (useFallbackBeats) {
+                    startFallbackBeatTimer(); // Restart with new interval
+                }
+                saveSettings();
+                needsUpdate = true;
+            },
+            displayTime: minScreenDisplayTime,
+            setDisplayTime: (value) => {
+                minScreenDisplayTime = value;
+                if (displayTimeValue) {
+                    displayTimeValue.textContent = (minScreenDisplayTime / 1000).toFixed(1) + 's';
+                }
+                if (displayTimeSlider) {
+                    displayTimeSlider.value = minScreenDisplayTime;
+                }
+                saveSettings();
+                needsUpdate = true;
+            },
+            beatEnergy,
+            cutoff,
+            beatsDetected,
+            peakDetected, // Pass the peak detected state
+            onRestart: restartAnimation,
+            onReset: () => {
+                resetToDefaultSettings();
+                needsUpdate = true;
+            },
+            handleFreqRangeChange,
+            visible: panelVisible,
+            toggleVisibility: () => {
+                panelVisible = !panelVisible;
+                needsUpdate = true;
+            }
+        };
+        
+        try {
+            ReactDOM.render(
+                React.createElement(window.HeroPanel, props),
+                root
+            );
+            console.log("HeroPanel rendered successfully");
+        } catch (error) {
+            console.error("Error rendering HeroPanel:", error);
+        }
+    }
+    
+    // Do the initial render
+    renderHeroPanel();
+    
+    // Add keyboard shortcut for showing/hiding the panel
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'c' || e.key === 'C') {
+            window.updateHeroPanelVisibility();
+        }
+    });
+    
+    // Set up continuous panel updates using requestAnimationFrame for smoother updates
+    function updatePanelLoop() {
+        // Only re-render if the panel is visible and metrics have changed or panel needs update
+        if (needsUpdate) {
+            // Update the panel
+            renderHeroPanel();
+            
+            // Reset the update flag
+            needsUpdate = false;
+        }
+        
+        // Request next frame for continuous updates
+        requestAnimationFrame(updatePanelLoop);
+    }
+    
+    // Start the continuous update loop
+    updatePanelLoop();
+    
+    console.log("HeroPanel initialization complete");
+}
+
+// ... existing code ...
