@@ -237,14 +237,6 @@ body {
     left: 0;
 }
 
-.cursor {
-    position: absolute;
-    width: 20px;
-    height: 30px;
-    background-color: var(--neon-green);
-    z-index: 10;
-}
-
 /* -------------- PHASE 2: MAIN TITLE -------------- */
 .phase2 {
     background-color: var(--dark-bg);

@@ -1833,13 +1833,9 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
 function startPhase1() {
     console.log("Starting Phase 1: Credits Sequence");
     
-    // Show cursor for 1 second
-    const cursor = document.querySelector('.cursor');
-    gsap.set(cursor, { display: 'block', top: '50%', left: '50%', xPercent: -50, yPercent: -50 });
-    
     // Load credits data then play main sequence
     loadCredits();
-    }
+}
     
     // -------------- PHASE 2: MAIN TITLE --------------
     function transitionToPhase2() {
