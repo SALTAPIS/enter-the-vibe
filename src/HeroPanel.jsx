@@ -185,15 +185,6 @@ const HeroPanel = ({
               colorScheme="blue"
             />
           </Box>
-          
-          <HStack spacing={3}>
-            <Button onClick={onRestart} colorScheme="blue" size="sm" flex={1}>
-              Restart
-            </Button>
-            <Button onClick={onReset} colorScheme="blue" size="sm" flex={1}>
-              Reset Settings
-            </Button>
-          </HStack>
         </VStack>
       </CardBody>
       

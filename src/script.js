@@ -1263,7 +1263,7 @@ function shouldTriggerPeak() {
     // Dynamic peak cutoff calculation
     if (currentEnergy > peakCutoff) {
         peakCutoff = currentEnergy;
-    } else {
+            } else {
         peakCutoff = peakCutoff * cutoffDecay;
     }
     
@@ -2106,16 +2106,7 @@ function startPhase1() {
     
 // Function to show the end scene when audio finishes
 function showEndScene() {
-    console.log("Audio finished - showing end scene");
-    
-    // First transition to phase 3 if not already there
-    const currentPhase = document.querySelector('.phase:not(.hidden)');
-    if (currentPhase && currentPhase.id !== 'phase3') {
-        // Force transition to phase 3
-        transitionToPhase3();
-    }
-    
-    // Create end scene elements
+    // Create end scene container
     const endScene = document.createElement('div');
     endScene.classList.add('end-scene');
     endScene.style.position = 'absolute';
@@ -2125,18 +2116,17 @@ function showEndScene() {
     endScene.style.height = '100%';
     endScene.style.display = 'flex';
     endScene.style.flexDirection = 'column';
-    endScene.style.justifyContent = 'center';
     endScene.style.alignItems = 'center';
-    endScene.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-    endScene.style.zIndex = '1000';
+    endScene.style.justifyContent = 'center';
     
-    // Create end title
-    const endTitle = document.createElement('div');
+    // Create main title
+    const endTitle = document.createElement('h1');
     endTitle.textContent = 'ENTER THE VIBE';
-    endTitle.style.fontSize = '6rem';
+    endTitle.style.fontSize = 'clamp(3rem, 10vw, 7rem)';
     endTitle.style.fontFamily = "'Anton', sans-serif";
-    endTitle.style.color = 'white';
-    endTitle.style.marginBottom = '2rem';
+    endTitle.style.color = '#33FF33';
+    endTitle.style.textShadow = '0 0 10px rgba(51, 255, 51, 0.8)';
+    endTitle.style.marginBottom = '1rem';
     endTitle.style.letterSpacing = '5px';
     endTitle.classList.add('electric');
     
@@ -2148,22 +2138,11 @@ function showEndScene() {
     subtitle.style.color = '#4495F1';
     subtitle.style.marginBottom = '3rem';
     
-    // Create restart button
-    const restartBtn = document.createElement('button');
-    restartBtn.textContent = 'RESTART';
-    restartBtn.style.padding = '1rem 2rem';
-    restartBtn.style.fontSize = '1.5rem';
-    restartBtn.style.fontFamily = "'Anton', sans-serif";
-    restartBtn.style.backgroundColor = 'transparent';
-    restartBtn.style.color = '#33FF33';
-    restartBtn.style.border = '2px solid #33FF33';
-    restartBtn.style.cursor = 'pointer';
-    restartBtn.addEventListener('click', restartAnimation);
+    // Removed restart button
     
     // Append elements
     endScene.appendChild(endTitle);
     endScene.appendChild(subtitle);
-    endScene.appendChild(restartBtn);
     
     // Add to phase 3
     const phase3 = document.getElementById('phase3');
@@ -2189,13 +2168,6 @@ function showEndScene() {
                     opacity: 0, 
         duration: 1,
         delay: 1
-    });
-    
-    gsap.from(restartBtn, {
-        y: 30,
-                    opacity: 0, 
-        duration: 1,
-        delay: 1.5
     });
 } 
 
@@ -2328,7 +2300,7 @@ function showFullscreenLogo(timeline, credit) {
         logo.style.marginBottom = '2rem';
         
         container.appendChild(logo);
-            } else {
+                } else {
         console.warn('No logo provided for fullscreen logo layout');
         
         // Add a placeholder message
@@ -2375,7 +2347,7 @@ function toggleControlsVisibility() {
             if (toggleControlsBtn) {
                 toggleControlsBtn.textContent = 'Hide Controls';
             }
-        } else {
+            } else {
             beatControls.style.display = 'none';
             if (toggleControlsBtn) {
                 toggleControlsBtn.textContent = 'Show Controls';
@@ -2444,11 +2416,12 @@ function initHeroPanel() {
         resetPeakDetection();
         saveSettings();
         
+        // Remove references to DOM elements that might not exist
         // Update the UI elements for frequency ranges
-        if (freqStartSlider) freqStartSlider.value = freqRangeStart;
-        if (freqStartValue) freqStartValue.textContent = freqRangeStart.toString();
-        if (freqEndSlider) freqEndSlider.value = freqRangeEnd;
-        if (freqEndValue) freqEndValue.textContent = freqRangeEnd.toString();
+        // if (freqStartSlider) freqStartSlider.value = freqRangeStart;
+        // if (freqStartValue) freqStartValue.textContent = freqRangeStart.toString();
+        // if (freqEndSlider) freqEndSlider.value = freqRangeEnd;
+        // if (freqEndValue) freqEndValue.textContent = freqRangeEnd.toString();
         
         // Flag for update
         if (typeof window.requestHeroPanelUpdate === 'function') {
@@ -2466,9 +2439,10 @@ function initHeroPanel() {
         // Set auto beats when toggled
         const setAutoBeats = (value) => {
             useFallbackBeats = value;
-            if (fallbackToggle) {
-                fallbackToggle.checked = value;
-            }
+            // Remove reference to DOM element that might not exist
+            // if (fallbackToggle) {
+            //     fallbackToggle.checked = value;
+            // }
             
             if (useFallbackBeats) {
                 startFallbackBeatTimer();
@@ -2483,24 +2457,26 @@ function initHeroPanel() {
             peakThreshold,
             setPeakThreshold: (value) => {
                 peakThreshold = value;
-                if (thresholdValue) {
-                    thresholdValue.textContent = peakThreshold.toFixed(2);
-                }
-                if (thresholdSlider) {
-                    thresholdSlider.value = peakThreshold;
-                }
+                // Remove references to DOM elements that might not exist
+                // if (thresholdValue) {
+                //     thresholdValue.textContent = peakThreshold.toFixed(2);
+                // }
+                // if (thresholdSlider) {
+                //     thresholdSlider.value = peakThreshold;
+                // }
                 saveSettings();
                 needsUpdate = true;
             },
             noiseFloor: noiseFloor,
             setNoiseFloor: (value) => {
                 noiseFloor = value;
-                if (noiseFloorValue) {
-                    noiseFloorValue.textContent = noiseFloor.toString();
-                }
-                if (noiseFloorSlider) {
-                    noiseFloorSlider.value = noiseFloor;
-                }
+                // Remove references to DOM elements that might not exist
+                // if (noiseFloorValue) {
+                //     noiseFloorValue.textContent = noiseFloor.toString();
+                // }
+                // if (noiseFloorSlider) {
+                //     noiseFloorSlider.value = noiseFloor;
+                // }
                 saveSettings();
                 needsUpdate = true;
             },
@@ -2511,12 +2487,13 @@ function initHeroPanel() {
                 if (freqRangeStart >= freqRangeEnd) {
                     freqRangeStart = freqRangeEnd - 1;
                 }
-                if (freqStartValue) {
-                    freqStartValue.textContent = freqRangeStart.toString();
-                }
-                if (freqStartSlider) {
-                    freqStartSlider.value = freqRangeStart;
-                }
+                // Remove references to DOM elements that might not exist
+                // if (freqStartValue) {
+                //     freqStartValue.textContent = freqRangeStart.toString();
+                // }
+                // if (freqStartSlider) {
+                //     freqStartSlider.value = freqRangeStart;
+                // }
                 resetPeakDetection();
                 saveSettings();
                 needsUpdate = true;
@@ -2528,12 +2505,13 @@ function initHeroPanel() {
                 if (freqRangeEnd <= freqRangeStart) {
                     freqRangeEnd = freqRangeStart + 1;
                 }
-                if (freqEndValue) {
-                    freqEndValue.textContent = freqRangeEnd.toString();
-                }
-                if (freqEndSlider) {
-                    freqEndSlider.value = freqRangeEnd;
-                }
+                // Remove references to DOM elements that might not exist
+                // if (freqEndValue) {
+                //     freqEndValue.textContent = freqRangeEnd.toString();
+                // }
+                // if (freqEndSlider) {
+                //     freqEndSlider.value = freqRangeEnd;
+                // }
                 resetPeakDetection();
                 saveSettings();
                 needsUpdate = true;
@@ -2543,12 +2521,13 @@ function initHeroPanel() {
             beatInterval: fallbackBeatInterval,
             setBeatInterval: (value) => {
                 fallbackBeatInterval = value;
-                if (intervalValue) {
-                    intervalValue.textContent = fallbackBeatInterval.toString();
-                }
-                if (fallbackInterval) {
-                    fallbackInterval.value = fallbackBeatInterval;
-                }
+                // Remove references to DOM elements that might not exist
+                // if (intervalValue) {
+                //     intervalValue.textContent = fallbackBeatInterval.toString();
+                // }
+                // if (fallbackInterval) {
+                //     fallbackInterval.value = fallbackBeatInterval;
+                // }
                 if (useFallbackBeats) {
                     startFallbackBeatTimer(); // Restart with new interval
                 }
@@ -2558,12 +2537,13 @@ function initHeroPanel() {
             displayTime: minScreenDisplayTime,
             setDisplayTime: (value) => {
                 minScreenDisplayTime = value;
-                if (displayTimeValue) {
-                    displayTimeValue.textContent = (minScreenDisplayTime / 1000).toFixed(1) + 's';
-                }
-                if (displayTimeSlider) {
-                    displayTimeSlider.value = minScreenDisplayTime;
-                }
+                // Remove references to DOM elements that might not exist
+                // if (displayTimeValue) {
+                //     displayTimeValue.textContent = (minScreenDisplayTime / 1000).toFixed(1) + 's';
+                // }
+                // if (displayTimeSlider) {
+                //     displayTimeSlider.value = minScreenDisplayTime;
+                // }
                 saveSettings();
                 needsUpdate = true;
             },

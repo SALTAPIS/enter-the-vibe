@@ -191,13 +191,28 @@
                   style={{
                     position: 'absolute',
                     width: '100%',
-                    height: '7px',
+                    height: '14px', 
                     WebkitAppearance: 'none',
                     appearance: 'none',
                     background: 'transparent',
                     pointerEvents: 'auto',
-                    zIndex: 2,
+                    zIndex: 1,
                     outline: 'none'
+                  }}
+                />
+
+                {/* Min handle visible dot */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: `${(minValue / maxLimit) * 100}%`,
+                    top: "50%",
+                    width: "12px",
+                    height: "12px",
+                    background: "white",
+                    borderRadius: "50%",
+                    transform: "translate(-50%, -50%)",
+                    pointerEvents: "none"
                   }}
                 />
                 
@@ -212,13 +227,28 @@
                   style={{
                     position: 'absolute',
                     width: '100%',
-                    height: '7px',
+                    height: '14px',
                     WebkitAppearance: 'none',
                     appearance: 'none',
                     background: 'transparent',
                     pointerEvents: 'auto',
-                    zIndex: 1,
+                    zIndex: 2,
                     outline: 'none'
+                  }}
+                />
+
+                {/* Max handle visible dot */}
+                <div
+                  style={{
+                    position: "absolute",
+                    left: `${(maxValue / maxLimit) * 100}%`,
+                    top: "50%",
+                    width: "12px",
+                    height: "12px",
+                    background: "white",
+                    borderRadius: "50%",
+                    transform: "translate(-50%, -50%)",
+                    pointerEvents: "none"
                   }}
                 />
               </div>
@@ -510,37 +540,6 @@
                   <div>Cutoff: {cutoff}</div>
                   <div>Beats: {beatsDetected}</div>
                 </div>
-              </div>
-              
-              <div style={{ display: "flex", gap: "8px" }}>
-                <button
-                  onClick={onRestart}
-                  style={{
-                    flex: "1",
-                    padding: "6px",
-                    background: "rgba(66, 153, 225, 0.6)",
-                    border: "none",
-                    borderRadius: "4px",
-                    color: "white",
-                    cursor: "pointer"
-                  }}
-                >
-                  Restart
-                </button>
-                <button
-                  onClick={onReset}
-                  style={{
-                    flex: "1",
-                    padding: "6px",
-                    background: "transparent",
-                    border: "1px solid rgba(255, 255, 255, 0.3)",
-                    borderRadius: "4px",
-                    color: "white",
-                    cursor: "pointer"
-                  }}
-                >
-                  Reset Settings
-                </button>
               </div>
             </div>
           );
