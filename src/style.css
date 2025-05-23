@@ -942,7 +942,7 @@ input:checked + .slider:before {
     gap: 8px;
     background: rgba(0, 0, 0, 0.95);
     border: 1px solid rgba(20, 20, 20, 1);
-    border-radius: 8px;
+    border-radius: 32px;
     padding: 8px 12px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.8);
     backdrop-filter: blur(10px);
@@ -955,24 +955,21 @@ input:checked + .slider:before {
     width: 44px;
     height: 44px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 6px;
+    border: none;
+    border-radius: 50%;
     cursor: pointer;
     transition: all 0.2s ease;
-    padding: 0;
-    margin: 0;
+    outline: none;
 }
 
 .control-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    background: transparent;
+    transform: scale(1.05);
 }
 
 .control-btn:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+    background: transparent;
+    transform: scale(0.95);
 }
 
 .control-btn svg {
