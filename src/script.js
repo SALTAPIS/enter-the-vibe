@@ -116,6 +116,13 @@ async function init() {
         console.error('Failed to initialize HeroPanel component:', e);
     }
     
+    // Initialize bottom control panel
+    try {
+        initBottomControls();
+    } catch (e) {
+        console.error('Failed to initialize bottom controls:', e);
+    }
+    
     // Initialize UI elements
     const startButton = document.getElementById('start-button');
     mainSound = document.getElementById('main-sound');
@@ -148,6 +155,11 @@ async function init() {
                     phase1.classList.remove('hidden');
                     gsap.set(phase1, { opacity: 1 });
                     
+                    // Show bottom controls when experience starts
+                    if (typeof window.showBottomControls === 'function') {
+                        window.showBottomControls();
+                    }
+                    
                     // Initialize audio context and visualization
                     if (mainSound) {
                         // Make sure audio is ready to play
@@ -164,12 +176,30 @@ async function init() {
                             console.log("Main sound started playing");
                             setupAudioVisualization(mainSound);
                             
+                            // Update bottom controls play state
+                            if (typeof window.updateBottomControlsPlayState === 'function') {
+                                window.updateBottomControlsPlayState(true);
+                            }
+                            
                             // Ensure fallback beats are running (even if audio analysis is working)
                             startFallbackBeatTimer();
                         }).catch(err => {
                             console.error("Error playing main sound:", err);
                             // If audio fails to play, still start fallback beats
                             startFallbackBeatTimer();
+                        });
+                        
+                        // Add audio event listeners for bottom controls
+                        mainSound.addEventListener('pause', () => {
+                            if (typeof window.updateBottomControlsPlayState === 'function') {
+                                window.updateBottomControlsPlayState(false);
+                            }
+                        });
+                        
+                        mainSound.addEventListener('ended', () => {
+                            if (typeof window.updateBottomControlsPlayState === 'function') {
+                                window.updateBottomControlsPlayState(false);
+                            }
                         });
                     } else {
                         console.error("Main sound element not found!");
@@ -1115,12 +1145,30 @@ function restartAnimation() {
             console.log("Main sound started playing");
             setupAudioVisualization(mainSound);
             
+            // Update bottom controls play state
+            if (typeof window.updateBottomControlsPlayState === 'function') {
+                window.updateBottomControlsPlayState(true);
+            }
+            
             // Ensure fallback beats are running (even if audio analysis is working)
             startFallbackBeatTimer();
         }).catch(err => {
             console.error("Error playing main sound:", err);
             // If audio fails to play, still start fallback beats
             startFallbackBeatTimer();
+        });
+        
+        // Add audio event listeners for bottom controls
+        mainSound.addEventListener('pause', () => {
+            if (typeof window.updateBottomControlsPlayState === 'function') {
+                window.updateBottomControlsPlayState(false);
+            }
+        });
+        
+        mainSound.addEventListener('ended', () => {
+            if (typeof window.updateBottomControlsPlayState === 'function') {
+                window.updateBottomControlsPlayState(false);
+            }
         });
     } else {
         console.error("Main sound element not found!");
@@ -2559,7 +2607,7 @@ function initHeroPanel() {
             return;
         }
         
-        let panelVisible = true; // Start with panel visible
+        let panelVisible = false; // Start with panel hidden
         let needsUpdate = true; // Always do initial render
         
         // Function to toggle panel visibility - exposed to window for keyboard shortcuts
@@ -2752,6 +2800,158 @@ function initHeroPanel() {
     
     // Start checking for HeroPanel component - give Babel time to transpile
     setTimeout(checkForHeroPanel, 100);
+}
+
+// -------------- BOTTOM CONTROL PANEL --------------
+function initBottomControls() {
+    const bottomControls = document.getElementById('bottom-controls');
+    const playPauseBtn = document.getElementById('play-pause-btn');
+    const restartBtn = document.getElementById('restart-btn');
+    const equalizerBtn = document.getElementById('equalizer-btn');
+    const heroPanelBtn = document.getElementById('hero-panel-btn');
+    
+    const playIcon = document.getElementById('play-icon');
+    const pauseIcon = document.getElementById('pause-icon');
+    
+    if (!bottomControls || !playPauseBtn || !restartBtn || !equalizerBtn || !heroPanelBtn) {
+        console.error('Bottom control panel elements not found');
+        return;
+    }
+    
+    let isPlaying = false;
+    let equalizerVisible = true; // Start with equalizer visible
+    let heroPanelVisible = false; // Start with hero panel hidden
+    
+    // Function to show the bottom controls (called when experience starts)
+    function showBottomControls() {
+        bottomControls.classList.remove('hidden');
+        console.log('Bottom controls now visible');
+    }
+    
+    // Function to hide the bottom controls
+    function hideBottomControls() {
+        bottomControls.classList.add('hidden');
+    }
+    
+    // Function to update play/pause button state
+    function updatePlayPauseButton() {
+        if (isPlaying) {
+            playIcon.style.display = 'none';
+            pauseIcon.style.display = 'block';
+            playPauseBtn.classList.add('active');
+        } else {
+            playIcon.style.display = 'block';
+            pauseIcon.style.display = 'none';
+            playPauseBtn.classList.remove('active');
+        }
+    }
+    
+    // Function to update equalizer button state
+    function updateEqualizerButton() {
+        const canvas = document.getElementById('audio-visualizer');
+        if (equalizerVisible) {
+            equalizerBtn.classList.add('active');
+            if (canvas) canvas.style.display = 'block';
+        } else {
+            equalizerBtn.classList.remove('active');
+            if (canvas) canvas.style.display = 'none';
+        }
+    }
+    
+    // Function to update hero panel button state
+    function updateHeroPanelButton() {
+        if (heroPanelVisible) {
+            heroPanelBtn.classList.add('active');
+        } else {
+            heroPanelBtn.classList.remove('active');
+        }
+    }
+    
+    // Function to setup audio event listeners (called when mainSound is available)
+    function setupAudioListeners(audioElement) {
+        if (!audioElement) return;
+        
+        audioElement.addEventListener('play', () => {
+            isPlaying = true;
+            updatePlayPauseButton();
+        });
+        
+        audioElement.addEventListener('pause', () => {
+            isPlaying = false;
+            updatePlayPauseButton();
+        });
+        
+        audioElement.addEventListener('ended', () => {
+            isPlaying = false;
+            updatePlayPauseButton();
+        });
+    }
+    
+    // Play/Pause button functionality
+    playPauseBtn.addEventListener('click', () => {
+        const audio = mainSound || document.getElementById('main-sound');
+        if (audio) {
+            if (isPlaying) {
+                // Pause the audio
+                audio.pause();
+                isPlaying = false;
+                console.log('Audio paused');
+            } else {
+                // Resume the audio
+                audio.play().then(() => {
+                    isPlaying = true;
+                    console.log('Audio resumed');
+                }).catch(err => {
+                    console.error('Error resuming audio:', err);
+                });
+            }
+            updatePlayPauseButton();
+        }
+    });
+    
+    // Restart button functionality
+    restartBtn.addEventListener('click', () => {
+        console.log('Restart button clicked');
+        restartAnimation();
+    });
+    
+    // Equalizer toggle button functionality
+    equalizerBtn.addEventListener('click', () => {
+        equalizerVisible = !equalizerVisible;
+        updateEqualizerButton();
+        console.log('Equalizer visibility toggled:', equalizerVisible);
+    });
+    
+    // Hero panel toggle button functionality
+    heroPanelBtn.addEventListener('click', () => {
+        heroPanelVisible = !heroPanelVisible;
+        if (typeof window.updateHeroPanelVisibility === 'function') {
+            window.updateHeroPanelVisibility();
+        }
+        updateHeroPanelButton();
+        console.log('Hero panel visibility toggled:', heroPanelVisible);
+    });
+    
+    // Setup audio listeners if mainSound is already available
+    if (mainSound) {
+        setupAudioListeners(mainSound);
+    }
+    
+    // Initialize button states
+    updatePlayPauseButton();
+    updateEqualizerButton();
+    updateHeroPanelButton();
+    
+    // Expose functions globally for external access
+    window.showBottomControls = showBottomControls;
+    window.hideBottomControls = hideBottomControls;
+    window.updateBottomControlsPlayState = (playing) => {
+        isPlaying = playing;
+        updatePlayPauseButton();
+    };
+    window.setupBottomControlsAudioListeners = setupAudioListeners;
+    
+    console.log('Bottom control panel initialized');
 }
 
 // ... existing code ...
