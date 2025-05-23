@@ -186,13 +186,8 @@ async function init() {
                             if (typeof window.updateBottomControlsPlayState === 'function') {
                                 window.updateBottomControlsPlayState(true);
                             }
-                            
-                            // Ensure fallback beats are running (even if audio analysis is working)
-                            startFallbackBeatTimer();
                         }).catch(err => {
                             console.error("Error playing main sound:", err);
-                            // If audio fails to play, still start fallback beats
-                            startFallbackBeatTimer();
                         });
                         
                         // Add audio event listeners for bottom controls
@@ -209,8 +204,6 @@ async function init() {
                         });
                     } else {
                         console.error("Main sound element not found!");
-                        // Even without sound, start fallback beats
-                        startFallbackBeatTimer();
                     }
                     
                     // Start the experience
@@ -526,83 +519,111 @@ function playCreditsSequence() {
     // Keep track of current screen index
     let currentScreenIndex = 0;
     
+    // Add a fallback timer to ensure screens advance even if beat detection fails
+    let fallbackTimer = null;
+    
     // Function to show the next screen
     showNextScreen = () => {
-        // Debug logging to understand what we're getting
-        console.log(`Screen ${currentScreenIndex}:`, allCredits[currentScreenIndex]);
-        
-        // Set the transition flag
-        isTransitionInProgress = true;
-        
-        // Clear containers immediately
-        creditsContainer.innerHTML = '';
-        singleCreditContainer.innerHTML = '';
-        
-        const credit = allCredits[currentScreenIndex];
-        
-        // Create a GSAP timeline for this screen
-        const screenTimeline = gsap.timeline();
-        
-        if (credit.layout === "single") {
-            // Single name
-            showSingleName(screenTimeline, credit);
-        } 
-        else if (credit.layout === "title" || credit.layout === "bilingual" || 
-                 credit.layout === "hierarchical" || credit.layout === "firstname-lastname") {
-            // Special layouts
-            showSpecialLayoutCredit(screenTimeline, credit);
-        }
-        else if (credit.category === "logo" && credit.layout === "fullscreen") {
-            // Fullscreen logo layout
-            showFullscreenLogo(screenTimeline, credit);
-        }
-        else if (credit.layout === "grid" || credit.layout === "row") {
-            // Handle name grids specially
-            if (credit.category === "name_grid" && credit.names) {
-                // Convert names array to credits format
-                const gridCredits = credit.names.map(nameObj => {
-                    // Handle both old format (strings) and new format (objects)
-                    if (typeof nameObj === 'string') {
-                        return {
-                            name: nameObj,
-                            description: "",
-                            category: "name_grid"
-                        };
-                    } else {
-                        return {
-                            name: nameObj.name,
-                            description: nameObj.description || "",
-                            category: "name_grid"
-                        };
-                    }
-                });
-                showGridLayout(screenTimeline, gridCredits, credit.layout);
+        try {
+            // Debug logging to understand what we're getting
+            console.log(`Screen ${currentScreenIndex}:`, allCredits[currentScreenIndex]);
+            
+            // Set the transition flag
+            isTransitionInProgress = true;
+            
+            // Clear any existing fallback timer
+            if (fallbackTimer) {
+                clearTimeout(fallbackTimer);
+                fallbackTimer = null;
             }
-            // Group of credits - show them together
-            else if (credit.credits) {
+            
+            // Clear containers immediately
+            creditsContainer.innerHTML = '';
+            singleCreditContainer.innerHTML = '';
+            
+            const credit = allCredits[currentScreenIndex];
+            
+            // Create a GSAP timeline for this screen
+            const screenTimeline = gsap.timeline();
+            
+            if (credit.layout === "single") {
+                // Single name
+                showSingleName(screenTimeline, credit);
+            } 
+            else if (credit.layout === "title" || credit.layout === "bilingual" || 
+                     credit.layout === "hierarchical" || credit.layout === "firstname-lastname") {
+                // Special layouts
+                showSpecialLayoutCredit(screenTimeline, credit);
+            }
+            else if (credit.category === "logo" && credit.layout === "fullscreen") {
+                // Fullscreen logo layout
+                showFullscreenLogo(screenTimeline, credit);
+            }
+            else if (credit.layout === "grid" || credit.layout === "row") {
+                // Handle name grids specially
+                if (credit.category === "name_grid" && credit.names) {
+                    // Convert names array to credits format
+                    const gridCredits = credit.names.map(nameObj => {
+                        // Handle both old format (strings) and new format (objects)
+                        if (typeof nameObj === 'string') {
+                            return {
+                                name: nameObj,
+                                description: "",
+                                category: "name_grid"
+                            };
+                        } else {
+                            return {
+                                name: nameObj.name,
+                                description: nameObj.description || "",
+                                category: "name_grid"
+                            };
+                        }
+                    });
+                    showGridLayout(screenTimeline, gridCredits, credit.layout);
+                }
+                // Group of credits - show them together
+                else if (credit.credits) {
                 showGridLayout(screenTimeline, credit.credits, credit.layout);
             }
-            else {
-                console.warn("Grid layout requested but no credits or names found:", credit);
+                else {
+                    console.warn("Grid layout requested but no credits or names found:", credit);
+                }
             }
+            else if (credit.name && credit.description) {
+                // Individual credit without explicit layout - show as single name
+                showSingleName(screenTimeline, credit);
+            }
+            else {
+                // Fallback - log unhandled screen type
+                console.warn("Unhandled screen type:", credit);
+            }
+            
+            // Increment index for next time
+            currentScreenIndex = (currentScreenIndex + 1) % allCredits.length;
+            lastScreenChangeTime = Date.now();
+            
+            console.log(`Successfully transitioned to screen ${currentScreenIndex - 1}, next will be ${currentScreenIndex}`);
+            
+            // Set up a fallback timer to advance screen if beat detection fails
+            fallbackTimer = setTimeout(() => {
+                console.log("⚠️ FALLBACK TIMER: No beat detected, forcing screen advance");
+                if (!isTransitionInProgress) {
+                    showNextScreen();
+                }
+            }, Math.max(minScreenDisplayTime * 2, 2000)); // Fallback after 2x minimum time or 2 seconds
+            
+        } catch (error) {
+            console.error("Error in showNextScreen:", error);
+            // Ensure we increment even if there's an error
+            currentScreenIndex = (currentScreenIndex + 1) % allCredits.length;
+            lastScreenChangeTime = Date.now();
+        } finally {
+            // ALWAYS reset the transition flag, even if there's an error
+            setTimeout(() => {
+                isTransitionInProgress = false;
+                console.log("✅ Transition flag reset, ready for next screen");
+            }, 100); // Increased delay slightly to ensure animations start
         }
-        else if (credit.name && credit.description) {
-            // Individual credit without explicit layout - show as single name
-            showSingleName(screenTimeline, credit);
-        }
-        else {
-            // Fallback - log unhandled screen type
-            console.warn("Unhandled screen type:", credit);
-        }
-        
-        // Increment index for next time
-        currentScreenIndex = (currentScreenIndex + 1) % allCredits.length;
-        lastScreenChangeTime = Date.now();
-        
-        // Reset the transition flag after a small delay to prevent immediate transitions
-        setTimeout(() => {
-            isTransitionInProgress = false;
-        }, 50);
     };
     
     // Show the first screen immediately
@@ -614,11 +635,16 @@ function playCreditsSequence() {
         const now = Date.now();
         const timeSinceLastChange = now - lastScreenChangeTime;
         
+        console.log(`🎵 Beat detected! Time since last change: ${timeSinceLastChange}ms, min required: ${minScreenDisplayTime}ms, transition in progress: ${isTransitionInProgress}`);
+        
         // Use the configurable minimum time between screen changes
         if (timeSinceLastChange >= minScreenDisplayTime && !isTransitionInProgress) {
+            console.log(`✅ Beat detected! Advancing to next screen. Time since last: ${timeSinceLastChange}ms`);
             showNextScreen();
+        } else if (isTransitionInProgress) {
+            console.log(`⏳ Beat detected but transition in progress`);
         } else {
-            console.log(`Beat detected but screen shown for only ${timeSinceLastChange}ms (min: ${minScreenDisplayTime}ms)`);
+            console.log(`⏱️ Beat detected but screen shown for only ${timeSinceLastChange}ms (min: ${minScreenDisplayTime}ms)`);
         }
     };
 }
@@ -744,20 +770,22 @@ let autoBeatInterval = 500; // Interval for automatic beats in ms
 let autoBeatTimer = null; // Timer reference for automatic beats
 let displayTime = 500; // How long to display beat visuals in ms
 
+// Fallback beat system variables (to be removed)
+let useFallbackBeats = false; // Flag for fallback beats
+let fallbackBeatInterval = 300; // Interval for fallback beats in ms
+let fallbackBeatTimer = null; // Timer reference for fallback beats
 // Credits settings
 let credits = []; // Loaded from JSON
 
 // Preload images array
 const preloadedImages = [];
 
-// Fallback beat timer
-let useFallbackBeats = false; // Default to OFF
-let fallbackBeatInterval = 300; // Updated interval
-let fallbackBeatTimer = null;
-
 // Controls elements
 let displayTimeSlider, displayTimeValue; // Control elements for display time
 let toggleControlsBtn, beatControls;
+let thresholdSlider, thresholdValue, noiseFloorSlider, noiseFloorValue;
+let freqStartSlider, freqStartValue, freqEndSlider, freqEndValue;
+let fallbackToggle, fallbackInterval, intervalValue, freqRangeSelect;
 
 // Function to start fallback beat timer
 function startFallbackBeatTimer() {
@@ -802,20 +830,12 @@ function setupAudioVisualization(audioElement) {
                 console.log("Audio started playing successfully");
                 // Start monitoring audio for actual content
                 checkForAudioContent();
-                // Start fallback beats only if enabled
-                if (useFallbackBeats) {
-                    startFallbackBeatTimer();
-                }
             })
             .catch(err => console.error("Failed to play audio:", err));
     } else {
         console.log("Audio is already playing");
         // Start monitoring audio for actual content
         checkForAudioContent();
-        // Start fallback beats only if enabled
-        if (useFallbackBeats) {
-            startFallbackBeatTimer();
-        }
     }
     
     try {
@@ -891,10 +911,6 @@ function setupAudioVisualization(audioElement) {
         drawVisualization();
     } catch (error) {
         console.error("Error setting up audio visualization:", error);
-        // Even if visualization fails, ensure fallback beats are running
-        if (useFallbackBeats) {
-            startFallbackBeatTimer();
-        }
     }
 }
 
@@ -971,9 +987,7 @@ function saveSettings() {
         noiseFloor,
         freqRangeStart,
         freqRangeEnd,
-        useFallbackBeats,
-        fallbackBeatInterval,
-        displayTime
+        minScreenDisplayTime
     };
     
     try {
@@ -991,21 +1005,23 @@ function loadSettings() {
         if (savedSettings) {
             const settings = JSON.parse(savedSettings);
             
-            // Apply saved settings
+            // Apply saved settings (removed fallback beat references)
             peakThreshold = settings.peakThreshold || 0.05;
-            noiseFloor = settings.noiseFloor || 70; // Use noiseFloor consistently
+            noiseFloor = settings.noiseFloor || 70;
             freqRangeStart = settings.freqRangeStart || 10;
             freqRangeEnd = settings.freqRangeEnd || 60;
-            useFallbackBeats = settings.useFallbackBeats || false;
-            fallbackBeatInterval = settings.fallbackBeatInterval || 300;
-            minScreenDisplayTime = settings.minScreenDisplayTime || 300; // Load display time setting, default 0.3s
+            minScreenDisplayTime = settings.minScreenDisplayTime || 300;
             
             console.log('Settings loaded from localStorage');
         }
     } catch (e) {
         console.error('Failed to load settings from localStorage:', e);
-        // If loading fails, use defaults
-        resetToDefaultSettings(false);
+        // If loading fails, use defaults without calling resetToDefaultSettings to avoid errors
+        peakThreshold = 0.05;
+        noiseFloor = 70;
+        freqRangeStart = 10;
+        freqRangeEnd = 60;
+        minScreenDisplayTime = 300;
     }
 }
 
@@ -1181,13 +1197,8 @@ function restartAnimation() {
             if (typeof window.updateBottomControlsPlayState === 'function') {
                 window.updateBottomControlsPlayState(true);
             }
-            
-            // Ensure fallback beats are running (even if audio analysis is working)
-            startFallbackBeatTimer();
         }).catch(err => {
             console.error("Error playing main sound:", err);
-            // If audio fails to play, still start fallback beats
-            startFallbackBeatTimer();
         });
         
         // Add audio event listeners for bottom controls
@@ -1204,8 +1215,6 @@ function restartAnimation() {
         });
     } else {
         console.error("Main sound element not found!");
-        // Even without sound, start fallback beats
-        startFallbackBeatTimer();
     }
     
     // Start the experience directly
@@ -1216,18 +1225,27 @@ function restartAnimation() {
 
 // Function to handle beat events during credits sequence
 function handleBeat(event) {
+    console.log(`🎯 handleBeat called with event:`, event.detail);
+    
     // If beatDetected is defined and callable, use it
     if (typeof beatDetected === 'function') {
+        console.log(`🎯 Calling beatDetected function`);
         beatDetected();
     } else {
+        console.log(`⚠️ beatDetected function not available, using fallback logic`);
         const currentTime = Date.now();
         
         // Only advance if screen has been visible for at least the minimum time
         // AND no transition is currently in progress
         if (currentTime - lastScreenChangeTime >= minScreenDisplayTime && !isTransitionInProgress) {
             if (typeof showNextScreen === 'function') {
+                console.log(`🎯 Calling showNextScreen directly`);
                 showNextScreen();
+            } else {
+                console.log(`⚠️ showNextScreen function not available`);
             }
+        } else {
+            console.log(`⏱️ Beat handled but conditions not met: time=${currentTime - lastScreenChangeTime}ms, transition=${isTransitionInProgress}`);
         }
     }
 }
@@ -1421,19 +1439,23 @@ function detectPeak(forcePeak = false) {
             window.requestHeroPanelUpdate();
         }
         
-        // Log peak detection only if it's forced (less spam)
+        // Log peak detection with more detail
         if (forcePeak) {
-            console.log(`Peak detected! (forced) Count: ${peakCount}`);
+            console.log(`🔥 Peak detected! (forced) Count: ${peakCount}`);
+        } else {
+            console.log(`🔥 Peak detected! (audio analysis) Count: ${peakCount}`);
         }
         
         // Create and dispatch a custom event for peak detection (reusing the same event name)
         const peakEvent = new CustomEvent('audiobeat', { 
             detail: { 
                 time: Date.now(),
-                forced: forcePeak
+                forced: forcePeak,
+                count: peakCount
             } 
         });
         window.dispatchEvent(peakEvent);
+        console.log(`📡 Beat event dispatched:`, peakEvent.detail);
         
         // Reset peak detected flag after a short delay
         setTimeout(() => {
@@ -2475,7 +2497,7 @@ function showLogoGrid(timeline, credit) {
         columns = 2;
     } else if (numLogos <= 9) {
         columns = 3;
-                } else {
+    } else {
         columns = 4;
     }
     
@@ -2488,7 +2510,7 @@ function showLogoGrid(timeline, credit) {
     // Check if logos exist before trying to iterate
     if (numLogos > 0) {
         // Add logos to the grid
-        logos.forEach(logoPath => {
+        logos.forEach((logoPath, index) => {
             const logoContainer = document.createElement('div');
             logoContainer.classList.add('logo-container');
             logoContainer.style.width = '100%';
@@ -2504,9 +2526,15 @@ function showLogoGrid(timeline, credit) {
             logo.style.maxHeight = '100px';
             logo.style.objectFit = 'contain';
             logo.style.filter = 'brightness(0) invert(1)'; // Make it white
+            logo.style.transition = 'all 0.3s ease';
             
             logoContainer.appendChild(logo);
             logoGrid.appendChild(logoContainer);
+            
+            // Apply random animation to each logo with a slight delay
+            gsap.delayedCall(index * 0.2, () => {
+                applyRandomLogoAnimation(logo);
+            });
         });
     } else {
         console.warn('No logos provided for logo grid layout');
@@ -2556,10 +2584,14 @@ function showFullscreenLogo(timeline, credit) {
         logo.style.maxHeight = '60vh';
         logo.style.objectFit = 'contain';
         logo.style.filter = 'brightness(0) invert(1)'; // Make it white
+        logo.style.transition = 'all 0.3s ease';
         
         container.appendChild(logo);
         
         // No company name or description - just the logo as requested
+        
+        // Apply random animation effect
+        applyRandomLogoAnimation(logo);
     } else {
         console.warn('No logo provided for fullscreen logo layout');
         
@@ -2578,6 +2610,281 @@ function showFullscreenLogo(timeline, credit) {
     gsap.set(container, { opacity: 1 });
     
     return timeline;
+}
+
+// Function to apply random animation effects to logos
+function applyRandomLogoAnimation(logoElement) {
+    try {
+        const animations = ['tilt', 'shake', 'glitch'];
+        
+        const randomAnimation = animations[Math.floor(Math.random() * animations.length)];
+        
+        console.log(`Applying ${randomAnimation} animation to logo`);
+        
+        // Clear any existing animations first
+        clearLogoAnimations(logoElement);
+        
+        switch (randomAnimation) {
+            case 'tilt':
+                applyTiltAnimation(logoElement);
+                break;
+            case 'shake':
+                applyShakeAnimation(logoElement);
+                break;
+            case 'glitch':
+                applyGlitchAnimation(logoElement);
+                break;
+        }
+    } catch (error) {
+        console.error('Error applying logo animation:', error);
+        // Don't let animation errors break the sequence
+    }
+}
+
+// Function to clear existing animations and classes
+function clearLogoAnimations(element) {
+    try {
+        // Kill any existing GSAP animations
+        gsap.killTweensOf(element);
+        
+        // Remove animation classes
+        element.classList.remove('logo-glitch', 'logo-glow');
+        
+        // Reset transformations and filters
+        gsap.set(element, {
+            x: 0,
+            y: 0,
+            rotation: 0,
+            rotationX: 0,
+            rotationY: 0,
+            scale: 1,
+            skewX: 0,
+            opacity: 1,
+            filter: 'brightness(0) invert(1)'
+        });
+    } catch (error) {
+        console.error('Error clearing logo animations:', error);
+    }
+}
+
+// 3D Tilt Animation - more subtle and varied
+function applyTiltAnimation(element) {
+    try {
+        gsap.set(element, { transformPerspective: 1000 });
+        
+        const tiltStrength = Math.random() * 8 + 3; // Random tilt between 3-11 degrees
+        const duration = Math.random() * 2 + 2; // Random duration between 2-4 seconds
+        
+        gsap.to(element, {
+            duration: duration,
+            rotationX: () => (Math.random() * tiltStrength * 2) - tiltStrength,
+            rotationY: () => (Math.random() * tiltStrength * 2) - tiltStrength,
+            ease: "sine.inOut",
+            repeat: -1,
+            yoyo: true,
+            repeatDelay: Math.random() * 1 + 0.5
+        });
+    } catch (error) {
+        console.error('Error in tilt animation:', error);
+    }
+}
+
+// Quick Shake Animation - with variable intensity
+function applyShakeAnimation(element) {
+    try {
+        const intensity = Math.random() * 15 + 10; // Random intensity between 10-25px
+        const shakeCount = Math.floor(Math.random() * 10) + 10; // Random shake count 10-20
+        
+        gsap.to(element, {
+            duration: 0.08,
+            x: () => (Math.random() * intensity * 2) - intensity,
+            y: () => (Math.random() * intensity * 2) - intensity,
+            ease: "power2.inOut",
+            repeat: shakeCount,
+            yoyo: true,
+            onComplete: () => {
+                gsap.set(element, { x: 0, y: 0 });
+                
+                // Add a brief glow after shake
+                gsap.to(element, {
+                    duration: 0.5,
+                    filter: 'brightness(0) invert(1) drop-shadow(0 0 15px rgba(255,255,255,0.6))',
+                    ease: "power2.out",
+                    onComplete: () => {
+                        gsap.set(element, { filter: 'brightness(0) invert(1)' });
+                    }
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error in shake animation:', error);
+    }
+}
+
+// Glitch Animation - enhanced with more variation
+function applyGlitchAnimation(element) {
+    try {
+        // Add glitch class for CSS effects
+        element.classList.add('logo-glitch');
+        
+        // Additional GSAP glitch effects with random timing
+        const glitchRepeats = Math.floor(Math.random() * 3) + 1; // 1-4 repeats
+        const glitchTimeline = gsap.timeline({ 
+            repeat: glitchRepeats, 
+            repeatDelay: Math.random() * 2 + 0.5,
+            onComplete: () => {
+                element.classList.remove('logo-glitch');
+            }
+        });
+        
+        // Create multiple glitch phases
+        for (let i = 0; i < 5; i++) {
+            glitchTimeline
+                .to(element, {
+                    duration: 0.05,
+                    scaleX: 1 + (Math.random() * 0.1 - 0.05),
+                    scaleY: 1 + (Math.random() * 0.1 - 0.05),
+                    skewX: Math.random() * 4 - 2,
+                    skewY: Math.random() * 2 - 1,
+                    ease: "power2.inOut"
+                })
+                .to(element, {
+                    duration: 0.05,
+                    scaleX: 1,
+                    scaleY: 1,
+                    skewX: 0,
+                    skewY: 0,
+                    ease: "power2.inOut"
+                });
+        }
+    } catch (error) {
+        console.error('Error in glitch animation:', error);
+        // Remove the class if there was an error
+        element.classList.remove('logo-glitch');
+    }
+}
+
+// Glow Animation - with color cycling
+function applyGlowAnimation(element) {
+    try {
+        element.classList.add('logo-glow');
+        
+        const colors = [
+            'rgba(255,255,255,0.8)',
+            'rgba(0,255,255,0.8)',
+            'rgba(255,0,255,0.8)',
+            'rgba(255,255,0,0.8)',
+            'rgba(0,255,0,0.8)',
+            'rgba(255,100,100,0.8)'
+        ];
+        
+        const glowTimeline = gsap.timeline({ repeat: -1 });
+        
+        colors.forEach((color, index) => {
+            glowTimeline.to(element, {
+                duration: 1,
+                filter: `brightness(0) invert(1) drop-shadow(0 0 25px ${color})`,
+                ease: "sine.inOut"
+            });
+        });
+        
+        // Remove glow class after a while
+        gsap.delayedCall(10, () => {
+            element.classList.remove('logo-glow');
+            gsap.killTweensOf(element);
+            gsap.set(element, { filter: 'brightness(0) invert(1)' });
+        });
+    } catch (error) {
+        console.error('Error in glow animation:', error);
+        // Remove the class if there was an error
+        element.classList.remove('logo-glow');
+    }
+}
+
+// Splatter Animation - enhanced with more fragments and better timing
+function applySplatterAnimation(element) {
+    try {
+        // Create multiple copies of the logo for the splatter effect
+        const parent = element.parentElement;
+        if (!parent) {
+            console.warn('No parent element for splatter animation');
+            return;
+        }
+        
+        const fragments = [];
+        const fragmentCount = Math.floor(Math.random() * 6) + 6; // 6-12 fragments
+        
+        // Create fragments
+        for (let i = 0; i < fragmentCount; i++) {
+            const fragment = element.cloneNode(true);
+            fragment.style.position = 'absolute';
+            fragment.style.maxWidth = '15%';
+            fragment.style.maxHeight = '15%';
+            fragment.style.left = '50%';
+            fragment.style.top = '50%';
+            fragment.style.transform = 'translate(-50%, -50%)';
+            fragment.style.zIndex = '10';
+            
+            parent.appendChild(fragment);
+            fragments.push(fragment);
+        }
+        
+        // Hide original logo with a quick scale down
+        gsap.to(element, {
+            duration: 0.2,
+            scale: 0,
+            opacity: 0,
+            ease: "power2.in"
+        });
+        
+        // Animate fragments bursting outward with variation
+        fragments.forEach((fragment, index) => {
+            const angle = (index / fragments.length) * Math.PI * 2 + (Math.random() * 0.5 - 0.25);
+            const distance = Math.random() * 400 + 200;
+            const endX = Math.cos(angle) * distance;
+            const endY = Math.sin(angle) * distance;
+            
+            gsap.to(fragment, {
+                duration: Math.random() * 1 + 1, // 1-2 seconds
+                x: endX,
+                y: endY,
+                rotation: Math.random() * 1440 - 720, // Random rotation up to 2 full spins
+                scale: Math.random() * 0.6 + 0.2,
+                opacity: 0,
+                ease: "power2.out",
+                delay: Math.random() * 0.3, // Stagger the start times
+                onComplete: () => {
+                    try {
+                        fragment.remove();
+                    } catch (e) {
+                        console.warn('Error removing fragment:', e);
+                    }
+                }
+            });
+        });
+        
+        // Bring back original logo with dramatic entrance
+        gsap.delayedCall(0.8, () => {
+            gsap.to(element, {
+                duration: 0.8,
+                opacity: 1,
+                scale: 1.2,
+                ease: "back.out(2.5)"
+            });
+            
+            // Scale back to normal size
+            gsap.to(element, {
+                duration: 0.4,
+                scale: 1,
+                ease: "power2.out",
+                delay: 0.8
+            });
+        });
+    } catch (error) {
+        console.error('Error in splatter animation:', error);
+        // Ensure the original element is visible if there's an error
+        gsap.set(element, { opacity: 1, scale: 1 });
+    }
 }
 
 // Function to toggle control panel visibility
