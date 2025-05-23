@@ -24,7 +24,13 @@
     { "name": "KATHLEEN ANTONELLI", "description": "ENIAC Programmer", "category": "early_computing" },
     { "name": "FRANCES SPENCE", "description": "ENIAC Programmer", "category": "early_computing" },
     { "name": "MARLYN MELTZER", "description": "ENIAC Programmer", "category": "early_computing" },
-    { "name": "RUTH TEITELBAUM", "description": "ENIAC Programmer", "category": "early_computing" }
+    { "name": "RUTH TEITELBAUM", "description": "ENIAC Programmer", "category": "early_computing" },
+    { "name": "HEDY LAMARR", "description": "Frequency Hopping Pioneer", "category": "early_computing" },
+    { "name": "TOMMY FLOWERS", "description": "Colossus Computer Designer", "category": "early_computing" },
+    { "name": "FREDDIE WILLIAMS", "description": "Williams Tube Inventor", "category": "early_computing" },
+    { "name": "TOM KILBURN", "description": "Manchester Computer Pioneer", "category": "early_computing" },
+    { "name": "PRESPER ECKERT", "description": "ENIAC Co-creator", "category": "early_computing" },
+    { "name": "JOHN MAUCHLY", "description": "ENIAC Co-creator", "category": "early_computing" }
   ],
   "semiconductors_era": [
     { "name": "JACK KILBY", "description": "Integrated Circuit Co-inventor", "category": "semiconductors" },
@@ -40,7 +46,12 @@
     { "name": "BJARNE STROUSTRUP", "description": "C++ Creator", "category": "semiconductors" },
     { "name": "RADIA PERLMAN", "description": "Spanning Tree Protocol", "category": "semiconductors" },
     { "name": "LYNN CONWAY", "description": "VLSI Pioneer", "category": "semiconductors" },
-    { "name": "FRAN ALLEN", "description": "Compiler Optimization Pioneer", "category": "semiconductors" }
+    { "name": "FRAN ALLEN", "description": "Compiler Optimization Pioneer", "category": "semiconductors" },
+    { "name": "CARVER MEAD", "description": "VLSI Pioneer", "category": "semiconductors" },
+    { "name": "MARCIAN HOFF", "description": "Microprocessor Inventor", "category": "semiconductors" },
+    { "name": "FEDERICO FAGGIN", "description": "Intel 4004 Designer", "category": "semiconductors" },
+    { "name": "TED HOFF", "description": "Microprocessor Architect", "category": "semiconductors" },
+    { "name": "NICK HOLONYAK", "description": "LED Inventor", "category": "semiconductors" }
   ],
   "ai_pioneers": [
     { "name": "JOHN MCCARTHY", "description": "AI Pioneer", "category": "ai_pioneers" },
@@ -58,7 +69,16 @@
     { "name": "SAM ALTMAN", "description": "OpenAI CEO", "category": "ai_pioneers" },
     { "name": "DARIO AMODEI", "description": "Anthropic Founder", "category": "ai_pioneers" },
     { "name": "MIRA MURATI", "description": "OpenAI CTO", "category": "ai_pioneers" },
-    { "name": "JEFF DEAN", "description": "Google AI Lead", "category": "ai_pioneers" }
+    { "name": "JEFF DEAN", "description": "Google AI Lead", "category": "ai_pioneers" },
+    { "name": "FRANK ROSENBLATT", "description": "Perceptron Inventor", "category": "ai_pioneers" },
+    { "name": "SEYMOUR PAPERT", "description": "AI Education Pioneer", "category": "ai_pioneers" },
+    { "name": "HERBERT SIMON", "description": "Cognitive Science Pioneer", "category": "ai_pioneers" },
+    { "name": "ALLEN NEWELL", "description": "Logic Theorist Creator", "category": "ai_pioneers" },
+    { "name": "EDWARD FEIGENBAUM", "description": "Expert Systems Pioneer", "category": "ai_pioneers" },
+    { "name": "RAJ REDDY", "description": "Speech Recognition Pioneer", "category": "ai_pioneers" },
+    { "name": "JUDEA PEARL", "description": "Bayesian Networks Creator", "category": "ai_pioneers" },
+    { "name": "STUART RUSSELL", "description": "AI Safety Pioneer", "category": "ai_pioneers" },
+    { "name": "PETER NORVIG", "description": "AI Researcher", "category": "ai_pioneers" }
   ],
   "networking_era": [
     { "name": "J.C.R. LICKLIDER", "description": "Internet Visionary", "category": "networking" },
@@ -70,7 +90,12 @@
     { "name": "ELIZABETH FEINLER", "description": "ARPANET Directory Manager", "category": "networking" },
     { "name": "IVAN SUTHERLAND", "description": "Sketchpad Creator", "category": "networking" },
     { "name": "DOUGLAS ENGELBART", "description": "Interactive Computing Pioneer", "category": "networking" },
-    { "name": "TED NELSON", "description": "Hypertext Pioneer", "category": "networking" }
+    { "name": "TED NELSON", "description": "Hypertext Pioneer", "category": "networking" },
+    { "name": "PAUL BARAN", "description": "Packet Switching Co-inventor", "category": "networking" },
+    { "name": "LEONARD KLEINROCK", "description": "Network Theory Pioneer", "category": "networking" },
+    { "name": "RAY TOMLINSON", "description": "Email Inventor", "category": "networking" },
+    { "name": "STEVE CROCKER", "description": "RFC Creator", "category": "networking" },
+    { "name": "JON POSTEL", "description": "Internet Protocol Pioneer", "category": "networking" }
   ],
   "personal_computing": [
     { "name": "BILL GATES", "description": "Microsoft Co-founder", "category": "personal_computing" },
@@ -85,7 +110,16 @@
     { "name": "LARRY WALL", "description": "Perl Creator", "category": "personal_computing" },
     { "name": "RASMUS LERDORF", "description": "PHP Creator", "category": "personal_computing" },
     { "name": "BRENDAN EICH", "description": "JavaScript Creator", "category": "personal_computing" },
-    { "name": "JAMES GOSLING", "description": "Java Creator", "category": "personal_computing" }
+    { "name": "JAMES GOSLING", "description": "Java Creator", "category": "personal_computing" },
+    { "name": "JOHN MCCARTHY", "description": "LISP Creator", "category": "personal_computing" },
+    { "name": "NIKLAUS WIRTH", "description": "Pascal Creator", "category": "personal_computing" },
+    { "name": "ANDERS HEJLSBERG", "description": "C# Creator", "category": "personal_computing" },
+    { "name": "MARTIN ODERSKY", "description": "Scala Creator", "category": "personal_computing" },
+    { "name": "RICH HICKEY", "description": "Clojure Creator", "category": "personal_computing" },
+    { "name": "YUKIHIRO MATSUMOTO", "description": "Ruby Creator", "category": "personal_computing" },
+    { "name": "ROB PIKE", "description": "Go Co-creator", "category": "personal_computing" },
+    { "name": "KEN THOMPSON", "description": "Go Co-creator", "category": "personal_computing" },
+    { "name": "GRAYDON HOARE", "description": "Rust Creator", "category": "personal_computing" }
   ],
   "internet_era": [
     { "name": "JERRY YANG", "description": "Yahoo Co-founder", "category": "internet_era" },
@@ -96,7 +130,11 @@
     { "name": "SERGEY BRIN", "description": "Google Co-founder", "category": "internet_era" },
     { "name": "SHAWN FANNING", "description": "Napster Creator", "category": "internet_era" },
     { "name": "JIMMY WALES", "description": "Wikipedia Co-founder", "category": "internet_era" },
-    { "name": "LARRY SANGER", "description": "Wikipedia Co-founder", "category": "internet_era" }
+    { "name": "LARRY SANGER", "description": "Wikipedia Co-founder", "category": "internet_era" },
+    { "name": "REED HASTINGS", "description": "Netflix Co-founder", "category": "internet_era" },
+    { "name": "CHAD HURLEY", "description": "YouTube Co-founder", "category": "internet_era" },
+    { "name": "STEVE CHEN", "description": "YouTube Co-founder", "category": "internet_era" },
+    { "name": "JAWED KARIM", "description": "YouTube Co-founder", "category": "internet_era" }
   ],
   "social_media_era": [
     { "name": "MARK ZUCKERBERG", "description": "Facebook Founder", "category": "social_media" },
@@ -108,7 +146,11 @@
     { "name": "KEVIN SYSTROM", "description": "Instagram Co-founder", "category": "social_media" },
     { "name": "MIKE KRIEGER", "description": "Instagram Co-founder", "category": "social_media" },
     { "name": "EVAN SPIEGEL", "description": "Snapchat Co-founder", "category": "social_media" },
-    { "name": "BOBBY MURPHY", "description": "Snapchat Co-founder", "category": "social_media" }
+    { "name": "BOBBY MURPHY", "description": "Snapchat Co-founder", "category": "social_media" },
+    { "name": "REID HOFFMAN", "description": "LinkedIn Founder", "category": "social_media" },
+    { "name": "STEWART BUTTERFIELD", "description": "Slack Co-founder", "category": "social_media" },
+    { "name": "DANIEL EK", "description": "Spotify Co-founder", "category": "social_media" },
+    { "name": "PAVEL DUROV", "description": "Telegram Founder", "category": "social_media" }
   ],
   "digital_artists": [
     { "name": "BEN LAPOSKY", "description": "First Electronic Art", "category": "digital_artists" },
@@ -135,7 +177,20 @@
     { "name": "REFIK ANADOL", "description": "Data Sculpture Artist", "category": "digital_artists" },
     { "name": "HELENA SARIN", "description": "GAN Art Pioneer", "category": "digital_artists" },
     { "name": "SOFIA CRESPO", "description": "Artificial Nature Artist", "category": "digital_artists" },
-    { "name": "SOUGWEN CHUNG", "description": "Human-Robot Art Collaborator", "category": "digital_artists" }
+    { "name": "SOUGWEN CHUNG", "description": "Human-Robot Art Collaborator", "category": "digital_artists" },
+    { "name": "JENNIFER STEINKAMP", "description": "Video Installation Artist", "category": "digital_artists" },
+    { "name": "TEAMLAB", "description": "Digital Immersive Art", "category": "digital_artists" },
+    { "name": "DANIEL ROZIN", "description": "Interactive Mirror Artist", "category": "digital_artists" },
+    { "name": "LAUREN MCCARTHY", "description": "Social Technology Artist", "category": "digital_artists" },
+    { "name": "KYLE MCDONALD", "description": "Code-based Artist", "category": "digital_artists" },
+    { "name": "LIA", "description": "Software Art Pioneer", "category": "digital_artists" },
+    { "name": "JARED TARBELL", "description": "Generative Artist", "category": "digital_artists" },
+    { "name": "ROBERT HODGIN", "description": "Creative Coder", "category": "digital_artists" },
+    { "name": "CHAR DAVIES", "description": "Virtual Reality Artist", "category": "digital_artists" },
+    { "name": "IAN CHENG", "description": "AI Simulation Artist", "category": "digital_artists" },
+    { "name": "SUSAN KARE", "description": "Interface Design Pioneer", "category": "digital_artists" },
+    { "name": "MURIEL COOPER", "description": "Digital Design Pioneer", "category": "digital_artists" },
+    { "name": "APRIL GREIMAN", "description": "Early Digital Designer", "category": "digital_artists" }
   ],
   "cyberpunk_writers": [
     { "name": "H.G. WELLS", "description": "World Brain Concept", "category": "cyberpunk_writers" },
@@ -152,7 +207,12 @@
     { "name": "OCTAVIA BUTLER", "description": "Afrofuturist Pioneer", "category": "cyberpunk_writers" },
     { "name": "VERNOR VINGE", "description": "Technological Singularity", "category": "cyberpunk_writers" },
     { "name": "TED CHIANG", "description": "Conceptual Sci-Fi Master", "category": "cyberpunk_writers" },
-    { "name": "LIU CIXIN", "description": "Three-Body Problem Author", "category": "cyberpunk_writers" }
+    { "name": "LIU CIXIN", "description": "Three-Body Problem Author", "category": "cyberpunk_writers" },
+    { "name": "STANISŁAW LEM", "description": "Polish Sci-Fi Visionary", "category": "cyberpunk_writers" },
+    { "name": "J.G. BALLARD", "description": "Tech Dystopia Pioneer", "category": "cyberpunk_writers" },
+    { "name": "RUDY RUCKER", "description": "Cyberpunk Mathematician", "category": "cyberpunk_writers" },
+    { "name": "GREG BEAR", "description": "Hard Science Fiction", "category": "cyberpunk_writers" },
+    { "name": "KIM STANLEY ROBINSON", "description": "Climate Fiction Pioneer", "category": "cyberpunk_writers" }
   ],
   "electronic_music": [
     { "name": "DAPHNE ORAM", "description": "Electronic Music Pioneer", "category": "electronic_music" },
@@ -168,7 +228,13 @@
     { "name": "BJÖRK", "description": "Digital Music Innovator", "category": "electronic_music" },
     { "name": "DAFT PUNK", "description": "Electronic Music Pioneers", "category": "electronic_music" },
     { "name": "AUTECHRE", "description": "Algorithmic Composition", "category": "electronic_music" },
-    { "name": "HOLLY HERNDON", "description": "AI-Enhanced Music", "category": "electronic_music" }
+    { "name": "HOLLY HERNDON", "description": "AI-Enhanced Music", "category": "electronic_music" },
+    { "name": "MAX MATHEWS", "description": "Computer Music Father", "category": "electronic_music" },
+    { "name": "JOHN CHOWNING", "description": "FM Synthesis Inventor", "category": "electronic_music" },
+    { "name": "MORTON SUBOTNICK", "description": "Buchla Computer Music", "category": "electronic_music" },
+    { "name": "PAULINE OLIVEROS", "description": "Electronic Tape Pioneer", "category": "electronic_music" },
+    { "name": "JEAN-CLAUDE RISSET", "description": "Computer Sound Synthesis", "category": "electronic_music" },
+    { "name": "KARLHEINZ STOCKHAUSEN", "description": "Electronic Space Music", "category": "electronic_music" }
   ],
   "hackers": [
     { "name": "JOHN DRAPER", "description": "Phone Phreaking Pioneer", "category": "hackers" },
@@ -180,7 +246,12 @@
     { "name": "DAN KAMINSKY", "description": "DNS Security Researcher", "category": "hackers" },
     { "name": "AARON SWARTZ", "description": "Internet Activist", "category": "hackers" },
     { "name": "JULIAN ASSANGE", "description": "WikiLeaks Founder", "category": "hackers" },
-    { "name": "MARCUS HUTCHINS", "description": "WannaCry Researcher", "category": "hackers" }
+    { "name": "MARCUS HUTCHINS", "description": "WannaCry Researcher", "category": "hackers" },
+    { "name": "MUDGE", "description": "L0pht Heavy Industries", "category": "hackers" },
+    { "name": "TSUTOMU SHIMOMURA", "description": "Computer Security Expert", "category": "hackers" },
+    { "name": "KEVIN POULSEN", "description": "Dark Dante Hacker", "category": "hackers" },
+    { "name": "ADRIAN LAMO", "description": "Homeless Hacker", "category": "hackers" },
+    { "name": "KEVIN LEE PUGH", "description": "Datastream Cowboy", "category": "hackers" }
   ],
   "global_pioneers": [
     { "name": "AN WANG", "description": "Wang Labs Founder", "category": "global_pioneers" },
@@ -198,7 +269,16 @@
     { "name": "SERGEY LEBEDEV", "description": "Soviet Computer Pioneer", "category": "global_pioneers" },
     { "name": "VICTOR GLUSHKOV", "description": "Soviet Cybernetics Pioneer", "category": "global_pioneers" },
     { "name": "VLADIMIR VAPNIK", "description": "Learning Theory Creator", "category": "global_pioneers" },
-    { "name": "RAJ REDDY", "description": "AI Pioneer", "category": "global_pioneers" }
+    { "name": "RAJ REDDY", "description": "AI Pioneer", "category": "global_pioneers" },
+    { "name": "NARINDER SINGH KAPANY", "description": "Fiber Optics Father", "category": "global_pioneers" },
+    { "name": "FAQIR CHAND KOHLI", "description": "Indian IT Industry Father", "category": "global_pioneers" },
+    { "name": "VIJAY P. BHATKAR", "description": "PARAM Supercomputer Architect", "category": "global_pioneers" },
+    { "name": "VINOD DHAM", "description": "Pentium Chip Father", "category": "global_pioneers" },
+    { "name": "AJAY BHATT", "description": "USB Co-inventor", "category": "global_pioneers" },
+    { "name": "MOHAMED ATALLA", "description": "MOSFET Inventor", "category": "global_pioneers" },
+    { "name": "LEI JUN", "description": "Xiaomi Founder", "category": "global_pioneers" },
+    { "name": "REN ZHENGFEI", "description": "Huawei Founder", "category": "global_pioneers" },
+    { "name": "ZHANG YIMING", "description": "ByteDance Founder", "category": "global_pioneers" }
   ],
   "blockchain_era": [
     { "name": "SATOSHI NAKAMOTO", "description": "Bitcoin Creator", "category": "blockchain" },
@@ -206,10 +286,30 @@
     { "name": "WHITFIELD DIFFIE", "description": "Public Key Cryptography", "category": "blockchain" },
     { "name": "MARTIN HELLMAN", "description": "Cryptography Pioneer", "category": "blockchain" },
     { "name": "SHAFI GOLDWASSER", "description": "Cryptography Pioneer", "category": "blockchain" },
-    { "name": "SILVIO MICALI", "description": "Cryptocurrency Pioneer", "category": "blockchain" }
+    { "name": "SILVIO MICALI", "description": "Cryptocurrency Pioneer", "category": "blockchain" },
+    { "name": "NICK SZABO", "description": "Smart Contracts Pioneer", "category": "blockchain" },
+    { "name": "HAL FINNEY", "description": "Bitcoin Developer", "category": "blockchain" },
+    { "name": "GAVIN WOOD", "description": "Ethereum Co-founder", "category": "blockchain" },
+    { "name": "CHARLIE LEE", "description": "Litecoin Creator", "category": "blockchain" },
+    { "name": "CHANGPENG ZHAO", "description": "Binance Founder", "category": "blockchain" },
+    { "name": "BRIAN ARMSTRONG", "description": "Coinbase Co-founder", "category": "blockchain" }
+  ],
+  "modern_tech_leaders": [
+    { "name": "ELON MUSK", "description": "Tesla SpaceX Founder", "category": "modern_tech" },
+    { "name": "BRIAN CHESKY", "description": "Airbnb Co-founder", "category": "modern_tech" },
+    { "name": "TRAVIS KALANICK", "description": "Uber Co-founder", "category": "modern_tech" },
+    { "name": "GARRETT CAMP", "description": "Uber Co-founder", "category": "modern_tech" },
+    { "name": "LOGAN GREEN", "description": "Lyft Co-founder", "category": "modern_tech" },
+    { "name": "JOHN ZIMMER", "description": "Lyft Co-founder", "category": "modern_tech" },
+    { "name": "PATRICK COLLISON", "description": "Stripe Co-founder", "category": "modern_tech" },
+    { "name": "JOHN COLLISON", "description": "Stripe Co-founder", "category": "modern_tech" },
+    { "name": "MELANIE PERKINS", "description": "Canva Co-founder", "category": "modern_tech" },
+    { "name": "TOBIAS LÜTKE", "description": "Shopify Founder", "category": "modern_tech" }
   ],
   "special": [
-    { "name": "GHOST IN THE MACHINE", "description": "Digital Consciousness", "category": "special" }
+    { "name": "GHOST IN THE MACHINE", "description": "Digital Consciousness", "category": "special" },
+    { "name": "THE PIONEERS WE FORGOT", "description": "Unknown Contributors", "category": "special" },
+    { "name": "FUTURE BUILDERS", "description": "Next Generation", "category": "special" }
   ],
   "layouts": {
     "title": [
@@ -261,6 +361,28 @@
           "/logos/commodore.svg",
           "/logos/atari.svg"
         ]
+      },
+      {
+        "name": "GAMING REVOLUTION",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Nintendo.svg",
+          "/logos/Sega.svg",
+          "/logos/Sony-PlayStation.svg",
+          "/logos/atari.svg"
+        ]
+      },
+      {
+        "name": "WORKSTATION ERA",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Sun Microsystems.svg",
+          "/logos/Silicon Graphics.svg",
+          "/logos/NeXT.svg",
+          "/logos/Digital Equipment Corporation.svg"
+        ]
       }
     ],
     "company_logos_internet": [
@@ -307,6 +429,28 @@
           "/logos/Nokia.svg",
           "/logos/BlackBerry.svg"
         ]
+      },
+      {
+        "name": "STREAMING REVOLUTION",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Netflix.svg",
+          "/logos/Spotify.svg",
+          "/logos/YouTube-Logo.wine.svg",
+          "/logos/Twitch.svg"
+        ]
+      },
+      {
+        "name": "MESSAGING PLATFORMS",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/WhatsApp.svg",
+          "/logos/Skype.svg",
+          "/logos/Discord.svg",
+          "/logos/Telegram.svg"
+        ]
       }
     ],
     "company_logos_modern": [
@@ -352,6 +496,50 @@
           "/logos/Claude Ai.svg",
           "/logos/Google Ai Gemini.svg",
           "/logos/Anthropic-Logo.wine.svg"
+        ]
+      },
+      {
+        "name": "CRYPTOCURRENCY",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Bitcoin.svg",
+          "/logos/Ethereum.svg",
+          "/logos/Binance.svg",
+          "/logos/Coinbase.svg"
+        ]
+      },
+      {
+        "name": "DESIGN TOOLS",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Adobe.svg",
+          "/logos/Figma.svg",
+          "/logos/Canva.svg",
+          "/logos/Sketch.svg"
+        ]
+      },
+      {
+        "name": "RIDE SHARING",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Uber.svg",
+          "/logos/Lyft.svg",
+          "/logos/DiDi.svg",
+          "/logos/Grab.svg"
+        ]
+      },
+      {
+        "name": "FINTECH",
+        "category": "logos",
+        "layout": "grid",
+        "logos": [
+          "/logos/Stripe.svg",
+          "/logos/Square.svg",
+          "/logos/Robinhood.svg",
+          "/logos/PayPal.svg"
         ]
       }
     ],
@@ -415,6 +603,18 @@
         "category": "logo",
         "layout": "fullscreen",
         "logo": "/logos/Cern_Logo_black.svg"
+      },
+      {
+        "name": "TESLA",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/Tesla.svg"
+      },
+      {
+        "name": "TSMC",
+        "category": "logo",
+        "layout": "fullscreen",
+        "logo": "/logos/TSMC.svg"
       }
     ],
     "bilingual": [
@@ -447,6 +647,36 @@
         "category": "credits", 
         "layout": "bilingual",
         "language": "hindi"
+      },
+      { 
+        "name": "برمجيات المستقبل\nأحمد زويل • AHMED ZEWAIL\nفاروق الباز • FAROUK EL-BAZ\nالرواد العرب\nمحمد عطا الله • MOHAMED ATALLA\nطارق كامل • TAREK KAMEL\nعلوم الحاسوب", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "arabic"
+      },
+      { 
+        "name": "SOVIET COMPUTING LEGACY\nСЕРГЕЙ ЛЕБЕДЕВ • SERGEY LEBEDEV\nВИКТОР ГЛУШКОВ • VICTOR GLUSHKOV\nКИБЕРНЕТИКА\nАЛЕКСЕЙ ЛЯПУНОВ • ALEXEY LYAPUNOV\nМСТИСЛАВ КЕЛДЫШ • MSTISLAV KELDYSH\nВЛАДИМИР КОТЕЛЬНИКОВ • VLADIMIR KOTELNIKOV", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "russian"
+      },
+      { 
+        "name": "프로그래밍 언어 개척자\n김범준 • KIM BEOM-JOON\n이해진 • LEE HAE-JIN\n한국 기술 혁신\n서정진 • SEO JUNG-JIN\n네이버와 카카오 • NAVER & KAKAO\n소프트웨어 강국", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "korean"
+      },
+      { 
+        "name": "PIONEIROS BRASILEIROS\nCARLOS MORIMOTO • CARLOS MORIMOTO\nSILVIO MEIRA • SILVIO MEIRA\nINOVAÇÃO DIGITAL\nHENRIQUE DUBUGRAS • HENRIQUE DUBUGRAS\nPEDRO FRANCESCHI • PEDRO FRANCESCHI\nFINTECH LATINO-AMERICANA", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "portuguese"
+      },
+      { 
+        "name": "AFRICAN TECH PIONEERS\nPHILIP EMEAGWALI • PHILIP EMEAGWALI\nVERONE MANKOU • VERONE MANKOU\nDIGITAL AFRICA\nNII NARKU QUAYNOR • NII NARKU QUAYNOR\nJULIANA ROTICH • JULIANA ROTICH\nMARK SHUTTLEWORTH • MARK SHUTTLEWORTH", 
+        "category": "credits", 
+        "layout": "bilingual",
+        "language": "english"
       }
     ],
     "hierarchical": [
@@ -477,6 +707,36 @@
       },
       {
         "name": "SOCIAL MEDIA PIONEERS\nMARK ZUCKERBERG\nJACK DORSEY\nKEVIN SYSTROM\nCONNECTING THE WORLD\nJAN KOUM\nEVAN SPIEGEL\nBRIAN ACTON", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "PROGRAMMING LANGUAGE CREATORS\nJOHN MCCARTHY\nDENNIS RITCHIE\nBJARNE STROUSTRUP\nMODERN LANGUAGES\nGUIDO VAN ROSSUM\nBRENDAN EICH\nJAMES GOSLING", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "SECURITY AND CRYPTOGRAPHY\nWHITFIELD DIFFIE\nMARTIN HELLMAN\nBRUCE SCHNEIER\nDIGITAL PRIVACY\nPHIL ZIMMERMANN\nMOXIE MARLINSPIKE\nAARN SWARTZ", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "GAME DEVELOPERS\nSHIGERU MIYAMOTO\nWILL WRIGHT\nHIDEO KOJIMA\nINTERACTIVE ENTERTAINMENT\nSID MEIER\nJOHN CARMACK\nJOHN ROMERO", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "DIGITAL ARTISTS\nVERA MOLNÁR\nCHARLES CSURI\nHAROLD COHEN\nCOMPUTATIONAL CREATIVITY\nCASEY REAS\nJOHN MAEDA\nZACH LIEBERMAN", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "ASIAN COMPUTING PIONEERS\nAN WANG\nFUJIO MASUOKA\nMORRIS CHANG\nGLOBAL INNOVATION\nKAI-FU LEE\nJENSEN HUANG\nJACK MA", 
+        "category": "credits", 
+        "layout": "hierarchical"
+      },
+      {
+        "name": "ELECTRONIC MUSIC PIONEERS\nDADHNE ORAM\nDELIA DERBYSHIRE\nWENDY CARLOS\nDIGITAL SOUND\nKRAFTWERK\nBRIAN ENO\nHOLLY HERNDON", 
         "category": "credits", 
         "layout": "hierarchical"
       }

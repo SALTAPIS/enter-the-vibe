@@ -10,6 +10,7 @@ let appConfig = null;
 // -------------- CREDIT SEQUENCE DATA --------------
 // Will store all credits loaded from JSON
 let allCredits = [];
+let currentCreditIndex = 0; // Track current position in credits sequence
 
 // Global variables for state tracking
 let lastScreenChangeTime = Date.now();
@@ -232,7 +233,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 // Function to build and start the credits sequence
 function buildAndStartCreditsSequence(creditsData) {
-    console.log("Building chronological computing history sequence");
+    console.log("Building comprehensive chronological computing history sequence");
     
     // Connect the beat detection to the credits sequence advancement
     window.addEventListener('audiobeat', handleBeat);
@@ -243,213 +244,433 @@ function buildAndStartCreditsSequence(creditsData) {
     // 1. Start with the title screens
     if (creditsData.layouts && creditsData.layouts.title) {
         creditScreens.push(...creditsData.layouts.title);
+        // Add titles again for emphasis
+        creditScreens.push(...creditsData.layouts.title);
     }
     
-    // Helper function to get credits from a category
-    function getCreditsFromCategory(categoryName, count = null) {
-        const categoryData = creditsData[categoryName] || [];
-        return count ? categoryData.slice(0, count) : [...categoryData];
+    // Helper function to create individual name screens from a category
+    function createIndividualScreens(categoryData, count = null) {
+        if (!categoryData || !Array.isArray(categoryData)) return [];
+        const screensToUse = count ? categoryData.slice(0, count) : categoryData;
+        return screensToUse.map(credit => ({
+            name: credit.name,
+            description: credit.description,
+            category: credit.category,
+            layout: "single"
+        }));
     }
     
-    // Helper function to create single name displays
-    function addSingleNameDisplays(credits, maxCount = 8) {
-        const selected = shuffleArray([...credits]).slice(0, maxCount);
-        for (const credit of selected) {
-            creditScreens.push({
-                ...credit,
-                layout: "single"
+    // Helper function to create grid screens from a category
+    function createGridScreens(categoryData, maxPerGrid = 4) {
+        if (!categoryData || !Array.isArray(categoryData)) return [];
+        const gridScreens = [];
+        for (let i = 0; i < categoryData.length; i += maxPerGrid) {
+            const gridCredits = categoryData.slice(i, i + maxPerGrid);
+            gridScreens.push({
+                name: gridCredits.map(c => c.name).join(" • "),
+                category: "credits",
+                layout: "grid",
+                credits: gridCredits
             });
         }
+        return gridScreens;
     }
     
-    // Helper function to create grid layouts
-    function addGridLayouts(credits, groupSize = 4) {
-        for (let i = 0; i < credits.length; i += groupSize) {
-            const group = credits.slice(i, i + groupSize);
-            if (group.length >= 2) { // At least 2 for a meaningful grid
-                creditScreens.push({
-                    credits: group,
-                    layout: "grid"
-                });
-            }
+    // Helper function to create row screens from a category
+    function createRowScreens(categoryData, maxPerRow = 3) {
+        if (!categoryData || !Array.isArray(categoryData)) return [];
+        const rowScreens = [];
+        for (let i = 0; i < categoryData.length; i += maxPerRow) {
+            const rowCredits = categoryData.slice(i, i + maxPerRow);
+            rowScreens.push({
+                name: rowCredits.map(c => c.name).join(" • "),
+                category: "credits", 
+                layout: "row",
+                credits: rowCredits
+            });
         }
+        return rowScreens;
     }
     
-    // Helper function to create row layouts
-    function addRowLayouts(credits, groupSize = 3) {
-        for (let i = 0; i < credits.length; i += groupSize) {
-            const group = credits.slice(i, i + groupSize);
-            if (group.length >= 2) { // At least 2 for a meaningful row
-                creditScreens.push({
-                    credits: group,
-                    layout: "row"
-                });
-            }
-        }
+    // 2. EARLY COMPUTING ERA (1800s-1940s)
+    // Individual pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.early_computing, 8));
+    
+    // Logo screen - Early computing companies
+    if (creditsData.layouts?.company_logos_early?.[0]) {
+        creditScreens.push(creditsData.layouts.company_logos_early[0]);
     }
     
-    // 2. EARLY COMPUTING ERA (1800s-1950s)
-    console.log("Adding Early Computing Era");
-    const earlyComputing = getCreditsFromCategory('early_computing');
-    // Show key pioneers as single names
-    addSingleNameDisplays(earlyComputing.slice(0, 8)); // Babbage, Lovelace, Turing, etc.
-    // Show ENIAC programmers in grid
-    addGridLayouts(earlyComputing.slice(19, 25)); // The 6 ENIAC programmers
+    // More early computing pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.early_computing.slice(8), 6));
     
-    // Add hierarchical layout for early computing
+    // Hierarchical screen
     if (creditsData.layouts?.hierarchical?.[0]) {
         creditScreens.push(creditsData.layouts.hierarchical[0]);
     }
     
-    // 3. SEMICONDUCTORS ERA (1950s-1970s)
-    console.log("Adding Semiconductors Era");
-    const semiconductors = getCreditsFromCategory('semiconductors_era');
-    addSingleNameDisplays(semiconductors.slice(0, 6)); // Kilby, Noyce, Moore, etc.
-    addGridLayouts(semiconductors.slice(6));
+    // Grid of remaining early computing pioneers
+    creditScreens.push(...createGridScreens(creditsData.early_computing.slice(14)));
     
-    // Add company logos for semiconductor revolution
+    // Fullscreen logo - IBM
+    if (creditsData.layouts?.fullscreen_logos?.[0]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[0]);
+    }
+    
+    // 3. SEMICONDUCTOR ERA (1940s-1970s)
+    // Individual pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.semiconductors_era, 6));
+    
+    // Logo screens - Mainframe and Semiconductor
+    if (creditsData.layouts?.company_logos_early?.[1]) {
+        creditScreens.push(creditsData.layouts.company_logos_early[1]);
+    }
     if (creditsData.layouts?.company_logos_early?.[2]) {
-        creditScreens.push(creditsData.layouts.company_logos_early[2]); // Semiconductor Revolution
+        creditScreens.push(creditsData.layouts.company_logos_early[2]);
     }
     
-    // 4. PERSONAL COMPUTING ERA (1970s-1990s)
-    console.log("Adding Personal Computing Era");
-    const personalComputing = getCreditsFromCategory('personal_computing');
-    addSingleNameDisplays(personalComputing.slice(0, 8)); // Jobs, Wozniak, Gates, etc.
-    addRowLayouts(personalComputing.slice(8));
+    // More semiconductor pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.semiconductors_era.slice(6), 5));
     
-    // Add hierarchical layout for PC era
-    if (creditsData.layouts?.hierarchical?.[2]) {
-        creditScreens.push(creditsData.layouts.hierarchical[2]);
+    // Hierarchical screen
+    if (creditsData.layouts?.hierarchical?.[1]) {
+        creditScreens.push(creditsData.layouts.hierarchical[1]);
     }
     
-    // Add company logos for PC birth
-    if (creditsData.layouts?.company_logos_early?.[3]) {
-        creditScreens.push(creditsData.layouts.company_logos_early[3]); // Personal Computer Birth
+    // Fullscreen logo - Bell Labs
+    if (creditsData.layouts?.fullscreen_logos?.[1]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[1]);
     }
     
-    // 5. NETWORKING ERA (1960s-1990s)
-    console.log("Adding Networking Era");
-    const networking = getCreditsFromCategory('networking_era');
-    addSingleNameDisplays(networking.slice(0, 6)); // Licklider, Cerf, Berners-Lee, etc.
-    addGridLayouts(networking.slice(6));
+    // Grid of remaining semiconductor era
+    creditScreens.push(...createGridScreens(creditsData.semiconductors_era.slice(11)));
     
-    // Add hierarchical layout for internet foundations
-    if (creditsData.layouts?.hierarchical?.[3]) {
-        creditScreens.push(creditsData.layouts.hierarchical[3]);
-    }
+    // 4. AI PIONEERS (1950s-1980s)
+    // Individual AI pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.ai_pioneers, 8));
     
-    // 6. INTERNET ERA (1990s-2000s)
-    console.log("Adding Internet Era");
-    const internet = getCreditsFromCategory('internet_era');
-    addSingleNameDisplays(internet.slice(0, 6)); // Bezos, Page, Brin, etc.
-    addRowLayouts(internet.slice(6));
-    
-    // Add company logos for search and e-commerce
-    if (creditsData.layouts?.company_logos_internet?.[1]) {
-        creditScreens.push(creditsData.layouts.company_logos_internet[1]); // Search and E-commerce
-    }
-    
-    // 7. SOCIAL MEDIA ERA (2000s-2010s)
-    console.log("Adding Social Media Era");
-    const socialMedia = getCreditsFromCategory('social_media_era');
-    addSingleNameDisplays(socialMedia.slice(0, 6)); // Zuckerberg, Dorsey, etc.
-    addGridLayouts(socialMedia.slice(6));
-    
-    // Add hierarchical layout for social media
-    if (creditsData.layouts?.hierarchical?.[5]) {
-        creditScreens.push(creditsData.layouts.hierarchical[5]);
-    }
-    
-    // Add company logos for social media revolution
-    if (creditsData.layouts?.company_logos_internet?.[2]) {
-        creditScreens.push(creditsData.layouts.company_logos_internet[2]); // Social Media Revolution
-    }
-    
-    // 8. AI PIONEERS (1950s-present)
-    console.log("Adding AI Pioneers");
-    const aiPioneers = getCreditsFromCategory('ai_pioneers');
-    addSingleNameDisplays(aiPioneers.slice(0, 10)); // McCarthy, Hinton, LeCun, etc.
-    addGridLayouts(aiPioneers.slice(10));
-    
-    // Add hierarchical layout for AI revolution
+    // Hierarchical screen
     if (creditsData.layouts?.hierarchical?.[4]) {
         creditScreens.push(creditsData.layouts.hierarchical[4]);
     }
     
-    // Add company logos for AI revolution
+    // More AI pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.ai_pioneers.slice(8), 6));
+    
+    // Row screens for remaining AI pioneers
+    creditScreens.push(...createRowScreens(creditsData.ai_pioneers.slice(14)));
+    
+    // 5. NETWORKING ERA (1960s-1990s)
+    // Individual networking pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.networking_era, 6));
+    
+    // Logo screen - Internet foundations
+    if (creditsData.layouts?.company_logos_internet?.[0]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[0]);
+    }
+    
+    // Hierarchical screen
+    if (creditsData.layouts?.hierarchical?.[3]) {
+        creditScreens.push(creditsData.layouts.hierarchical[3]);
+    }
+    
+    // Fullscreen logo - CERN
+    if (creditsData.layouts?.fullscreen_logos?.[9]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[9]);
+    }
+    
+    // Grid of remaining networking pioneers
+    creditScreens.push(...createGridScreens(creditsData.networking_era.slice(6)));
+    
+    // 6. PERSONAL COMPUTING ERA (1970s-1990s)
+    // Individual PC pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.personal_computing, 8));
+    
+    // Logo screens - Personal computer birth
+    if (creditsData.layouts?.company_logos_early?.[3]) {
+        creditScreens.push(creditsData.layouts.company_logos_early[3]);
+    }
+    
+    // Hierarchical screen
+    if (creditsData.layouts?.hierarchical?.[2]) {
+        creditScreens.push(creditsData.layouts.hierarchical[2]);
+    }
+    
+    // Fullscreen logos - Apple and Microsoft
+    if (creditsData.layouts?.fullscreen_logos?.[2]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[2]);
+    }
+    if (creditsData.layouts?.fullscreen_logos?.[3]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[3]);
+    }
+    
+    // Programming language creators
+    if (creditsData.layouts?.hierarchical?.[6]) {
+        creditScreens.push(creditsData.layouts.hierarchical[6]);
+    }
+    
+    // More PC era pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.personal_computing.slice(8), 6));
+    
+    // Grid of remaining PC pioneers
+    creditScreens.push(...createGridScreens(creditsData.personal_computing.slice(14)));
+    
+    // Gaming and workstation eras
+    if (creditsData.layouts?.company_logos_early?.[4]) {
+        creditScreens.push(creditsData.layouts.company_logos_early[4]);
+    }
+    if (creditsData.layouts?.company_logos_early?.[5]) {
+        creditScreens.push(creditsData.layouts.company_logos_early[5]);
+    }
+    
+    // 7. INTERNET ERA (1990s-2000s)
+    // Individual internet pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.internet_era, 6));
+    
+    // Logo screens - Search and e-commerce
+    if (creditsData.layouts?.company_logos_internet?.[1]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[1]);
+    }
+    
+    // Fullscreen logo - Google
+    if (creditsData.layouts?.fullscreen_logos?.[4]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[4]);
+    }
+    
+    // More internet era pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.internet_era.slice(6)));
+    
+    // 8. SOCIAL MEDIA ERA (2000s-2010s)
+    // Individual social media pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.social_media_era, 6));
+    
+    // Logo screens - Social media and mobile
+    if (creditsData.layouts?.company_logos_internet?.[2]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[2]);
+    }
+    if (creditsData.layouts?.company_logos_internet?.[3]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[3]);
+    }
+    
+    // Hierarchical screen
+    if (creditsData.layouts?.hierarchical?.[5]) {
+        creditScreens.push(creditsData.layouts.hierarchical[5]);
+    }
+    
+    // More social media pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.social_media_era.slice(6)));
+    
+    // Streaming and messaging platforms
+    if (creditsData.layouts?.company_logos_internet?.[4]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[4]);
+    }
+    if (creditsData.layouts?.company_logos_internet?.[5]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[5]);
+    }
+    
+    // 9. GLOBAL PIONEERS (Worldwide Innovation)
+    // Individual global pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.global_pioneers, 8));
+    
+    // Bilingual screens - Japanese
+    if (creditsData.layouts?.bilingual?.[0]) {
+        creditScreens.push(creditsData.layouts.bilingual[0]);
+    }
+    if (creditsData.layouts?.bilingual?.[1]) {
+        creditScreens.push(creditsData.layouts.bilingual[1]);
+    }
+    
+    // Fullscreen logos - Intel, NVIDIA, TSMC
+    if (creditsData.layouts?.fullscreen_logos?.[5]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[5]);
+    }
+    if (creditsData.layouts?.fullscreen_logos?.[6]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[6]);
+    }
+    if (creditsData.layouts?.fullscreen_logos?.[11]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[11]);
+    }
+    
+    // Bilingual screens - Chinese  
+    if (creditsData.layouts?.bilingual?.[2]) {
+        creditScreens.push(creditsData.layouts.bilingual[2]);
+    }
+    
+    // Asian computing pioneers hierarchical
+    if (creditsData.layouts?.hierarchical?.[10]) {
+        creditScreens.push(creditsData.layouts.hierarchical[10]);
+    }
+    
+    // More global pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.global_pioneers.slice(8), 8));
+    
+    // Bilingual screens - Russian, Hindi, Arabic
+    if (creditsData.layouts?.bilingual?.[3]) {
+        creditScreens.push(creditsData.layouts.bilingual[3]);
+    }
+    if (creditsData.layouts?.bilingual?.[6]) {
+        creditScreens.push(creditsData.layouts.bilingual[6]);
+    }
+    if (creditsData.layouts?.bilingual?.[4]) {
+        creditScreens.push(creditsData.layouts.bilingual[4]);
+    }
+    if (creditsData.layouts?.bilingual?.[5]) {
+        creditScreens.push(creditsData.layouts.bilingual[5]);
+    }
+    
+    // Grid of remaining global pioneers
+    creditScreens.push(...createGridScreens(creditsData.global_pioneers.slice(16)));
+    
+    // 10. DIGITAL ARTISTS & CREATIVE TECHNOLOGISTS
+    // Individual digital artists
+    creditScreens.push(...createIndividualScreens(creditsData.digital_artists, 10));
+    
+    // Hierarchical screen
+    if (creditsData.layouts?.hierarchical?.[9]) {
+        creditScreens.push(creditsData.layouts.hierarchical[9]);
+    }
+    
+    // More digital artists
+    creditScreens.push(...createIndividualScreens(creditsData.digital_artists.slice(10), 8));
+    
+    // Grid of remaining digital artists
+    creditScreens.push(...createGridScreens(creditsData.digital_artists.slice(18)));
+    
+    // 11. ELECTRONIC MUSIC PIONEERS
+    // Individual electronic music pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.electronic_music, 6));
+    
+    // Hierarchical screen
+    if (creditsData.layouts?.hierarchical?.[11]) {
+        creditScreens.push(creditsData.layouts.hierarchical[11]);
+    }
+    
+    // More electronic music pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.electronic_music.slice(6), 6));
+    
+    // Grid of remaining electronic music pioneers
+    creditScreens.push(...createGridScreens(creditsData.electronic_music.slice(12)));
+    
+    // 12. CYBERPUNK WRITERS & VISIONARIES
+    // Individual cyberpunk writers
+    creditScreens.push(...createIndividualScreens(creditsData.cyberpunk_writers, 8));
+    
+    // Grid of more writers
+    creditScreens.push(...createGridScreens(creditsData.cyberpunk_writers.slice(8)));
+    
+    // 13. HACKERS & SECURITY PIONEERS
+    // Individual hackers
+    creditScreens.push(...createIndividualScreens(creditsData.hackers, 6));
+    
+    // Hierarchical screen
+    if (creditsData.layouts?.hierarchical?.[7]) {
+        creditScreens.push(creditsData.layouts.hierarchical[7]);
+    }
+    
+    // More hackers
+    creditScreens.push(...createIndividualScreens(creditsData.hackers.slice(6)));
+    
+    // 14. MODERN TECH ERA (2010s-2020s)
+    // Individual modern tech leaders
+    creditScreens.push(...createIndividualScreens(creditsData.modern_tech_leaders, 6));
+    
+    // Logo screens - Cloud, developer platforms, programming languages
+    if (creditsData.layouts?.company_logos_modern?.[0]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[0]);
+    }
+    if (creditsData.layouts?.company_logos_modern?.[1]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[1]);
+    }
+    if (creditsData.layouts?.company_logos_modern?.[2]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[2]);
+    }
+    
+    // More modern tech leaders
+    creditScreens.push(...createIndividualScreens(creditsData.modern_tech_leaders.slice(6)));
+    
+    // Design tools and fintech
+    if (creditsData.layouts?.company_logos_modern?.[5]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[5]);
+    }
+    if (creditsData.layouts?.company_logos_modern?.[7]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[7]);
+    }
+    
+    // Ride sharing  
+    if (creditsData.layouts?.company_logos_modern?.[6]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[6]);
+    }
+    
+    // Fullscreen logo - Tesla
+    if (creditsData.layouts?.fullscreen_logos?.[10]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[10]);
+    }
+    
+    // 15. BLOCKCHAIN ERA
+    // Individual blockchain pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.blockchain_era, 6));
+    
+    // Cryptocurrency logos
+    if (creditsData.layouts?.company_logos_modern?.[4]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[4]);
+    }
+    
+    // More blockchain pioneers
+    creditScreens.push(...createIndividualScreens(creditsData.blockchain_era.slice(6)));
+    
+    // 16. AI REVOLUTION (2020s+)
+    // Logo screen - AI Revolution
     if (creditsData.layouts?.company_logos_modern?.[3]) {
-        creditScreens.push(creditsData.layouts.company_logos_modern[3]); // AI Revolution
+        creditScreens.push(creditsData.layouts.company_logos_modern[3]);
     }
     
-    // 9. DIGITAL ARTISTS (1960s-present)
-    console.log("Adding Digital Artists");
-    const digitalArtists = getCreditsFromCategory('digital_artists');
-    addSingleNameDisplays(digitalArtists.slice(0, 8)); // Laposky, Molnár, etc.
-    addRowLayouts(digitalArtists.slice(8, 20));
-    addGridLayouts(digitalArtists.slice(20));
-    
-    // 10. CYBERPUNK WRITERS (1940s-present)
-    console.log("Adding Cyberpunk Writers");
-    const writers = getCreditsFromCategory('cyberpunk_writers');
-    addSingleNameDisplays(writers.slice(0, 6)); // Gibson, Sterling, etc.
-    addRowLayouts(writers.slice(6));
-    
-    // 11. ELECTRONIC MUSIC PIONEERS (1950s-present)
-    console.log("Adding Electronic Music Pioneers");
-    const electronic = getCreditsFromCategory('electronic_music');
-    addSingleNameDisplays(electronic.slice(0, 6)); // Kraftwerk, Eno, etc.
-    addGridLayouts(electronic.slice(6));
-    
-    // 12. HACKERS AND SECURITY (1960s-present)
-    console.log("Adding Hackers and Security Pioneers");
-    const hackers = getCreditsFromCategory('hackers');
-    addSingleNameDisplays(hackers.slice(0, 5)); // Draper, Mitnick, etc.
-    addRowLayouts(hackers.slice(5));
-    
-    // 13. GLOBAL PIONEERS (1950s-present)
-    console.log("Adding Global Computing Pioneers");
-    const global = getCreditsFromCategory('global_pioneers');
-    addSingleNameDisplays(global.slice(0, 8)); // An Wang, Huang, etc.
-    addGridLayouts(global.slice(8));
-    
-    // 14. BLOCKCHAIN ERA (2000s-present)
-    console.log("Adding Blockchain Era");
-    const blockchain = getCreditsFromCategory('blockchain_era');
-    addSingleNameDisplays(blockchain); // All blockchain pioneers as single names
-    
-    // 15. Add bilingual layouts for international perspective
-    if (creditsData.layouts?.bilingual) {
-        creditScreens.push(...creditsData.layouts.bilingual);
+    // Fullscreen logos - OpenAI and Anthropic
+    if (creditsData.layouts?.fullscreen_logos?.[7]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[7]);
+    }
+    if (creditsData.layouts?.fullscreen_logos?.[8]) {
+        creditScreens.push(creditsData.layouts.fullscreen_logos[8]);
     }
     
-    // 16. Add some fullscreen company logos at key moments
-    if (creditsData.layouts?.fullscreen_logos) {
-        const keyLogos = [
-            creditsData.layouts.fullscreen_logos[0], // IBM
-            creditsData.layouts.fullscreen_logos[2], // Apple
-            creditsData.layouts.fullscreen_logos[4], // Google
-            creditsData.layouts.fullscreen_logos[7], // OpenAI
-            creditsData.layouts.fullscreen_logos[8], // Anthropic
-        ];
-        
-        // Insert these at strategic points
-        creditScreens.splice(20, 0, keyLogos[0]); // IBM after early computing
-        creditScreens.splice(40, 0, keyLogos[1]); // Apple after PC era
-        creditScreens.splice(60, 0, keyLogos[2]); // Google after internet era
-        creditScreens.splice(-10, 0, keyLogos[3]); // OpenAI near end
-        creditScreens.splice(-5, 0, keyLogos[4]); // Anthropic near end
+    // More AI pioneers (modern era)
+    creditScreens.push(...createIndividualScreens(creditsData.ai_pioneers.slice(12), 8));
+    
+    // 17. INTERNATIONAL PERSPECTIVES
+    // Bilingual screens - Korean, Portuguese, African
+    if (creditsData.layouts?.bilingual?.[7]) {
+        creditScreens.push(creditsData.layouts.bilingual[7]);
+    }
+    if (creditsData.layouts?.bilingual?.[8]) {
+        creditScreens.push(creditsData.layouts.bilingual[8]);
+    }
+    if (creditsData.layouts?.bilingual?.[9]) {
+        creditScreens.push(creditsData.layouts.bilingual[9]);
     }
     
-    // 17. FINALE - Special entry
-    const special = getCreditsFromCategory('special');
-    if (special.length > 0) {
-        addSingleNameDisplays(special);
+    // Game developers hierarchical
+    if (creditsData.layouts?.hierarchical?.[8]) {
+        creditScreens.push(creditsData.layouts.hierarchical[8]);
     }
     
-    console.log(`Built chronological sequence with ${creditScreens.length} screens`);
+    // 18. SPECIAL MENTIONS
+    // Individual special credits
+    creditScreens.push(...createIndividualScreens(creditsData.special));
     
-    // Start playing the sequence
+    // Store the sequence for global access
+    allCredits = creditScreens;
+    
+    console.log(`Built comprehensive sequence with ${creditScreens.length} screens`);
+    console.log("Sequence includes:", {
+        individual_screens: creditScreens.filter(s => s.layout === 'single').length,
+        grid_screens: creditScreens.filter(s => s.layout === 'grid').length,
+        row_screens: creditScreens.filter(s => s.layout === 'row').length,
+        logo_screens: creditScreens.filter(s => s.category === 'logos').length,
+        fullscreen_logos: creditScreens.filter(s => s.layout === 'fullscreen').length,
+        bilingual_screens: creditScreens.filter(s => s.layout === 'bilingual').length,
+        hierarchical_screens: creditScreens.filter(s => s.layout === 'hierarchical').length
+    });
+    
+    // Start playing the credits sequence
     playCreditsSequence(creditScreens);
 }
 
@@ -493,18 +714,18 @@ function playCreditsSequence(screens) {
             // Special layouts
             showSpecialLayoutCredit(screenTimeline, credit);
         }
+        else if (credit.category === "logos" || credit.logos) {
+            // Logo grid layout - check for category="logos" OR presence of logos property
+            showLogoGrid(screenTimeline, credit);
+        }
+        else if (credit.category === "logo" && credit.layout === "fullscreen") {
+            // Fullscreen logo layout
+            showFullscreenLogo(screenTimeline, credit);
+        }
         else if (credit.layout === "grid" || credit.layout === "row") {
             // Group of credits - show them together
             // The layout property determines if we use grid or row layout
             showGridLayout(screenTimeline, credit.credits, credit.layout);
-        }
-        else if (credit.layout === "logo_grid" || (credit.category === "logos" && credit.layout === "grid")) {
-            // Logo grid layout
-            showLogoGrid(screenTimeline, credit);
-        }
-        else if (credit.layout === "fullscreen_logo" || (credit.category === "logo" && credit.layout === "fullscreen")) {
-            // Fullscreen logo layout
-            showFullscreenLogo(screenTimeline, credit);
         }
         else if (credit.credits) {
             // Legacy packery layout - use grid layout
