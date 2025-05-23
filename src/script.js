@@ -652,6 +652,15 @@ function splitNameIntoLines(name) {
     return `${firstName}\n${lastName}`;
 }
 
+// Function to limit description to maximum 2 words
+function limitDescriptionWords(description) {
+    if (!description) return '';
+    
+    // Split by spaces and take only first 2 words
+    const words = description.split(' ');
+    return words.slice(0, 2).join(' ');
+}
+
 // -------------- FONT FAMILIES --------------
 const fontClasses = [
     'font-boska',
@@ -1550,21 +1559,21 @@ function resetPeakDetection() {
     
     // If there's a description, add it
     if (credit.description) {
-            const descEl = document.createElement('div');
-            descEl.classList.add('credit-description');
-            descEl.textContent = credit.description;
-        
-        // Use description font size from appConfig if available
-        if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.single) {
-            descEl.style.fontSize = appConfig.display.fonts.layouts.single.description;
-        } else {
-            // Fallback to hardcoded value
-            descEl.style.fontSize = 'clamp(1.2rem, 3vw, 2.5rem)';
-        }
-        
-        // Add description to wrapper
-        creditWrapper.appendChild(descEl);
+        const descEl = document.createElement('div');
+        descEl.classList.add('credit-description');
+        descEl.textContent = limitDescriptionWords(credit.description);
+    
+    // Use description font size from appConfig if available
+    if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.single) {
+        descEl.style.fontSize = appConfig.display.fonts.layouts.single.description;
+    } else {
+        // Fallback to hardcoded value
+        descEl.style.fontSize = 'clamp(1.2rem, 3vw, 2.5rem)';
     }
+    
+    // Add description to wrapper
+    creditWrapper.appendChild(descEl);
+}
     
     // Add wrapper to container
     singleCreditContainer.appendChild(creditWrapper);
@@ -1979,7 +1988,7 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
         if (credit.description) {
             const descEl = document.createElement('div');
             descEl.classList.add('credit-description');
-            descEl.textContent = credit.description;
+            descEl.textContent = limitDescriptionWords(credit.description);
             
             // Use description font size from appConfig if available
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {

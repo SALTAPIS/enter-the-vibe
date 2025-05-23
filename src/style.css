@@ -24,6 +24,13 @@
     --grid-color: rgba(0, 255, 255, 0.3);
     --horizon-color: #ff00ff;
     --sun-color: #ff6600;
+    
+    /* App theme colors from config */
+    --theme-blue: #4495F1;
+    --theme-gold: #D1A032;
+    --theme-green: #33FF33;
+    --theme-red: #FF0000;
+    --theme-white: #FFFFFF;
 }
 
 body {
@@ -82,7 +89,7 @@ body {
 
 .credit {
     font-family: 'Anton', sans-serif;
-    color: white;
+    color: var(--theme-white);
     text-align: center;
     padding: 10px;
     position: absolute;
@@ -99,6 +106,7 @@ body {
     width: 100%;
     white-space: normal;
     text-align: center;
+    color: var(--theme-blue);
 }
 
 .credit.hierarchical,
@@ -112,6 +120,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    color: var(--theme-white);
 }
 
 .credit.hierarchical > div,
@@ -119,12 +128,13 @@ body {
     width: 100%;
 }
 
+/* Remove old color classes - use category-based colors instead */
 .credit.white {
-    color: white;
+    color: var(--theme-white);
 }
 
 .credit.colored {
-    /* Color is set inline via JavaScript */
+    /* Color is set inline via JavaScript based on category */
 }
 
 .credit.single {
@@ -150,28 +160,37 @@ body {
     margin-bottom: 5px;
 }
 
+/* Description text - ALWAYS WHITE and subtle */
 .credit-description {
     font-family: 'OCR A', 'Inter', sans-serif;
     font-weight: bold;
     font-size: clamp(1.2rem, 3vw, 2.5rem);
-    opacity: 0.9;
+    opacity: 0.8;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-top: 10px;
     position: relative;
     text-align: center;
     max-width: 100%;
-    color: #dddddd;
+    color: var(--theme-white) !important;
 }
 
-/* Description below packery names */
+.credit.grid-item .credit-description,
+.credit.row-item .credit-description {
+    font-size: clamp(0.8rem, 2vw, 1.5rem);
+    opacity: 0.7;
+    color: var(--theme-white) !important;
+}
+
+/* Packery description positioning */
 .packery-description {
     position: absolute;
     font-size: 1.2rem;
     text-align: center;
-    color: #DDDDDD;
+    color: var(--theme-white) !important;
     width: 100%;
     max-width: 100%;
+    opacity: 0.8;
 }
 
 /* Display Font Classes */
@@ -475,7 +494,7 @@ body {
     font-family: 'Anton', sans-serif;
     font-size: clamp(3rem, 8vw, 7rem);
     margin: 0 5px;
-    color: white;
+    color: var(--theme-white);
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
     position: relative;
     display: inline-block;
@@ -531,7 +550,7 @@ body {
     font-size: clamp(3rem, 15vw, 10rem);
     font-family: 'Anton', sans-serif;
     text-shadow: 0 0 20px var(--neon-pink);
-    color: white;
+    color: var(--theme-white);
     letter-spacing: 5px;
     animation: flicker 2s infinite alternate;
 }
@@ -552,7 +571,7 @@ body {
 
 #start-button:hover {
     background-color: var(--neon-green);
-    color: black;
+    color: var(--dark-bg);
     transform: scale(1.05);
 }
 
@@ -587,12 +606,12 @@ body {
     right: 20px;
     width: 300px;
     background-color: rgba(0, 0, 0, 0.85);
-    color: white;
+    color: var(--theme-white);
     padding: 15px;
     z-index: 1000;
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 20px rgba(0, 0, 255, 0.3);
+    box-shadow: 0 0 20px rgba(68, 149, 241, 0.3);
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     display: block; /* Show by default */
@@ -645,7 +664,7 @@ body {
     width: 100%;
     padding: 6px 10px;
     background-color: rgba(0, 0, 0, 0.5);
-    color: white;
+    color: var(--theme-white);
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 4px;
     font-family: 'Inter', sans-serif;
@@ -665,7 +684,7 @@ body {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
     background-color: rgba(0, 0, 0, 0.7);
-    color: white;
+    color: var(--theme-white);
     padding: 10px;
     z-index: 1000;
     border-radius: 4px;
@@ -692,12 +711,12 @@ body {
 }
 
 .action-button {
-    background-color: rgba(0, 100, 255, 0.4) !important;
-    border: 1px solid rgba(0, 150, 255, 0.6) !important;
+    background-color: rgba(68, 149, 241, 0.4) !important;
+    border: 1px solid rgba(68, 149, 241, 0.6) !important;
 }
 
 .action-button:hover {
-    background-color: rgba(0, 100, 255, 0.6) !important;
+    background-color: rgba(68, 149, 241, 0.6) !important;
 }
 
 /* Add styles for the grid and row layouts */
@@ -779,16 +798,6 @@ body {
     line-height: 1.05;
 }
 
-/* Update packery description position */
-.packery-description {
-    position: absolute;
-    font-size: 1.2rem;
-    text-align: center;
-    color: #DDDDDD;
-    width: 100%;
-    max-width: 100%;
-}
-
 /* Title layout for large title screens */
 .credit.title {
     font-size: clamp(10rem, 20vw, 20rem);
@@ -811,6 +820,7 @@ body {
     align-items: center;
     background-color: rgba(0, 0, 0, 0.8);
     z-index: 1000;
+    color: var(--theme-white);
 }
 
 .end-scene button {
@@ -826,7 +836,7 @@ body {
 
 .end-scene button:hover {
     background-color: var(--neon-green);
-    color: black;
+    color: var(--dark-bg);
     box-shadow: 0 0 20px rgba(51, 255, 51, 0.7);
 }
 
@@ -1046,4 +1056,47 @@ input:checked + .slider:before {
         width: 18px;
         height: 18px;
     }
+}
+
+/* -------------- CONSOLIDATED CREDIT STYLING -------------- */
+
+/* ALL NAMES, COMPANIES, AND INSTITUTIONS USE WHITE */
+.name-first,
+.name-last,
+.credit.single,
+.credit.grid-item,
+.credit.row-item,
+.credit.firstname-lastname,
+.credit.company,
+.credit.ai_company,
+.credit.non_western,
+.credit.tech,
+.credit.artist,
+.credit.writer,
+.credit.hacker,
+.credit.creative {
+    color: var(--theme-white);
+}
+
+/* ONLY CATEGORY HEADINGS AND SPECIAL ELEMENTS USE COLORS */
+.credit.title {
+    color: var(--theme-blue);
+}
+
+.credit.special {
+    color: var(--neon-pink);
+}
+
+/* Category headings within hierarchical layouts */
+.credit.hierarchical .category-heading {
+    color: var(--theme-blue);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Bilingual language headings */
+.credit.bilingual .language-heading {
+    color: var(--theme-gold);
+    font-weight: bold;
+    margin-bottom: 8px;
 } 
