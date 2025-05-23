@@ -77,11 +77,7 @@ async function loadCredits() {
             ...(creditsData.electronic_music || []),
             ...(creditsData.hackers || []),
             ...(creditsData.global_pioneers || []),
-            ...(creditsData.modern_tech_leaders || []),
-            ...(creditsData.companies || []),
-            ...(creditsData.ai_companies || []),
-            ...(creditsData.ai_ceos || []),
-            ...(creditsData.non_western || []),
+            ...(creditsData.blockchain_era || []),
             ...(creditsData.special || [])
         ];
 
@@ -290,11 +286,6 @@ function buildAndStartCreditsSequence(creditsData) {
         creditScreens.push(creditsData.layouts.name_grids[0]); // Early computing grid
     }
     
-    // Add first bilingual screen early
-    if (creditsData.layouts.bilingual && creditsData.layouts.bilingual[0]) {
-        creditScreens.push(creditsData.layouts.bilingual[0]); // Japanese screen
-    }
-    
     // Mix early computing with featured pioneers
     const earlyMix = addMixedScreens(['early_computing', 'featured'], 8);
     creditScreens.push(...earlyMix);
@@ -327,13 +318,8 @@ function buildAndStartCreditsSequence(creditsData) {
         creditScreens.push(creditsData.layouts.bilingual[0]); // Japanese screen
     }
     
-    // Add second bilingual screen
-    if (creditsData.layouts.bilingual && creditsData.layouts.bilingual[1]) {
-        creditScreens.push(creditsData.layouts.bilingual[1]); // Chinese screen
-    }
-    
     // 4. AI PIONEERS & EARLY RESEARCH (1950s-1980s)
-    creditScreens.push({ name: "ARTIFICIAL INTELLIGENCE PIONEERS", category: "era_title", layout: "single", color: "green" });
+    creditScreens.push({ name: "AI PIONEERS", category: "era_title", layout: "single", color: "green" });
     creditScreens.push(creditsData.layouts.hierarchical[4]); // AI revolution hierarchical
     
     // Add AI name grid
@@ -474,15 +460,13 @@ function buildAndStartCreditsSequence(creditsData) {
     // Debug: Check what AI companies data we have
     console.log("AI Companies data:", creditsData.ai_companies);
     console.log("AI Companies length:", creditsData.ai_companies ? creditsData.ai_companies.length : 0);
-    console.log("AI CEOs data:", creditsData.ai_ceos);
-    console.log("AI CEOs length:", creditsData.ai_ceos ? creditsData.ai_ceos.length : 0);
     
-    // Mix all AI-related content including modern companies and CEOs
-    const aiRevolutionMix = addMixedScreens(['ai_pioneers', 'ai_companies', 'ai_ceos', 'featured'], 30);
+    // Mix all AI-related content including modern companies
+    const aiRevolutionMix = addMixedScreens(['ai_pioneers', 'ai_companies', 'featured'], 25);
     console.log("AI Revolution mix length:", aiRevolutionMix.length);
     console.log("AI Revolution mix sample:", aiRevolutionMix.slice(0, 5));
     
-    creditScreens.push(...aiRevolutionMix.slice(0, 45));
+    creditScreens.push(...aiRevolutionMix.slice(0, 35));
     
     // Add AI era logos (modern AI companies)
     const aiLogos = getLogosForEra('ai');
@@ -546,9 +530,6 @@ function playCreditsSequence() {
     // Keep track of current screen index
     let currentScreenIndex = 0;
     
-    // Add a fallback timer to ensure screens advance even if beat detection fails
-    let fallbackTimer = null;
-    
     // Function to show the next screen
     showNextScreen = () => {
         try {
@@ -557,12 +538,6 @@ function playCreditsSequence() {
             
             // Set the transition flag
             isTransitionInProgress = true;
-            
-            // Clear any existing fallback timer
-            if (fallbackTimer) {
-                clearTimeout(fallbackTimer);
-                fallbackTimer = null;
-            }
             
             // Clear containers immediately
             creditsContainer.innerHTML = '';
@@ -630,14 +605,6 @@ function playCreditsSequence() {
             lastScreenChangeTime = Date.now();
             
             console.log(`Successfully transitioned to screen ${currentScreenIndex - 1}, next will be ${currentScreenIndex}`);
-            
-            // Set up a fallback timer to advance screen if beat detection fails
-            fallbackTimer = setTimeout(() => {
-                console.log("⚠️ FALLBACK TIMER: No beat detected, forcing screen advance");
-                if (!isTransitionInProgress) {
-                    showNextScreen();
-                }
-            }, Math.max(minScreenDisplayTime * 2, 2000)); // Fallback after 2x minimum time or 2 seconds
             
         } catch (error) {
             console.error("Error in showNextScreen:", error);
@@ -797,10 +764,6 @@ let autoBeatInterval = 500; // Interval for automatic beats in ms
 let autoBeatTimer = null; // Timer reference for automatic beats
 let displayTime = 500; // How long to display beat visuals in ms
 
-// Fallback beat system variables (to be removed)
-let useFallbackBeats = false; // Flag for fallback beats
-let fallbackBeatInterval = 300; // Interval for fallback beats in ms
-let fallbackBeatTimer = null; // Timer reference for fallback beats
 // Credits settings
 let credits = []; // Loaded from JSON
 
@@ -812,32 +775,7 @@ let displayTimeSlider, displayTimeValue; // Control elements for display time
 let toggleControlsBtn, beatControls;
 let thresholdSlider, thresholdValue, noiseFloorSlider, noiseFloorValue;
 let freqStartSlider, freqStartValue, freqEndSlider, freqEndValue;
-let fallbackToggle, fallbackInterval, intervalValue, freqRangeSelect;
-
-// Function to start fallback beat timer
-function startFallbackBeatTimer() {
-    stopFallbackBeatTimer(); // First stop any existing timer
-    
-    if (useFallbackBeats && !fallbackBeatTimer) {
-        // Removed console log to reduce spam
-        fallbackBeatTimer = setInterval(() => {
-            // Only trigger fallback beats if audio is actually playing
-            if (useFallbackBeats && isAudioActuallyPlaying) {
-                // Force a peak detection - removed console log to reduce spam
-                detectPeak(true);
-            }
-        }, fallbackBeatInterval);
-    }
-}
-
-// Function to stop fallback beat timer
-function stopFallbackBeatTimer() {
-    if (fallbackBeatTimer) {
-        // Removed console log to reduce spam
-        clearInterval(fallbackBeatTimer);
-        fallbackBeatTimer = null;
-    }
-}
+let freqRangeSelect;
 
 // Setup audio visualization
 function setupAudioVisualization(audioElement) {
@@ -990,14 +928,6 @@ function initBeatControls() {
             freqRangeEnd = beatConfig.frequencies.custom.end.default;
         }
         
-        if (useFallbackBeats === undefined && beatConfig.fallbackBeats) {
-            useFallbackBeats = beatConfig.fallbackBeats.enabled;
-        }
-        
-        if (fallbackBeatInterval === undefined && beatConfig.fallbackBeats) {
-            fallbackBeatInterval = beatConfig.fallbackBeats.interval.default;
-        }
-        
         if (minScreenDisplayTime === undefined && appConfig.display && appConfig.display.timing) {
             minScreenDisplayTime = appConfig.display.timing.minDisplayTime;
         }
@@ -1067,10 +997,6 @@ function updateUIFromSettings() {
     freqEndSlider.value = freqRangeEnd;
     freqEndValue.textContent = freqRangeEnd.toString();
     
-    fallbackToggle.checked = useFallbackBeats;
-    fallbackInterval.value = fallbackBeatInterval;
-    intervalValue.textContent = fallbackBeatInterval.toString();
-    
     // Update display time slider
     if (displayTimeSlider) {
         displayTimeSlider.value = minScreenDisplayTime;
@@ -1099,8 +1025,6 @@ function resetToDefaultSettings(saveAfterReset = true) {
     noiseFloor = 70; // Use noiseFloor consistently
     freqRangeStart = 10;
     freqRangeEnd = 60;
-    useFallbackBeats = false;
-    fallbackBeatInterval = 300;
     minScreenDisplayTime = 300; // Reset display time to 0.3 seconds
     
     resetPeakDetection();
@@ -3027,19 +2951,6 @@ function initHeroPanel() {
             const cutoff = typeof peakCutoff === 'number' ? peakCutoff : 0;
             const beatsDetected = peakCount;
             
-            // Set auto beats when toggled
-            const setAutoBeats = (value) => {
-                useFallbackBeats = value;
-                
-                if (useFallbackBeats) {
-                    startFallbackBeatTimer();
-                } else {
-                    stopFallbackBeatTimer();
-                }
-                saveSettings();
-                needsUpdate = true;
-            };
-            
             const props = {
                 peakThreshold,
                 setPeakThreshold: (value) => {
@@ -3074,17 +2985,6 @@ function initHeroPanel() {
                         freqRangeEnd = freqRangeStart + 1;
                     }
                     resetPeakDetection();
-                    saveSettings();
-                    needsUpdate = true;
-                },
-                autoBeats: useFallbackBeats,
-                setAutoBeats,
-                beatInterval: fallbackBeatInterval,
-                setBeatInterval: (value) => {
-                    fallbackBeatInterval = value;
-                    if (useFallbackBeats) {
-                        startFallbackBeatTimer(); // Restart with new interval
-                    }
                     saveSettings();
                     needsUpdate = true;
                 },
