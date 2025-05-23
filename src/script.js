@@ -1054,8 +1054,6 @@ function restartAnimation() {
         transitionSound.pause();
     }
     
-    stopFallbackBeatTimer();
-    
     // Remove any attached event listeners for beat detection
     window.removeEventListener('audiobeat', handleBeat);
     
@@ -1068,110 +1066,161 @@ function restartAnimation() {
         endScene.remove();
     }
     
+    // Clear credits containers
+    const creditsContainer = document.querySelector('.credits-container');
+    const singleCreditContainer = document.querySelector('.single-credit-container');
+    if (creditsContainer) creditsContainer.innerHTML = '';
+    if (singleCreditContainer) singleCreditContainer.innerHTML = '';
+    
     // Reset audio context and disconnect all nodes
     if (audioContext) {
-        // Close the audio context to clean up resources
-        audioContext.close().then(() => {
-            console.log("Audio context closed");
-            audioContext = null;
-            analyser = null;
-            audioSource = null;
-        }).catch(err => {
-            console.error("Error closing audio context:", err);
-        });
-    }
-    
-    // Hide all phases
-    document.querySelectorAll('.phase').forEach(phase => {
-        phase.classList.add('hidden');
-    });
-    
-    // Show phase 1 immediately rather than showing the start screen
-    const phase1 = document.getElementById('phase1');
-    phase1.classList.remove('hidden');
-    gsap.set(phase1, { opacity: 1 });
-    
-    // Reset beat counter and detection
-    peakCount = 0;
-    resetPeakDetection();
-    
-    // Replace the audio elements with fresh clones to prevent connection issues
-    const originalMainSound = document.getElementById('main-sound');
-    const originalGlitchSound = document.getElementById('glitch-sound');
-    const originalTransitionSound = document.getElementById('transition-sound');
-    
-    if (originalMainSound) {
-        // Create a clone of the main sound element
-        const clone = originalMainSound.cloneNode(true);
-        // Replace the original with the clone
-        originalMainSound.parentNode.replaceChild(clone, originalMainSound);
-        // Update our reference
-        mainSound = clone;
-    }
-    
-    if (originalGlitchSound) {
-        // Create a clone of the glitch sound element
-        const clone = originalGlitchSound.cloneNode(true);
-        // Replace the original with the clone
-        originalGlitchSound.parentNode.replaceChild(clone, originalGlitchSound);
-        // Update our reference
-        glitchSound = clone;
-    }
-    
-    if (originalTransitionSound) {
-        // Create a clone of the transition sound element
-        const clone = originalTransitionSound.cloneNode(true);
-        // Replace the original with the clone
-        originalTransitionSound.parentNode.replaceChild(clone, originalTransitionSound);
-        // Update our reference
-        transitionSound = clone;
-    }
-    
-    // Create a new audio context
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Initialize audio and visualization
-    if (mainSound) {
-        // Make sure audio is ready to play
-        mainSound.volume = 1.0;
-        mainSound.currentTime = 0;
-        
-        // Add event listener for when audio ends
-        mainSound.addEventListener('ended', showEndScene);
-        
-        // Play the sound
-        mainSound.play().then(() => {
-            console.log("Main sound started playing");
-            setupAudioVisualization(mainSound);
-            
-            // Update bottom controls play state
-            if (typeof window.updateBottomControlsPlayState === 'function') {
-                window.updateBottomControlsPlayState(true);
-            }
-        }).catch(err => {
-            console.error("Error playing main sound:", err);
-        });
-        
-        // Add audio event listeners for bottom controls
-        mainSound.addEventListener('pause', () => {
-            if (typeof window.updateBottomControlsPlayState === 'function') {
-                window.updateBottomControlsPlayState(false);
-            }
-        });
-        
-        mainSound.addEventListener('ended', () => {
-            if (typeof window.updateBottomControlsPlayState === 'function') {
-                window.updateBottomControlsPlayState(false);
-            }
-        });
+        try {
+            // Close the audio context to clean up resources
+            audioContext.close().then(() => {
+                console.log("Audio context closed");
+                // Create new audio context after closing the old one
+                initializeAudioAndRestart();
+            }).catch(err => {
+                console.error("Error closing audio context:", err);
+                // If closing fails, try to restart anyway
+                initializeAudioAndRestart();
+            });
+        } catch (err) {
+            console.error("Error with audio context:", err);
+            // If there's an error, try to restart anyway
+            initializeAudioAndRestart();
+        }
     } else {
-        console.error("Main sound element not found!");
+        // No audio context to close, just restart
+        initializeAudioAndRestart();
     }
     
-    // Start the experience directly
-    startPhase1();
-    
-    console.log("Animation restarted and immediately started");
+    function initializeAudioAndRestart() {
+        // Reset global audio variables
+        audioContext = null;
+        analyser = null;
+        audioSource = null;
+        frequencyData = null;
+        
+        // Hide all phases
+        document.querySelectorAll('.phase').forEach(phase => {
+            phase.classList.add('hidden');
+        });
+        
+        // Show phase 1 immediately
+        const phase1 = document.getElementById('phase1');
+        if (phase1) {
+            phase1.classList.remove('hidden');
+            gsap.set(phase1, { opacity: 1 });
+        }
+        
+        // Reset beat counter and detection
+        peakCount = 0;
+        currentCreditIndex = 0; // Reset credits index
+        lastScreenChangeTime = Date.now();
+        isTransitionInProgress = false;
+        resetPeakDetection();
+        
+        // Replace the audio elements with fresh clones to prevent connection issues
+        const originalMainSound = document.getElementById('main-sound');
+        const originalGlitchSound = document.getElementById('glitch-sound');
+        const originalTransitionSound = document.getElementById('transition-sound');
+        
+        if (originalMainSound) {
+            try {
+                // Create a clone of the main sound element
+                const clone = originalMainSound.cloneNode(true);
+                // Replace the original with the clone
+                originalMainSound.parentNode.replaceChild(clone, originalMainSound);
+                // Update our reference
+                mainSound = clone;
+            } catch (err) {
+                console.error("Error cloning main sound:", err);
+                mainSound = originalMainSound; // Fallback to original
+            }
+        }
+        
+        if (originalGlitchSound) {
+            try {
+                // Create a clone of the glitch sound element
+                const clone = originalGlitchSound.cloneNode(true);
+                // Replace the original with the clone
+                originalGlitchSound.parentNode.replaceChild(clone, originalGlitchSound);
+                // Update our reference
+                glitchSound = clone;
+            } catch (err) {
+                console.error("Error cloning glitch sound:", err);
+                glitchSound = originalGlitchSound; // Fallback to original
+            }
+        }
+        
+        if (originalTransitionSound) {
+            try {
+                // Create a clone of the transition sound element
+                const clone = originalTransitionSound.cloneNode(true);
+                // Replace the original with the clone
+                originalTransitionSound.parentNode.replaceChild(clone, originalTransitionSound);
+                // Update our reference
+                transitionSound = clone;
+            } catch (err) {
+                console.error("Error cloning transition sound:", err);
+                transitionSound = originalTransitionSound; // Fallback to original
+            }
+        }
+        
+        // Create a new audio context
+        try {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            console.log("New audio context created");
+        } catch (err) {
+            console.error("Error creating new audio context:", err);
+        }
+        
+        // Initialize audio and visualization
+        if (mainSound) {
+            // Make sure audio is ready to play
+            mainSound.volume = 1.0;
+            mainSound.currentTime = 0;
+            
+            // Add event listener for when audio ends
+            mainSound.addEventListener('ended', showEndScene);
+            
+            // Play the sound
+            mainSound.play().then(() => {
+                console.log("Main sound started playing after restart");
+                if (audioContext) {
+                    setupAudioVisualization(mainSound);
+                }
+                
+                // Update bottom controls play state
+                if (typeof window.updateBottomControlsPlayState === 'function') {
+                    window.updateBottomControlsPlayState(true);
+                }
+            }).catch(err => {
+                console.error("Error playing main sound after restart:", err);
+            });
+            
+            // Add audio event listeners for bottom controls
+            mainSound.addEventListener('pause', () => {
+                if (typeof window.updateBottomControlsPlayState === 'function') {
+                    window.updateBottomControlsPlayState(false);
+                }
+            });
+            
+            mainSound.addEventListener('ended', () => {
+                if (typeof window.updateBottomControlsPlayState === 'function') {
+                    window.updateBottomControlsPlayState(false);
+                }
+            });
+        } else {
+            console.error("Main sound element not found after restart!");
+        }
+        
+        // Start the experience directly
+        startPhase1();
+        
+        console.log("Animation restarted and immediately started");
+    }
 }
 
 // Function to handle beat events during credits sequence
