@@ -62,20 +62,25 @@ async function loadCredits() {
         }
         const creditsData = await response.json();
         
-        // Combine all credits into one array
+        // Combine all chronological credits into one array in the correct order
         allCredits = [
-            ...(creditsData.technology || []),
-            ...(creditsData.artists || []),
-            ...(creditsData.writers || []),
+            ...(creditsData.early_computing || []),
+            ...(creditsData.semiconductors_era || []),
+            ...(creditsData.ai_pioneers || []),
+            ...(creditsData.networking_era || []),
+            ...(creditsData.personal_computing || []),
+            ...(creditsData.internet_era || []),
+            ...(creditsData.social_media_era || []),
+            ...(creditsData.digital_artists || []),
+            ...(creditsData.cyberpunk_writers || []),
+            ...(creditsData.electronic_music || []),
             ...(creditsData.hackers || []),
-            ...(creditsData.creative || []),
-            ...(creditsData.special || []),
-            ...(creditsData.non_western || []),
-            ...(creditsData.companies || []),
-            ...(creditsData.ai_companies || [])
+            ...(creditsData.global_pioneers || []),
+            ...(creditsData.blockchain_era || []),
+            ...(creditsData.special || [])
         ];
 
-        console.log(`Loaded ${allCredits.length} credits from JSON`);
+        console.log(`Loaded ${allCredits.length} credits from JSON in chronological order`);
         
         // Now build the credits sequence
         buildAndStartCreditsSequence(creditsData);
@@ -227,7 +232,7 @@ document.addEventListener('DOMContentLoaded', init);
 
 // Function to build and start the credits sequence
 function buildAndStartCreditsSequence(creditsData) {
-    console.log("Building credits sequence from JSON data");
+    console.log("Building chronological computing history sequence");
     
     // Connect the beat detection to the credits sequence advancement
     window.addEventListener('audiobeat', handleBeat);
@@ -235,274 +240,21 @@ function buildAndStartCreditsSequence(creditsData) {
     // The main screens array for our sequence
     const creditScreens = [];
     
-    // 1. Start with the title screens - DOUBLED
+    // 1. Start with the title screens
     if (creditsData.layouts && creditsData.layouts.title) {
-        // Add title screens twice
-        creditScreens.push(...creditsData.layouts.title);
         creditScreens.push(...creditsData.layouts.title);
     }
     
-    // 2. Add various layout types in a structured sequence
-    
-    // Create a shuffled list of all regular credits
-    const regularCredits = shuffleArray([...allCredits]);
-    
-    // Create a function to get credits of a specific category - INCREASED COUNTS
-    function getCreditsOfCategory(category, count = 8) { // Doubled default count
-        return regularCredits
-            .filter(credit => credit.category === category)
-            .slice(0, count);
+    // Helper function to get credits from a category
+    function getCreditsFromCategory(categoryName, count = null) {
+        const categoryData = creditsData[categoryName] || [];
+        return count ? categoryData.slice(0, count) : [...categoryData];
     }
     
-    // First, show a selection of AI CEOs as prominent single name displays - DOUBLED to 14
-    if (creditsData.ai_companies && creditsData.ai_companies.length > 0) {
-        // Get the first 14 AI CEOs for single name displays (doubled from 7)
-        const aiCeos = shuffleArray([...creditsData.ai_companies]).slice(0, 14);
-        
-        // Add each AI CEO as a single name display
-        for (const ceo of aiCeos) {
-            creditScreens.push({
-                ...ceo,
-                layout: "single"
-            });
-        }
-    }
-    
-    // Next, show early computing pioneers as single name displays - DOUBLED to 14
-    if (creditsData.technology && creditsData.technology.length > 0) {
-        // Filter for pioneers (those with years earlier than 1980)
-        const pioneers = creditsData.technology.filter(person => {
-            if (person.description && person.description.includes("19")) {
-                const yearMatch = person.description.match(/(19[0-7][0-9])/);
-                return yearMatch && parseInt(yearMatch[0]) < 1980;
-            }
-            return false;
-        });
-        
-        // Take a sample of 14 pioneers (doubled from 7)
-        const featuredPioneers = shuffleArray(pioneers).slice(0, 14);
-        
-        // Add each pioneer as a single name display
-        for (const pioneer of featuredPioneers) {
-            creditScreens.push({
-                ...pioneer,
-                layout: "single"
-            });
-        }
-    }
-    
-    // Now, do single name showcases from the featured section - DOUBLED to 10
-    for (let i = 0; i < 10; i++) {  // Show 10 individual prominent people (doubled from 5)
-        const featuredCredit = creditsData.featured?.[i] || regularCredits[i];
-        if (featuredCredit) {
-            // For each featured credit, add it as a single name
-            creditScreens.push({
-                ...featuredCredit,
-                layout: "single"
-            });
-        }
-    }
-    
-    // Add non-western pioneers as single name displays - DOUBLED to 14
-    if (creditsData.non_western && creditsData.non_western.length > 0) {
-        // Take a sample of 14 non-western pioneers (doubled from 7)
-        const nonWesternPioneers = shuffleArray([...creditsData.non_western]).slice(0, 14);
-        
-        // Add each non-western pioneer as a single name display
-        for (const pioneer of nonWesternPioneers) {
-            creditScreens.push({
-                ...pioneer,
-                layout: "single"
-            });
-        }
-    }
-    
-    // Add bilingual layouts - DOUBLED
-    if (creditsData.layouts && creditsData.layouts.bilingual) {
-        // Add all bilingual layouts twice
-        creditScreens.push(...creditsData.layouts.bilingual);
-        creditScreens.push(...creditsData.layouts.bilingual);
-    }
-    
-    // Add tech people in grid layouts - TRIPLED
-    const techCredits = getCreditsOfCategory('tech', 24); // Tripled from 8
-    if (techCredits.length >= 4) {
-        // Add tech grids in groups of 4 - creating 6 grids instead of 2
-        for (let i = 0; i < 6; i++) {
-            const startIdx = i * 4;
-            if (startIdx < techCredits.length) {
-                const endIdx = Math.min(startIdx + 4, techCredits.length);
-                creditScreens.push({
-                    credits: techCredits.slice(startIdx, endIdx),
-                    layout: "grid"
-                });
-            }
-        }
-    }
-    
-    // Add more bilingual layouts - DOUBLED
-    if (creditsData.layouts && creditsData.layouts.bilingual) {
-        const firstTwo = creditsData.layouts.bilingual.slice(0, 2);
-        // Add first two bilingual layouts twice
-        creditScreens.push(...firstTwo);
-        creditScreens.push(...firstTwo);
-    }
-    
-    // Add artists in row layouts - TRIPLED
-    const artistCredits = getCreditsOfCategory('artist', 18); // Tripled from 6
-    if (artistCredits.length >= 3) {
-        // Add artist rows in groups of 3 - creating 6 rows instead of 2
-        for (let i = 0; i < 6; i++) {
-            const startIdx = i * 3;
-            if (startIdx < artistCredits.length) {
-                const endIdx = Math.min(startIdx + 3, artistCredits.length);
-                creditScreens.push({
-                    credits: artistCredits.slice(startIdx, endIdx),
-                    layout: "row"
-                });
-            }
-        }
-    }
-    
-    // Add hierarchical layouts - DOUBLED
-    if (creditsData.layouts && creditsData.layouts.hierarchical) {
-        // Add hierarchical layouts twice
-        creditScreens.push(...creditsData.layouts.hierarchical);
-        creditScreens.push(...creditsData.layouts.hierarchical);
-    }
-    
-    // Add writers in grid layouts - TRIPLED
-    const writerCredits = getCreditsOfCategory('writer', 12); // Tripled from 4
-    if (writerCredits.length >= 4) {
-        // Add writer grids in groups of 4 - creating 3 grids instead of 1
-        for (let i = 0; i < 3; i++) {
-            const startIdx = i * 4;
-            if (startIdx < writerCredits.length) {
-                const endIdx = Math.min(startIdx + 4, writerCredits.length);
-                creditScreens.push({
-                    credits: writerCredits.slice(startIdx, endIdx),
-                    layout: "grid"
-                });
-            }
-        }
-    }
-    
-    // Add firstname-lastname layouts - TRIPLED
-    if (creditsData.layouts && creditsData.layouts["firstname-lastname"]) {
-        // Add more firstname-lastname layouts by tripling the existing ones
-        const firstnameLastnameLayouts = [...creditsData.layouts["firstname-lastname"]];
-        
-        // First pass - add the original layouts
-        creditScreens.push(...firstnameLastnameLayouts);
-        
-        // Second pass - add duplicates with minor variations
-        for (const layout of firstnameLastnameLayouts) {
-            creditScreens.push({
-                ...layout,
-                effect: layout.effect === 'neon' ? undefined : 'neon' // Toggle neon effect
-            });
-        }
-        
-        // Third pass - add more duplicates but in reverse order to create variety
-        const reversedLayouts = [...firstnameLastnameLayouts].reverse();
-        for (const layout of reversedLayouts) {
-            creditScreens.push({
-                ...layout
-            });
-        }
-    }
-    
-    // Add hackers in row layouts - TRIPLED
-    const hackerCredits = getCreditsOfCategory('hacker', 18); // Tripled from 6
-    if (hackerCredits.length >= 3) {
-        // Add hacker rows in groups of 3 - creating 6 rows instead of 2
-        for (let i = 0; i < 6; i++) {
-            const startIdx = i * 3;
-            if (startIdx < hackerCredits.length) {
-                const endIdx = Math.min(startIdx + 3, hackerCredits.length);
-                creditScreens.push({
-                    credits: hackerCredits.slice(startIdx, endIdx),
-                    layout: "row"
-                });
-            }
-        }
-    }
-    
-    // Add non-western pioneers in grid layouts - TRIPLED
-    if (creditsData.non_western && creditsData.non_western.length > 0) {
-        // Create 3 grid layouts with non-western pioneers
-        for (let i = 0; i < 3; i++) {
-            const startIdx = i * 6;
-            if (startIdx < creditsData.non_western.length) {
-                const nonWesternSlice = shuffleArray([...creditsData.non_western]).slice(startIdx, startIdx + 6);
-                creditScreens.push({
-                    credits: nonWesternSlice,
-                    layout: "grid"
-                });
-            }
-        }
-    }
-    
-    // Add AI companies in grid layouts - TRIPLED
-    if (creditsData.ai_companies && creditsData.ai_companies.length > 0) {
-        // Create 3 grid layouts with AI companies
-        for (let i = 0; i < 3; i++) {
-            const startIdx = i * 6;
-            if (startIdx < creditsData.ai_companies.length) {
-                const aiCompaniesSlice = shuffleArray([...creditsData.ai_companies]).slice(startIdx, startIdx + 6);
-                creditScreens.push({
-                    credits: aiCompaniesSlice,
-                    layout: "grid"
-                });
-            }
-        }
-    }
-    
-    // Add logo grid layouts - DOUBLED
-    if (creditsData.layouts && creditsData.layouts.logo_grids) {
-        // First, make sure they have the correct layout type
-        const fixedLogoGrids = creditsData.layouts.logo_grids.map(grid => ({
-            ...grid,
-            layout: "logo_grid",
-            category: "logos"
-        }));
-        
-        // Add logo grid layouts twice
-        creditScreens.push(...fixedLogoGrids);
-        creditScreens.push(...fixedLogoGrids);
-    }
-
-    // Add fullscreen logo layouts - DOUBLED
-    if (creditsData.layouts && creditsData.layouts.fullscreen_logos) {
-        // First, make sure they have the correct layout type
-        const fixedFullscreenLogos = creditsData.layouts.fullscreen_logos.map(logo => ({
-            ...logo,
-            layout: "fullscreen_logo",
-            category: "logo"
-        }));
-        
-        // Add fullscreen logo layouts twice
-        creditScreens.push(...fixedFullscreenLogos);
-        creditScreens.push(...fixedFullscreenLogos);
-    }
-    
-    // Add more bilingual layouts to end strong - DOUBLED
-    if (creditsData.layouts && creditsData.layouts.bilingual) {
-        const remainingLayouts = creditsData.layouts.bilingual.slice(2);
-        // Add remaining bilingual layouts twice
-        creditScreens.push(...remainingLayouts);
-        creditScreens.push(...remainingLayouts);
-    }
-    
-    // Add special credits at the end - DOUBLED
-    const specialCredits = getCreditsOfCategory('special', 8); // Doubled from 4
-    if (specialCredits.length > 0) {
-        // Add each special credit twice
-        for (const credit of specialCredits) {
-            creditScreens.push({
-                ...credit,
-                layout: "single"
-            });
+    // Helper function to create single name displays
+    function addSingleNameDisplays(credits, maxCount = 8) {
+        const selected = shuffleArray([...credits]).slice(0, maxCount);
+        for (const credit of selected) {
             creditScreens.push({
                 ...credit,
                 layout: "single"
@@ -510,7 +262,194 @@ function buildAndStartCreditsSequence(creditsData) {
         }
     }
     
-    // Start playing the credits sequence with our built screens
+    // Helper function to create grid layouts
+    function addGridLayouts(credits, groupSize = 4) {
+        for (let i = 0; i < credits.length; i += groupSize) {
+            const group = credits.slice(i, i + groupSize);
+            if (group.length >= 2) { // At least 2 for a meaningful grid
+                creditScreens.push({
+                    credits: group,
+                    layout: "grid"
+                });
+            }
+        }
+    }
+    
+    // Helper function to create row layouts
+    function addRowLayouts(credits, groupSize = 3) {
+        for (let i = 0; i < credits.length; i += groupSize) {
+            const group = credits.slice(i, i + groupSize);
+            if (group.length >= 2) { // At least 2 for a meaningful row
+                creditScreens.push({
+                    credits: group,
+                    layout: "row"
+                });
+            }
+        }
+    }
+    
+    // 2. EARLY COMPUTING ERA (1800s-1950s)
+    console.log("Adding Early Computing Era");
+    const earlyComputing = getCreditsFromCategory('early_computing');
+    // Show key pioneers as single names
+    addSingleNameDisplays(earlyComputing.slice(0, 8)); // Babbage, Lovelace, Turing, etc.
+    // Show ENIAC programmers in grid
+    addGridLayouts(earlyComputing.slice(19, 25)); // The 6 ENIAC programmers
+    
+    // Add hierarchical layout for early computing
+    if (creditsData.layouts?.hierarchical?.[0]) {
+        creditScreens.push(creditsData.layouts.hierarchical[0]);
+    }
+    
+    // 3. SEMICONDUCTORS ERA (1950s-1970s)
+    console.log("Adding Semiconductors Era");
+    const semiconductors = getCreditsFromCategory('semiconductors_era');
+    addSingleNameDisplays(semiconductors.slice(0, 6)); // Kilby, Noyce, Moore, etc.
+    addGridLayouts(semiconductors.slice(6));
+    
+    // Add company logos for semiconductor revolution
+    if (creditsData.layouts?.company_logos_early?.[2]) {
+        creditScreens.push(creditsData.layouts.company_logos_early[2]); // Semiconductor Revolution
+    }
+    
+    // 4. PERSONAL COMPUTING ERA (1970s-1990s)
+    console.log("Adding Personal Computing Era");
+    const personalComputing = getCreditsFromCategory('personal_computing');
+    addSingleNameDisplays(personalComputing.slice(0, 8)); // Jobs, Wozniak, Gates, etc.
+    addRowLayouts(personalComputing.slice(8));
+    
+    // Add hierarchical layout for PC era
+    if (creditsData.layouts?.hierarchical?.[2]) {
+        creditScreens.push(creditsData.layouts.hierarchical[2]);
+    }
+    
+    // Add company logos for PC birth
+    if (creditsData.layouts?.company_logos_early?.[3]) {
+        creditScreens.push(creditsData.layouts.company_logos_early[3]); // Personal Computer Birth
+    }
+    
+    // 5. NETWORKING ERA (1960s-1990s)
+    console.log("Adding Networking Era");
+    const networking = getCreditsFromCategory('networking_era');
+    addSingleNameDisplays(networking.slice(0, 6)); // Licklider, Cerf, Berners-Lee, etc.
+    addGridLayouts(networking.slice(6));
+    
+    // Add hierarchical layout for internet foundations
+    if (creditsData.layouts?.hierarchical?.[3]) {
+        creditScreens.push(creditsData.layouts.hierarchical[3]);
+    }
+    
+    // 6. INTERNET ERA (1990s-2000s)
+    console.log("Adding Internet Era");
+    const internet = getCreditsFromCategory('internet_era');
+    addSingleNameDisplays(internet.slice(0, 6)); // Bezos, Page, Brin, etc.
+    addRowLayouts(internet.slice(6));
+    
+    // Add company logos for search and e-commerce
+    if (creditsData.layouts?.company_logos_internet?.[1]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[1]); // Search and E-commerce
+    }
+    
+    // 7. SOCIAL MEDIA ERA (2000s-2010s)
+    console.log("Adding Social Media Era");
+    const socialMedia = getCreditsFromCategory('social_media_era');
+    addSingleNameDisplays(socialMedia.slice(0, 6)); // Zuckerberg, Dorsey, etc.
+    addGridLayouts(socialMedia.slice(6));
+    
+    // Add hierarchical layout for social media
+    if (creditsData.layouts?.hierarchical?.[5]) {
+        creditScreens.push(creditsData.layouts.hierarchical[5]);
+    }
+    
+    // Add company logos for social media revolution
+    if (creditsData.layouts?.company_logos_internet?.[2]) {
+        creditScreens.push(creditsData.layouts.company_logos_internet[2]); // Social Media Revolution
+    }
+    
+    // 8. AI PIONEERS (1950s-present)
+    console.log("Adding AI Pioneers");
+    const aiPioneers = getCreditsFromCategory('ai_pioneers');
+    addSingleNameDisplays(aiPioneers.slice(0, 10)); // McCarthy, Hinton, LeCun, etc.
+    addGridLayouts(aiPioneers.slice(10));
+    
+    // Add hierarchical layout for AI revolution
+    if (creditsData.layouts?.hierarchical?.[4]) {
+        creditScreens.push(creditsData.layouts.hierarchical[4]);
+    }
+    
+    // Add company logos for AI revolution
+    if (creditsData.layouts?.company_logos_modern?.[3]) {
+        creditScreens.push(creditsData.layouts.company_logos_modern[3]); // AI Revolution
+    }
+    
+    // 9. DIGITAL ARTISTS (1960s-present)
+    console.log("Adding Digital Artists");
+    const digitalArtists = getCreditsFromCategory('digital_artists');
+    addSingleNameDisplays(digitalArtists.slice(0, 8)); // Laposky, Molnár, etc.
+    addRowLayouts(digitalArtists.slice(8, 20));
+    addGridLayouts(digitalArtists.slice(20));
+    
+    // 10. CYBERPUNK WRITERS (1940s-present)
+    console.log("Adding Cyberpunk Writers");
+    const writers = getCreditsFromCategory('cyberpunk_writers');
+    addSingleNameDisplays(writers.slice(0, 6)); // Gibson, Sterling, etc.
+    addRowLayouts(writers.slice(6));
+    
+    // 11. ELECTRONIC MUSIC PIONEERS (1950s-present)
+    console.log("Adding Electronic Music Pioneers");
+    const electronic = getCreditsFromCategory('electronic_music');
+    addSingleNameDisplays(electronic.slice(0, 6)); // Kraftwerk, Eno, etc.
+    addGridLayouts(electronic.slice(6));
+    
+    // 12. HACKERS AND SECURITY (1960s-present)
+    console.log("Adding Hackers and Security Pioneers");
+    const hackers = getCreditsFromCategory('hackers');
+    addSingleNameDisplays(hackers.slice(0, 5)); // Draper, Mitnick, etc.
+    addRowLayouts(hackers.slice(5));
+    
+    // 13. GLOBAL PIONEERS (1950s-present)
+    console.log("Adding Global Computing Pioneers");
+    const global = getCreditsFromCategory('global_pioneers');
+    addSingleNameDisplays(global.slice(0, 8)); // An Wang, Huang, etc.
+    addGridLayouts(global.slice(8));
+    
+    // 14. BLOCKCHAIN ERA (2000s-present)
+    console.log("Adding Blockchain Era");
+    const blockchain = getCreditsFromCategory('blockchain_era');
+    addSingleNameDisplays(blockchain); // All blockchain pioneers as single names
+    
+    // 15. Add bilingual layouts for international perspective
+    if (creditsData.layouts?.bilingual) {
+        creditScreens.push(...creditsData.layouts.bilingual);
+    }
+    
+    // 16. Add some fullscreen company logos at key moments
+    if (creditsData.layouts?.fullscreen_logos) {
+        const keyLogos = [
+            creditsData.layouts.fullscreen_logos[0], // IBM
+            creditsData.layouts.fullscreen_logos[2], // Apple
+            creditsData.layouts.fullscreen_logos[4], // Google
+            creditsData.layouts.fullscreen_logos[7], // OpenAI
+            creditsData.layouts.fullscreen_logos[8], // Anthropic
+        ];
+        
+        // Insert these at strategic points
+        creditScreens.splice(20, 0, keyLogos[0]); // IBM after early computing
+        creditScreens.splice(40, 0, keyLogos[1]); // Apple after PC era
+        creditScreens.splice(60, 0, keyLogos[2]); // Google after internet era
+        creditScreens.splice(-10, 0, keyLogos[3]); // OpenAI near end
+        creditScreens.splice(-5, 0, keyLogos[4]); // Anthropic near end
+    }
+    
+    // 17. FINALE - Special entry
+    const special = getCreditsFromCategory('special');
+    if (special.length > 0) {
+        addSingleNameDisplays(special);
+    }
+    
+    console.log(`Built chronological sequence with ${creditScreens.length} screens`);
+    
+    // Start playing the sequence
     playCreditsSequence(creditScreens);
 }
 
