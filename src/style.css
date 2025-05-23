@@ -590,6 +590,48 @@ body {
     transform: scale(0.98);
 }
 
+/* -------------- INTRO PHASE: TYPER ANIMATION -------------- */
+#intro-phase {
+    background-color: var(--dark-bg);
+}
+
+.intro-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    max-width: 1000px;
+    height: 100%;
+    text-align: center;
+    position: relative;
+}
+
+.typer-text {
+    font-family: 'OCR A', 'Anton', sans-serif;
+    font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+    color: var(--theme-white);
+    line-height: 1.4;
+    letter-spacing: 1px;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.typer-cursor {
+    display: inline-block;
+    font-family: 'OCR A', 'Anton', sans-serif;
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    color: var(--neon-green);
+    animation: cursor-blink 1s infinite;
+    text-shadow: 0 0 10px var(--neon-green);
+    margin-left: 2px;
+}
+
+@keyframes cursor-blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
 /* -------------- AUDIO VISUALIZER -------------- */
 .audio-visualizer {
     position: fixed;

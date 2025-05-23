@@ -149,65 +149,21 @@ async function init() {
                 });
             }
             
-            // Hide start screen
+            // Hide start screen and show intro phase
             const startScreen = document.getElementById('start-screen');
             gsap.to(startScreen, { 
                 duration: 0.5, 
                 opacity: 0, 
                 onComplete: () => {
                     startScreen.classList.add('hidden');
-                    // Show phase 1
-                    const phase1 = document.getElementById('phase1');
-                    phase1.classList.remove('hidden');
-                    gsap.set(phase1, { opacity: 1 });
                     
-                    // Show bottom controls when experience starts
-                    if (typeof window.showBottomControls === 'function') {
-                        window.showBottomControls();
-                    }
+                    // Show intro phase
+                    const introPhase = document.getElementById('intro-phase');
+                    introPhase.classList.remove('hidden');
+                    gsap.set(introPhase, { opacity: 1 });
                     
-                    // Initialize audio context and visualization
-                    if (mainSound) {
-                        // Make sure audio is ready to play
-                        mainSound.volume = 1.0;
-                        mainSound.currentTime = 0;
-                        
-                        // Add event listener for when audio ends
-                        mainSound.removeEventListener('ended', showEndScene); // Remove any existing listener first
-                        mainSound.addEventListener('ended', showEndScene);
-                        console.log("Added 'ended' event listener to mainSound");
-                        
-                        // Play the sound
-                        mainSound.play().then(() => {
-                            console.log("Main sound started playing");
-                            setupAudioVisualization(mainSound);
-                            
-                            // Update bottom controls play state
-                            if (typeof window.updateBottomControlsPlayState === 'function') {
-                                window.updateBottomControlsPlayState(true);
-                            }
-                        }).catch(err => {
-                            console.error("Error playing main sound:", err);
-                        });
-                        
-                        // Add audio event listeners for bottom controls
-                        mainSound.addEventListener('pause', () => {
-                            if (typeof window.updateBottomControlsPlayState === 'function') {
-                                window.updateBottomControlsPlayState(false);
-                            }
-                        });
-                        
-                        mainSound.addEventListener('ended', () => {
-                            if (typeof window.updateBottomControlsPlayState === 'function') {
-                                window.updateBottomControlsPlayState(false);
-                            }
-                        });
-                    } else {
-                        console.error("Main sound element not found!");
-                    }
-                    
-                    // Start the experience
-                    startPhase1();
+                    // Start typer animation
+                    startTyperAnimation();
                 } 
             });
         });
@@ -223,6 +179,128 @@ async function init() {
 
 // Start initialization when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);
+
+// -------------- TYPER ANIMATION INTRO --------------
+function startTyperAnimation() {
+    console.log("Starting typer animation intro");
+    
+    const typerText = document.getElementById('typer-text');
+    const typerCursor = document.getElementById('typer-cursor');
+    
+    if (!typerText || !typerCursor) {
+        console.error("Typer elements not found!");
+        transitionToPhase1();
+        return;
+    }
+    
+    // The text to type
+    const textToType = "In 1936, 26-year-old Konrad Zuse began building his mechanical computer Z1 in his parents' living room at Wrangelstraße 38 in Berlin-Kreuzberg, leading to the Z3 in 1941—the world's first fully programmable digital computer --- and then this happened";
+    
+    // Clear existing content
+    typerText.textContent = '';
+    
+    let currentIndex = 0;
+    const typingSpeed = 50; // milliseconds per character
+    const pauseAtEnd = 2000; // pause at the end before transition
+    
+    // Create typing interval
+    const typingInterval = setInterval(() => {
+        if (currentIndex < textToType.length) {
+            typerText.textContent += textToType[currentIndex];
+            currentIndex++;
+            
+            // Play subtle typing sound effect if available
+            if (glitchSound && Math.random() < 0.3) { // 30% chance for typing sound
+                const sound = glitchSound.cloneNode();
+                sound.volume = 0.1;
+                sound.currentTime = 0;
+                sound.play().catch(e => {}); // Ignore errors
+            }
+        } else {
+            // Typing complete
+            clearInterval(typingInterval);
+            
+            // Hide cursor after a moment
+            setTimeout(() => {
+                typerCursor.style.opacity = '0';
+                
+                // Wait a bit more then transition to phase 1
+                setTimeout(() => {
+                    transitionToPhase1();
+                }, pauseAtEnd);
+            }, 1000);
+        }
+    }, typingSpeed);
+}
+
+// Function to transition from intro to Phase 1 (credits)
+function transitionToPhase1() {
+    console.log("Transitioning from intro to Phase 1");
+    
+    const introPhase = document.getElementById('intro-phase');
+    const phase1 = document.getElementById('phase1');
+    
+    // Fade out intro phase
+    gsap.to(introPhase, {
+        duration: 0.8,
+        opacity: 0,
+        onComplete: () => {
+            introPhase.classList.add('hidden');
+            
+            // Show phase 1
+            phase1.classList.remove('hidden');
+            gsap.set(phase1, { opacity: 1 });
+            
+            // Show bottom controls when credits start
+            if (typeof window.showBottomControls === 'function') {
+                window.showBottomControls();
+            }
+            
+            // Initialize audio context and visualization
+            if (mainSound) {
+                // Make sure audio is ready to play
+                mainSound.volume = 1.0;
+                mainSound.currentTime = 0;
+                
+                // Add event listener for when audio ends
+                mainSound.removeEventListener('ended', showEndScene); // Remove any existing listener first
+                mainSound.addEventListener('ended', showEndScene);
+                console.log("Added 'ended' event listener to mainSound");
+                
+                // Play the sound
+                mainSound.play().then(() => {
+                    console.log("Main sound started playing");
+                    setupAudioVisualization(mainSound);
+                    
+                    // Update bottom controls play state
+                    if (typeof window.updateBottomControlsPlayState === 'function') {
+                        window.updateBottomControlsPlayState(true);
+                    }
+                }).catch(err => {
+                    console.error("Error playing main sound:", err);
+                });
+                
+                // Add audio event listeners for bottom controls
+                mainSound.addEventListener('pause', () => {
+                    if (typeof window.updateBottomControlsPlayState === 'function') {
+                        window.updateBottomControlsPlayState(false);
+                    }
+                });
+                
+                mainSound.addEventListener('ended', () => {
+                    if (typeof window.updateBottomControlsPlayState === 'function') {
+                        window.updateBottomControlsPlayState(false);
+                    }
+                });
+            } else {
+                console.error("Main sound element not found!");
+            }
+            
+            // Start the credits sequence
+            startPhase1();
+        }
+    });
+}
 
 // Function to build and start the credits sequence
 function buildAndStartCreditsSequence(creditsData) {
