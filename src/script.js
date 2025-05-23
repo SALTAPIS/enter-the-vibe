@@ -281,7 +281,7 @@ function buildAndStartCreditsSequence(creditsData) {
     }
     
     // 2. EARLY COMPUTING FOUNDATION (1800s-1950s)
-    creditScreens.push({ name: "EARLY COMPUTING FOUNDATION", category: "era_title", layout: "single", color: "blue" });
+    creditScreens.push({ name: "EARLY COMPUTING", category: "era_title", layout: "single", color: "blue" });
     creditScreens.push(creditsData.layouts.hierarchical[0]); // Early computing pioneers
     
     // Add early computing name grid
@@ -337,7 +337,7 @@ function buildAndStartCreditsSequence(creditsData) {
     // No AI era logos yet - save for later
     
     // 5. PERSONAL COMPUTING ERA (1970s-1990s)
-    creditScreens.push({ name: "PERSONAL COMPUTING REVOLUTION", category: "era_title", layout: "single", color: "orange" });
+    creditScreens.push({ name: "PERSONAL COMPUTING", category: "era_title", layout: "single", color: "orange" });
     creditScreens.push(creditsData.layouts.hierarchical[2]); // Personal computer era
     
     // Add personal computing name grid
@@ -354,7 +354,7 @@ function buildAndStartCreditsSequence(creditsData) {
     creditScreens.push(...personalComputingLogos.slice(0, 4));
     
     // 6. NETWORKING & INTERNET FOUNDATIONS (1960s-1990s)
-    creditScreens.push({ name: "NETWORKING & INTERNET FOUNDATIONS", category: "era_title", layout: "single", color: "cyan" });
+    creditScreens.push({ name: "NETWORKING & INTERNET", category: "era_title", layout: "single", color: "cyan" });
     creditScreens.push(creditsData.layouts.hierarchical[3]); // Internet foundations
     
     // Add networking name grid
@@ -1966,8 +1966,8 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 firstNameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameFirst;
             } else {
-                // Fallback to hardcoded value
-                firstNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+                // Fallback to hardcoded value - made bigger
+                firstNameEl.style.fontSize = 'clamp(3.5rem, 8vw, 6rem)';
             }
             
             const lastNameEl = document.createElement('div');
@@ -1978,8 +1978,8 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 lastNameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameLast;
             } else {
-                // Fallback to hardcoded value
-                lastNameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+                // Fallback to hardcoded value - made bigger
+                lastNameEl.style.fontSize = 'clamp(3.5rem, 8vw, 6rem)';
             }
             
             nameContainer.appendChild(firstNameEl);
@@ -1993,8 +1993,8 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 nameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameFirst;
             } else {
-                // Fallback to hardcoded value
-                nameEl.style.fontSize = 'clamp(2.5rem, 6vw, 4.5rem)';
+                // Fallback to hardcoded value - made bigger
+                nameEl.style.fontSize = 'clamp(3.5rem, 8vw, 6rem)';
             }
             
             nameEl.style.fontWeight = 'bold';
@@ -2017,8 +2017,8 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 descEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].description;
             } else {
-                // Fallback to hardcoded value
-                descEl.style.fontSize = 'clamp(0.9rem, 2vw, 1.5rem)';
+                // Fallback to hardcoded value - made bigger
+                descEl.style.fontSize = 'clamp(1.2rem, 2.5vw, 2rem)';
             }
             
             descEl.style.marginTop = '15px';
@@ -2558,6 +2558,8 @@ function showFullscreenLogo(timeline, credit) {
         logo.style.filter = 'brightness(0) invert(1)'; // Make it white
         
         container.appendChild(logo);
+        
+        // No company name or description - just the logo as requested
     } else {
         console.warn('No logo provided for fullscreen logo layout');
         
