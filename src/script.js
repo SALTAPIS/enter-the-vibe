@@ -330,15 +330,11 @@ function buildAndStartCreditsSequence(creditsData) {
         creditScreens.push(creditsData.layouts.name_grids[2]); // AI Revolution grid
     }
     
-    // Mix AI pioneers with modern AI companies
-    const aiMix = addMixedScreens(['ai_pioneers', 'ai_companies'], 15);
+    // Mix AI pioneers only (no modern companies yet)
+    const aiMix = addMixedScreens(['ai_pioneers'], 10);
     creditScreens.push(...aiMix);
     
-    // Add AI era logos
-    const earlyAiLogos = getLogosForEra('ai');
-    if (earlyAiLogos.length > 0) {
-        creditScreens.push(...earlyAiLogos); // OpenAI, Anthropic, Google Gemini, Claude AI
-    }
+    // No AI era logos yet - save for later
     
     // 5. PERSONAL COMPUTING ERA (1970s-1990s)
     creditScreens.push({ name: "PERSONAL COMPUTING REVOLUTION", category: "era_title", layout: "single", color: "orange" });
@@ -464,11 +460,11 @@ function buildAndStartCreditsSequence(creditsData) {
     // 11. AI REVOLUTION (2010s-present)
     creditScreens.push({ name: "THE AI REVOLUTION", category: "era_title", layout: "single", color: "red" });
     
-    // Mix all AI-related content
-    const aiRevolutionMix = addMixedScreens(['ai_pioneers', 'ai_companies', 'featured'], 20);
-    creditScreens.push(...aiRevolutionMix.slice(0, 30));
+    // Mix all AI-related content including modern companies
+    const aiRevolutionMix = addMixedScreens(['ai_pioneers', 'ai_companies', 'featured'], 25);
+    creditScreens.push(...aiRevolutionMix.slice(0, 35));
     
-    // Add AI era logos
+    // Add AI era logos (modern AI companies)
     const aiLogos = getLogosForEra('ai');
     if (aiLogos.length > 0) {
         creditScreens.push(...aiLogos); // OpenAI, Anthropic, Google Gemini, Claude AI
@@ -564,11 +560,22 @@ function playCreditsSequence() {
             // Handle name grids specially
             if (credit.category === "name_grid" && credit.names) {
                 // Convert names array to credits format
-                const gridCredits = credit.names.map(name => ({
-                    name: name,
-                    description: "", // No descriptions for name grids
-                    category: "name_grid"
-                }));
+                const gridCredits = credit.names.map(nameObj => {
+                    // Handle both old format (strings) and new format (objects)
+                    if (typeof nameObj === 'string') {
+                        return {
+                            name: nameObj,
+                            description: "",
+                            category: "name_grid"
+                        };
+                    } else {
+                        return {
+                            name: nameObj.name,
+                            description: nameObj.description || "",
+                            category: "name_grid"
+                        };
+                    }
+                });
                 showGridLayout(screenTimeline, gridCredits, credit.layout);
             }
             // Group of credits - show them together
@@ -1902,18 +1909,18 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
         const totalCredits = credits.length;
         let columns, rows;
         
-        if (totalCredits <= 2) {
-            columns = totalCredits;
-            rows = 1;
-        } else if (totalCredits <= 4) {
+        if (totalCredits <= 4) {
+            // 2x2 layout for 4 or fewer names
             columns = 2;
-            rows = Math.ceil(totalCredits / 2);
-        } else if (totalCredits <= 6) {
+            rows = 2;
+        } else if (totalCredits === 6) {
+            // 3x2 layout for exactly 6 names
             columns = 3;
-            rows = Math.ceil(totalCredits / 3);
+            rows = 2;
         } else {
-            columns = 4;
-            rows = Math.ceil(totalCredits / 4);
+            // Fallback for other counts (shouldn't happen with our data)
+            columns = Math.min(3, totalCredits);
+            rows = Math.ceil(totalCredits / columns);
         }
         
         // Set explicit grid template

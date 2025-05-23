@@ -90,7 +90,7 @@
     { "name": "BILL GATES", "description": "Microsoft", "category": "personal_computing" },
     { "name": "PAUL ALLEN", "description": "Microsoft", "category": "personal_computing" },
     { "name": "STEVE JOBS", "description": "Apple", "category": "personal_computing" },
-    { "name": "STEVE WOZNIAK", "description": "Apple", "category": "personal_computing" },
+    { "name": "STEVE WOZNIAK", "description": "Apple Co-founder Phreaker (1970s)", "category": "personal_computing" },
     { "name": "GARY KILDALL", "description": "CP/M OS", "category": "personal_computing" },
     { "name": "CHUCK PEDDLE", "description": "6502 Processor", "category": "personal_computing" },
     { "name": "ADAM OSBORNE", "description": "Portable Computer", "category": "personal_computing" },
@@ -227,13 +227,11 @@
   "hackers": [
     { "name": "TOMMY FLOWERS", "description": "Colossus Computer Builder (1943)", "category": "hacker" },
     { "name": "CLAUDE SHANNON", "description": "Information Theory Pioneer (1948)", "category": "hacker" },
-    { "name": "JOHN DRAPER", "description": "Phone Phreaking Pioneer (1970s)", "category": "hacker" },
-    { "name": "STEVE WOZNIAK", "description": "Apple Co-founder & Phreaker (1970s)", "category": "hacker" },
-    { "name": "ROBERT MORRIS", "description": "Internet Worm Creator (1988)", "category": "hacker" },
-    { "name": "TSUTOMU SHIMOMURA", "description": "Cybersecurity Expert (1990s)", "category": "hacker" },
-    { "name": "KEVIN MITNICK", "description": "Famous Hacker & Security Consultant (1990s)", "category": "hacker" },
-    { "name": "PETER SHIPLEY", "description": "Wardialing Pioneer (1990s)", "category": "hacker" },
-    { "name": "MARK ABENE", "description": "Phiber Optik, Hacker Culture Icon (1990s)", "category": "hacker" },
+    { "name": "JOHN DRAPER", "description": "Captain Crunch Phone Phreaker", "category": "hacker" },
+    { "name": "STEVE WOZNIAK", "description": "Apple Phone Phreaker (1970s)", "category": "hacker" },
+    { "name": "KEVIN MITNICK", "description": "Famous Hacker Security Consultant (1990s)", "category": "hacker" },
+    { "name": "KEVIN POULSEN", "description": "Dark Dante Hacker (1990s)", "category": "hacker" },
+    { "name": "MARK ABENE", "description": "Phiber Optik Hacker Culture Icon (1990s)", "category": "hacker" },
     { "name": "LINUS TORVALDS", "description": "Linux Kernel Creator (1991)", "category": "hacker" },
     { "name": "RICHARD STALLMAN", "description": "Free Software Movement (1983)", "category": "hacker" },
     { "name": "ERIC S. RAYMOND", "description": "Open Source Advocate (1990s)", "category": "hacker" },
@@ -241,7 +239,8 @@
     { "name": "PHIL ZIMMERMANN", "description": "PGP Creator (1991)", "category": "hacker" },
     { "name": "SOLAR DESIGNER", "description": "Security Researcher (1990s)", "category": "hacker" },
     { "name": "MUDGE", "description": "L0pht Hacker (1990s)", "category": "hacker" },
-    { "name": "SPACE ROGUE", "description": "L0pht Hacker & Founder (1990s)", "category": "hacker" },
+    { "name": "ERIC HUGHES", "description": "Cypherpunk Movement (1993)", "category": "hacker" },
+    { "name": "SPACE ROGUE", "description": "L0pht Hacker Founder (1990s)", "category": "hacker" },
     { "name": "MOXIE MARLINSPIKE", "description": "Signal Creator (2010s)", "category": "hacker" },
     { "name": "DAN KAMINSKY", "description": "DNS Security Researcher (2008)", "category": "hacker" },
     { "name": "AARON SWARTZ", "description": "Internet Activist (2000s)", "category": "hacker" },
@@ -286,7 +285,7 @@
     { "name": "BRIAN CHESKY", "description": "Airbnb", "category": "modern_tech" },
     { "name": "TRAVIS KALANICK", "description": "Uber", "category": "modern_tech" },
     { "name": "GARRETT CAMP", "description": "Uber", "category": "modern_tech" },
-    { "name": "PATRICK COLLISON", "description": "Striper", "category": "modern_tech" },
+    { "name": "PATRICK COLLISON", "description": "Stripe", "category": "modern_tech" },
     { "name": "JOHN COLLISON", "description": "Stripe", "category": "modern_tech" },
     { "name": "MELANIE PERKINS", "description": "Canva", "category": "modern_tech" },
     { "name": "TOBIAS LÜTKE", "description": "Shopify", "category": "modern_tech" }
@@ -294,7 +293,7 @@
   "companies": [
     { "name": "BELL LABS", "description": "Computing Research Pioneer (1925)", "category": "company" },
     { "name": "IBM", "description": "Computing Giant (1911)", "category": "company" },
-    { "name": "XEROX PARC", "description": "GUI & Ethernet Birthplace (1970)", "category": "company" },
+    { "name": "XEROX PARC", "description": "GUI Ethernet Birthplace (1970)", "category": "company" },
     { "name": "DIGITAL EQUIPMENT CORP", "description": "Minicomputer Pioneer (1957)", "category": "company" },
     { "name": "FAIRCHILD", "description": "Silicon Valley Seed (1957)", "category": "company" },
     { "name": "INTEL", "description": "Microprocessor Pioneer (1968)", "category": "company" },
@@ -325,73 +324,55 @@
     { "name": "DEEPMIND", "description": "AI Research Pioneer (2010)", "category": "company" }
   ],
   "ai_companies": [
-    { "name": "OPENAI", "description": "GPT Models, Founded 2015", "category": "ai_company" },
-    { "name": "GOOGLE DEEPMIND", "description": "AlphaGo/Gemini, Founded 2010", "category": "ai_company" },
-    { "name": "ANTHROPIC", "description": "Claude AI, Founded 2021", "category": "ai_company" },
-    { "name": "HUGGING FACE", "description": "Open Source ML Hub, Founded 2016", "category": "ai_company" },
-    { "name": "META AI", "description": "LLaMA Models, Founded 2013", "category": "ai_company" },
-    { "name": "COHERE", "description": "Enterprise AI, Founded 2019", "category": "ai_company" },
-    { "name": "STABILITY AI", "description": "Stable Diffusion, Founded 2020", "category": "ai_company" },
-    { "name": "MIDJOURNEY", "description": "Visual AI, Founded 2021", "category": "ai_company" },
-    { "name": "NVIDIA", "description": "AI Hardware, Founded 1993", "category": "ai_company" },
-    { "name": "MICROSOFT", "description": "Azure AI, Founded 1975", "category": "ai_company" },
-    { "name": "AMAZON AWS", "description": "AI Cloud Services, Founded 2006", "category": "ai_company" },
-    { "name": "IBM WATSON", "description": "Enterprise AI, Founded 2011", "category": "ai_company" },
-    { "name": "ANYSCALE", "description": "Ray AI Framework, Founded 2019", "category": "ai_company" },
-    { "name": "PERPLEXITY", "description": "AI Search Engine, Founded 2022", "category": "ai_company" },
-    { "name": "CHARACTER.AI", "description": "AI Characters, Founded 2021", "category": "ai_company" },
-    { "name": "JASPER", "description": "AI Writing, Founded 2021", "category": "ai_company" },
-    { "name": "RUNWAY", "description": "Gen-2 Video AI, Founded 2018", "category": "ai_company" },
-    { "name": "SCALE AI", "description": "Data Annotation, Founded 2016", "category": "ai_company" },
-    { "name": "INFLECTION AI", "description": "Pi Assistant, Founded 2022", "category": "ai_company" },
-    { "name": "MISTRAL AI", "description": "Open Models, Founded 2023", "category": "ai_company" },
-    { "name": "DEEPSEEK", "description": "Chinese AI Research, Founded 2021", "category": "ai_company" },
-    { "name": "DATABRICKS", "description": "Dolly/AI Data Platform, Founded 2013", "category": "ai_company" },
-    { "name": "CEREBRAS", "description": "AI Hardware, Founded 2016", "category": "ai_company" },
-    { "name": "ADEPT AI", "description": "AI Actions, Founded 2022", "category": "ai_company" },
-    { "name": "AI21 LABS", "description": "Jurassic/Wordtune, Founded 2017", "category": "ai_company" },
-    { "name": "BAIDU", "description": "Ernie Bot, Founded 2000", "category": "ai_company" },
-    { "name": "TOGETHER AI", "description": "AI Infrastructure, Founded 2022", "category": "ai_company" },
-    { "name": "SAGEMAKER", "description": "AWS ML Platform, Founded 2017", "category": "ai_company" },
-    { "name": "PYTORCH", "description": "Deep Learning Framework, Founded 2016", "category": "ai_company" },
-    { "name": "TENSORFLOW", "description": "Google ML Framework, Founded 2015", "category": "ai_company" },
-    { "name": "WEIGHTS & BIASES", "description": "ML Tools, Founded 2017", "category": "ai_company" },
-    { "name": "MODAL", "description": "Cloud Functions, Founded 2020", "category": "ai_company" },
-    { "name": "REPLICATE", "description": "ML Deployment, Founded 2019", "category": "ai_company" }
+    { "name": "OPENAI", "description": "GPT Models Founded 2015", "category": "ai_company" },
+    { "name": "GOOGLE DEEPMIND", "description": "AlphaGo/Gemini Founded 2010", "category": "ai_company" },
+    { "name": "ANTHROPIC", "description": "Claude AI Founded 2021", "category": "ai_company" },
+    { "name": "HUGGING FACE", "description": "Open Source ML Hub Founded 2016", "category": "ai_company" },
+    { "name": "META-AI", "description": "LLaMA Models Founded 2013", "category": "ai_company" },
+    { "name": "COHERE", "description": "Enterprise AI Founded 2019", "category": "ai_company" },
+    { "name": "STABILITY-AI", "description": "Stable Diffusion Founded 2020", "category": "ai_company" },
+    { "name": "MIDJOURNEY", "description": "Visual AI Founded 2021", "category": "ai_company" },
+    { "name": "NVIDIA", "description": "AI Hardware Founded 1993", "category": "ai_company" },
+    { "name": "MICROSOFT", "description": "Azure AI Founded 1975", "category": "ai_company" },
+    { "name": "AMAZON AWS", "description": "AI Cloud Services Founded 2006", "category": "ai_company" },
+    { "name": "IBM WATSON", "description": "Enterprise AI Founded 2011", "category": "ai_company" },
+    { "name": "ANYSCALE", "description": "Ray AI Framework Founded 2019", "category": "ai_company" },
+    { "name": "PERPLEXITY", "description": "AI Search Engine Founded 2022", "category": "ai_company" },
+    { "name": "CHARACTER-AI", "description": "AI Characters Founded 2021", "category": "ai_company" },
+    { "name": "JASPER", "description": "AI Writing Founded 2021", "category": "ai_company" },
+    { "name": "RUNWAY", "description": "Gen-2 Video AI Founded 2018", "category": "ai_company" },
+    { "name": "SCALE-AI", "description": "Data Annotation Founded 2016", "category": "ai_company" },
+    { "name": "INFLECTION-AI", "description": "Pi Assistant Founded 2022", "category": "ai_company" },
+    { "name": "MISTRAL-AI", "description": "Open Models Founded 2023", "category": "ai_company" },
+    { "name": "DEEPSEEK", "description": "Chinese AI Research Founded 2021", "category": "ai_company" },
+    { "name": "DATABRICKS", "description": "Dolly/AI Data Platform Founded 2013", "category": "ai_company" },
+    { "name": "CEREBRAS", "description": "AI Hardware Founded 2016", "category": "ai_company" },
+    { "name": "ADEPT-AI", "description": "AI Actions Founded 2022", "category": "ai_company" },
+    { "name": "AI21-LABS", "description": "Jurassic/Wordtune Founded 2017", "category": "ai_company" },
+    { "name": "BAIDU", "description": "Ernie Bot Founded 2000", "category": "ai_company" },
+    { "name": "TOGETHER-AI", "description": "AI Infrastructure Founded 2022", "category": "ai_company" },
+    { "name": "SAGEMAKER", "description": "AWS ML Platform Founded 2017", "category": "ai_company" },
+    { "name": "PYTORCH", "description": "Deep Learning Framework Founded 2016", "category": "ai_company" },
+    { "name": "TENSORFLOW", "description": "Google ML Framework Founded 2015", "category": "ai_company" },
+    { "name": "WEIGHTS & BIASES", "description": "ML Tools Founded 2017", "category": "ai_company" },
+    { "name": "MODAL", "description": "Cloud Functions Founded 2020", "category": "ai_company" },
+    { "name": "REPLICATE", "description": "ML Deployment Founded 2019", "category": "ai_company" }
   ],
   "non_western": [
     { "name": "AN WANG", "description": "Wang Labs Founder", "category": "non_western" },
     { "name": "FUJIO MASUOKA", "description": "Flash Memory Inventor", "category": "non_western" },
     { "name": "MASATOSHI SHIMA", "description": "Intel 4004 Co-designer", "category": "non_western" },
     { "name": "KEN SAKAMURA", "description": "TRON OS Developer", "category": "non_western" },
-    { "name": "KAI-FU LEE", "description": "AI Researcher", "category": "non_western" },
-    { "name": "MORRIS CHANG", "description": "TSMC Founder", "category": "non_western" },
-    { "name": "JENSEN HUANG", "description": "NVIDIA Co-founder", "category": "non_western" },
-    { "name": "CHARLES KUEN KAO", "description": "Fiber Optics Pioneer", "category": "non_western" },
-    { "name": "ANDREW CHI-CHIH YAO", "description": "Computer Scientist", "category": "non_western" },
-    { "name": "NARINDER SINGH KAPANY", "description": "Fiber Optics Pioneer", "category": "non_western" },
-    { "name": "FAQIR CHAND KOHLI", "description": "Indian IT Industry Father", "category": "non_western" },
-    { "name": "N. R. NARAYANA MURTHY", "description": "Infosys Co-founder", "category": "non_western" },
-    { "name": "NANDAN NILEKANI", "description": "Aadhaar Architect", "category": "non_western" },
-    { "name": "AZIM PREMJI", "description": "Wipro Chairman", "category": "non_western" },
-    { "name": "VIJAY P. BHATKAR", "description": "PARAM Supercomputer Architect", "category": "non_western" },
-    { "name": "AJAY BHATT", "description": "USB Co-inventor", "category": "non_western" },
-    { "name": "VINOD DHAM", "description": "Pentium Chip Father", "category": "non_western" },
-    { "name": "WANG XUAN", "description": "Chinese Computing Pioneer", "category": "non_western" },
-    { "name": "JACK MA", "description": "Alibaba Founder", "category": "non_western" },
-    { "name": "PONY MA", "description": "Tencent Founder", "category": "non_western" },
-    { "name": "ROBIN LI", "description": "Baidu Co-founder", "category": "non_western" },
-    { "name": "ZHANG YIMING", "description": "ByteDance Founder", "category": "non_western" },
-    { "name": "LEI JUN", "description": "Xiaomi Founder", "category": "non_western" },
-    { "name": "REN ZHENGFEI", "description": "Huawei Founder", "category": "non_western" },
-    { "name": "SERGEY LEBEDEV", "description": "Soviet Computer Pioneer", "category": "non_western" },
-    { "name": "VICTOR GLUSHKOV", "description": "Soviet Cybernetics Pioneer", "category": "non_western" },
-    { "name": "MSTISLAV KELDYSH", "description": "Soviet Computing Leader", "category": "non_western" },
-    { "name": "VLADIMIR VAPNIK", "description": "Learning Theory Creator", "category": "non_western" },
-    { "name": "GEORGES CHARPAK", "description": "Electronic Detection Pioneer", "category": "non_western" },
-    { "name": "MOHAMED ATALLA", "description": "MOSFET Inventor", "category": "non_western" },
-    { "name": "NIMA ARKANI-HAMED", "description": "Physicist & Computing Theorist", "category": "non_western" },
-    { "name": "RAJ REDDY", "description": "AI Pioneer", "category": "non_western" }
+    { "name": "KAI-FU LEE", "description": "AI Pioneer Former Google China Head", "category": "non_western" },
+    { "name": "YAN LECUN", "description": "Deep Learning Pioneer Facebook AI", "category": "non_western" },
+    { "name": "ILYA SUTSKEVER", "description": "OpenAI Scientific Director", "category": "non_western" },
+    { "name": "RAJ REDDY", "description": "AI Pioneer Turing Award Winner", "category": "non_western" },
+    { "name": "ANDREW NG", "description": "Stanford AI Professor Coursera", "category": "non_western" },
+    { "name": "DEMIS HASSABIS", "description": "DeepMind Founder AI Pioneer", "category": "tech" },
+    { "name": "ANDREJ KARPATHY", "description": "AI Researcher Tesla Autopilot", "category": "tech" },
+    { "name": "JENSEN HUANG", "description": "NVIDIA Founder AI Hardware Pioneer", "category": "non_western" },
+    { "name": "JACK MA", "description": "Alibaba Founder AI Investor", "category": "non_western" },
+    { "name": "DARIO AMODEI", "description": "Anthropic Founder AI Safety Pioneer", "category": "tech" }
   ],
   "featured": [
     { "name": "ADA LOVELACE", "description": "First Programmer (1843)", "category": "tech" },
@@ -426,16 +407,16 @@
     { "name": "FAQIR CHAND KOHLI", "description": "Indian IT Industry Father", "category": "non_western" },
     { "name": "MSTISLAV KELDYSH", "description": "Soviet Computing Leader", "category": "non_western" },
     { "name": "VLADIMIR VAPNIK", "description": "Statistical Learning Theory Creator", "category": "non_western" },
-    { "name": "KAI-FU LEE", "description": "AI Pioneer & Former Google China Head", "category": "non_western" },
-    { "name": "ANDREW CHI-CHIH YAO", "description": "Turing Award Winner", "category": "non_western" },
-    { "name": "ILYA SUTSKEVER", "description": "OpenAI Co-founder & Scientific Director", "category": "non_western" },
-    { "name": "RAJ REDDY", "description": "AI Pioneer & Turing Award Winner", "category": "non_western" },
-    { "name": "VINOD DHAM", "description": "Pentium Chip Father", "category": "non_western" },
-    { "name": "DEMIS HASSABIS", "description": "DeepMind Founder & AI Pioneer", "category": "tech" },
-    { "name": "AJAY BHATT", "description": "USB Co-inventor", "category": "non_western" },
-    { "name": "JENSEN HUANG", "description": "NVIDIA Founder & AI Hardware Pioneer", "category": "non_western" },
-    { "name": "JACK MA", "description": "Alibaba Founder & AI Investor", "category": "non_western" },
-    { "name": "DARIO AMODEI", "description": "Anthropic Founder & AI Safety Pioneer", "category": "tech" }
+    { "name": "KAI-FU LEE", "description": "AI Pioneer Former Google China Head", "category": "non_western" },
+    { "name": "YAN LECUN", "description": "Deep Learning Pioneer Facebook AI", "category": "non_western" },
+    { "name": "ILYA SUTSKEVER", "description": "OpenAI Scientific Director", "category": "non_western" },
+    { "name": "RAJ REDDY", "description": "AI Pioneer Turing Award Winner", "category": "non_western" },
+    { "name": "ANDREW NG", "description": "Stanford AI Professor Coursera", "category": "non_western" },
+    { "name": "DEMIS HASSABIS", "description": "DeepMind Founder AI Pioneer", "category": "tech" },
+    { "name": "ANDREJ KARPATHY", "description": "AI Researcher Tesla Autopilot", "category": "tech" },
+    { "name": "JENSEN HUANG", "description": "NVIDIA Founder AI Hardware Pioneer", "category": "non_western" },
+    { "name": "JACK MA", "description": "Alibaba Founder AI Investor", "category": "non_western" },
+    { "name": "DARIO AMODEI", "description": "Anthropic Founder AI Safety Pioneer", "category": "tech" }
   ],
   "special": [
     { "name": "GHOST IN THE MACHINE", "description": "Digital Consciousness", "category": "special" },
@@ -955,8 +936,10 @@
     "name_grids": [
       {
         "names": [
-          "CHARLES BABBAGE", "ADA LOVELACE", "ALAN TURING", "GRACE HOPPER", "CLAUDE SHANNON", "JOHN VON NEUMANN",
-          "TOMMY FLOWERS", "MAURICE WILKES", "JOHN ATANASOFF", "CLIFFORD BERRY", "BETTY HOLBERTON", "MARLYN WESCOFF"
+          { "name": "CHARLES BABBAGE", "description": "Analytical Engine" },
+          { "name": "ADA LOVELACE", "description": "First Programmer" },
+          { "name": "ALAN TURING", "description": "Computing Theory" },
+          { "name": "GRACE HOPPER", "description": "COBOL Compiler" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -964,8 +947,10 @@
       },
       {
         "names": [
-          "JACK KILBY", "ROBERT NOYCE", "GORDON MOORE", "WILLIAM SHOCKLEY", "JOHN BARDEEN", "WALTER BRATTAIN",
-          "DONALD KNUTH", "EDSGER DIJKSTRA", "BARBARA LISKOV", "SEYMOUR CRAY", "LYNN CONWAY", "FRAN ALLEN"
+          { "name": "JACK KILBY", "description": "Integrated Circuit" },
+          { "name": "ROBERT NOYCE", "description": "Microchip Pioneer" },
+          { "name": "GORDON MOORE", "description": "Moores Law" },
+          { "name": "WILLIAM SHOCKLEY", "description": "Transistor Inventor" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -973,8 +958,12 @@
       },
       {
         "names": [
-          "GEOFFREY HINTON", "YANN LECUN", "YOSHUA BENGIO", "ANDREW NG", "ILYA SUTSKEVER", "IAN GOODFELLOW",
-          "DEMIS HASSABIS", "SAM ALTMAN", "DARIO AMODEI", "ANDREJ KARPATHY", "MIRA MURATI", "JEFF DEAN"
+          { "name": "GEOFFREY HINTON", "description": "Deep Learning" },
+          { "name": "YANN LECUN", "description": "Convolutional Networks" },
+          { "name": "YOSHUA BENGIO", "description": "Neural Networks" },
+          { "name": "ANDREW NG", "description": "Machine Learning" },
+          { "name": "DEMIS HASSABIS", "description": "DeepMind Founder" },
+          { "name": "SAM ALTMAN", "description": "OpenAI CEO" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -982,8 +971,10 @@
       },
       {
         "names": [
-          "VINTON CERF", "BOB KAHN", "TIM BERNERS-LEE", "DOUGLAS ENGELBART", "TED NELSON", "J.C.R. LICKLIDER",
-          "LEONARD KLEINROCK", "LOUIS POUZIN", "JON POSTEL", "RAY TOMLINSON", "PAUL BARAN", "DONALD DAVIES"
+          { "name": "VINTON CERF", "description": "Internet Protocol" },
+          { "name": "BOB KAHN", "description": "TCP/IP Protocol" },
+          { "name": "TIM BERNERS-LEE", "description": "World Wide Web" },
+          { "name": "DOUGLAS ENGELBART", "description": "Computer Mouse" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -991,8 +982,10 @@
       },
       {
         "names": [
-          "BILL GATES", "PAUL ALLEN", "STEVE JOBS", "STEVE WOZNIAK", "GARY KILDALL", "CHUCK PEDDLE",
-          "ADAM OSBORNE", "CLIVE SINCLAIR", "JACK TRAMIEL", "DAN BRICKLIN", "BOB FRANKSTON", "RICHARD STALLMAN"
+          { "name": "BILL GATES", "description": "Microsoft" },
+          { "name": "STEVE JOBS", "description": "Apple" },
+          { "name": "STEVE WOZNIAK", "description": "Apple Hardware" },
+          { "name": "RICHARD STALLMAN", "description": "Free Software" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -1000,8 +993,10 @@
       },
       {
         "names": [
-          "MARC ANDREESSEN", "JERRY YANG", "DAVID FILO", "JEFF BEZOS", "PIERRE OMIDYAR", "LARRY PAGE",
-          "SERGEY BRIN", "SHAWN FANNING", "JIMMY WALES", "LARRY SANGER", "REED HASTINGS", "ERIC BINA"
+          { "name": "MARC ANDREESSEN", "description": "Netscape Browser" },
+          { "name": "JERRY YANG", "description": "Yahoo Portal" },
+          { "name": "JEFF BEZOS", "description": "Amazon" },
+          { "name": "LARRY PAGE", "description": "Google Search" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -1009,8 +1004,10 @@
       },
       {
         "names": [
-          "MARK ZUCKERBERG", "JACK DORSEY", "BIZ STONE", "EVAN WILLIAMS", "JAN KOUM", "BRIAN ACTON",
-          "KEVIN SYSTROM", "MIKE KRIEGER", "EVAN SPIEGEL", "BOBBY MURPHY", "REID HOFFMAN", "STEWART BUTTERFIELD"
+          { "name": "MARK ZUCKERBERG", "description": "Facebook" },
+          { "name": "JACK DORSEY", "description": "Twitter" },
+          { "name": "KEVIN SYSTROM", "description": "Instagram" },
+          { "name": "EVAN SPIEGEL", "description": "Snapchat" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -1018,8 +1015,10 @@
       },
       {
         "names": [
-          "VERA MOLNÁR", "CHARLES CSURI", "NAM JUNE PAIK", "JOHN WHITNEY", "MANFRED MOHR", "FRIEDER NAKE",
-          "HAROLD COHEN", "LILLIAN SCHWARTZ", "JOHN MAEDA", "CASEY REAS", "BEN FRY", "GOLAN LEVIN"
+          { "name": "VERA MOLNÁR", "description": "Computer Art Pioneer" },
+          { "name": "CHARLES CSURI", "description": "Digital Art Father" },
+          { "name": "NAM JUNE PAIK", "description": "Video Art" },
+          { "name": "JOHN WHITNEY", "description": "Motion Graphics" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -1027,8 +1026,10 @@
       },
       {
         "names": [
-          "DAPHNE ORAM", "DELIA DERBYSHIRE", "WENDY CARLOS", "KRAFTWERK", "BRIAN ENO", "YELLOW MAGIC ORCHESTRA",
-          "LAURIE SPIEGEL", "SUZANNE CIANI", "GIORGIO MORODER", "APHEX TWIN", "MAX MATHEWS", "JOHN CHOWNING"
+          { "name": "DAPHNE ORAM", "description": "Electronic Music Pioneer" },
+          { "name": "WENDY CARLOS", "description": "Synthesizer Virtuoso" },
+          { "name": "KRAFTWERK", "description": "Electronic Band" },
+          { "name": "BRIAN ENO", "description": "Ambient Music" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -1036,8 +1037,10 @@
       },
       {
         "names": [
-          "WILLIAM GIBSON", "BRUCE STERLING", "NEAL STEPHENSON", "PAT CADIGAN", "OCTAVIA BUTLER", "VERNOR VINGE",
-          "TED CHIANG", "LIU CIXIN", "STANISŁAW LEM", "J.G. BALLARD", "PHILIP K. DICK", "ARTHUR C. CLARKE"
+          { "name": "WILLIAM GIBSON", "description": "Neuromancer" },
+          { "name": "BRUCE STERLING", "description": "Cyberpunk Theorist" },
+          { "name": "NEAL STEPHENSON", "description": "Snow Crash" },
+          { "name": "TED CHIANG", "description": "AI Fiction" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -1045,8 +1048,10 @@
       },
       {
         "names": [
-          "AN WANG", "FUJIO MASUOKA", "MASATOSHI SHIMA", "JENSEN HUANG", "MORRIS CHANG", "CHARLES KUEN KAO",
-          "WANG XUAN", "JACK MA", "PONY MA", "ROBIN LI", "SERGEY LEBEDEV", "VICTOR GLUSHKOV"
+          { "name": "AN WANG", "description": "Word Processing" },
+          { "name": "JENSEN HUANG", "description": "NVIDIA GPU" },
+          { "name": "MORRIS CHANG", "description": "TSMC Founder" },
+          { "name": "JACK MA", "description": "Alibaba" }
         ],
         "category": "name_grid",
         "layout": "grid",
@@ -1054,8 +1059,12 @@
       },
       {
         "names": [
-          "BELL LABS", "IBM", "XEROX PARC", "FAIRCHILD", "INTEL", "MICROSOFT",
-          "APPLE", "GOOGLE", "FACEBOOK", "AMAZON", "NVIDIA", "OPENAI"
+          { "name": "BELL LABS", "description": "Research Pioneer" },
+          { "name": "IBM", "description": "Computing Giant" },
+          { "name": "XEROX PARC", "description": "GUI Birthplace" },
+          { "name": "INTEL", "description": "Microprocessor" },
+          { "name": "APPLE", "description": "Personal Computer" },
+          { "name": "GOOGLE", "description": "Search Engine" }
         ],
         "category": "name_grid",
         "layout": "grid",
