@@ -77,7 +77,11 @@ async function loadCredits() {
             ...(creditsData.electronic_music || []),
             ...(creditsData.hackers || []),
             ...(creditsData.global_pioneers || []),
-            ...(creditsData.blockchain_era || []),
+            ...(creditsData.modern_tech_leaders || []),
+            ...(creditsData.companies || []),
+            ...(creditsData.ai_companies || []),
+            ...(creditsData.ai_ceos || []),
+            ...(creditsData.non_western || []),
             ...(creditsData.special || [])
         ];
 
@@ -244,6 +248,10 @@ function buildAndStartCreditsSequence(creditsData) {
     // Helper function to get credits from a category
     function getCreditsFromCategory(categoryName, count = null) {
         const categoryData = creditsData[categoryName] || [];
+        console.log(`Getting credits from ${categoryName}: ${categoryData.length} items${count ? ` (limiting to ${count})` : ''}`);
+        if (categoryData.length === 0) {
+            console.warn(`⚠️ Category '${categoryName}' is empty or does not exist!`);
+        }
         return count ? categoryData.slice(0, count) : categoryData;
     }
     
@@ -282,6 +290,11 @@ function buildAndStartCreditsSequence(creditsData) {
         creditScreens.push(creditsData.layouts.name_grids[0]); // Early computing grid
     }
     
+    // Add first bilingual screen early
+    if (creditsData.layouts.bilingual && creditsData.layouts.bilingual[0]) {
+        creditScreens.push(creditsData.layouts.bilingual[0]); // Japanese screen
+    }
+    
     // Mix early computing with featured pioneers
     const earlyMix = addMixedScreens(['early_computing', 'featured'], 8);
     creditScreens.push(...earlyMix);
@@ -312,6 +325,11 @@ function buildAndStartCreditsSequence(creditsData) {
     // Add first bilingual screen
     if (creditsData.layouts.bilingual) {
         creditScreens.push(creditsData.layouts.bilingual[0]); // Japanese screen
+    }
+    
+    // Add second bilingual screen
+    if (creditsData.layouts.bilingual && creditsData.layouts.bilingual[1]) {
+        creditScreens.push(creditsData.layouts.bilingual[1]); // Chinese screen
     }
     
     // 4. AI PIONEERS & EARLY RESEARCH (1950s-1980s)
@@ -453,9 +471,18 @@ function buildAndStartCreditsSequence(creditsData) {
     // 11. AI REVOLUTION (2010s-present)
     creditScreens.push({ name: "THE AI REVOLUTION", category: "era_title", layout: "single", color: "red" });
     
-    // Mix all AI-related content including modern companies
-    const aiRevolutionMix = addMixedScreens(['ai_pioneers', 'ai_companies', 'featured'], 25);
-    creditScreens.push(...aiRevolutionMix.slice(0, 35));
+    // Debug: Check what AI companies data we have
+    console.log("AI Companies data:", creditsData.ai_companies);
+    console.log("AI Companies length:", creditsData.ai_companies ? creditsData.ai_companies.length : 0);
+    console.log("AI CEOs data:", creditsData.ai_ceos);
+    console.log("AI CEOs length:", creditsData.ai_ceos ? creditsData.ai_ceos.length : 0);
+    
+    // Mix all AI-related content including modern companies and CEOs
+    const aiRevolutionMix = addMixedScreens(['ai_pioneers', 'ai_companies', 'ai_ceos', 'featured'], 30);
+    console.log("AI Revolution mix length:", aiRevolutionMix.length);
+    console.log("AI Revolution mix sample:", aiRevolutionMix.slice(0, 5));
+    
+    creditScreens.push(...aiRevolutionMix.slice(0, 45));
     
     // Add AI era logos (modern AI companies)
     const aiLogos = getLogosForEra('ai');
