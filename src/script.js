@@ -2090,6 +2090,11 @@ function startPhase1() {
         const titleThe = document.getElementById('title-the');
         const titleVibe = document.getElementById('title-vibe');
         
+        // Update the text content to "VIBE CODING SALON #01"
+        if (titleEnter) titleEnter.textContent = 'VIBE';
+        if (titleThe) titleThe.textContent = 'CODING';
+        if (titleVibe) titleVibe.textContent = 'SALON #01';
+        
         // Title animation sequence
         const titleTimeline = gsap.timeline({
             onComplete: () => {
@@ -2110,9 +2115,9 @@ function startPhase1() {
             }
         });
         
-        // Animate each title word - "Enter the Void" style but with Anton font (no rotations)
+        // Animate each title word - "VIBE CODING SALON #01" style
         titleTimeline
-            // ENTER
+            // VIBE
             .to(titleEnter, {
                 duration: 1,
                 opacity: 1,
@@ -2127,7 +2132,7 @@ function startPhase1() {
                 }
             }, "+=0.5") // Longer delay
             
-            // THE
+            // CODING
             .to(titleThe, {
                 duration: 0.8,
                 opacity: 1,
@@ -2139,7 +2144,7 @@ function startPhase1() {
                 titleThe.classList.add('flicker');
             }, "+=0.4") // Longer delay
             
-            // VIBE
+            // SALON #01
             .to(titleVibe, {
                 duration: 1.2,
                 opacity: 1,
@@ -2371,7 +2376,7 @@ function showEndScene() {
     
     // Create main title
     const endTitle = document.createElement('h1');
-    endTitle.textContent = 'ENTER THE VIBE';
+    endTitle.textContent = 'VIBE CODING SALON #01';
     endTitle.style.fontSize = 'clamp(3rem, 10vw, 7rem)';
     endTitle.style.fontFamily = "'Anton', sans-serif";
     endTitle.style.color = '#33FF33';
