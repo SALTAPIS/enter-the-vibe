@@ -6,7 +6,16 @@
 
 ## Features
 
-### 1. Dynamic Credits Sequence
+### 1. Intro Sequence with Historical Context
+
+- **Typer Animation**: 
+  - Typewriter-style text animation introducing Konrad Zuse and early computing history
+  - Text: "In 1936, 26-year-old Konrad Zuse began building his mechanical computer Z1 in his parents' living room at Wrangelstraße 38 in Berlin-Kreuzberg, leading to the Z3 in 1941—the world's first fully programmable digital computer --- and then this happened"
+  - Historical images of Zuse's computers displayed alongside the text
+  - Desktop-optimized layout with side-by-side image and text presentation
+  - Smooth transition to the main credits sequence
+
+### 2. Dynamic Credits Sequence
 
 - **Multiple Layout Types**:
   - Single Name Layout: Showcases one name at a time with large typography
@@ -26,13 +35,14 @@
   - Title layout: `clamp(10rem, 20vw, 20rem)`
   - Bilingual layout: `clamp(2.5rem, 6vw, 4rem)` for headings
   - Hierarchical layout: `clamp(3rem, 7vw, 5rem)` for headings
+  - All names consistently use Anton font with white color
 
 - **Visual Effects**:
   - Electric effect: Pulsing text shadow that creates a neon glow
   - Flicker effect: Random opacity changes that simulate flickering lights
   - Glitch effect: More intense flickering for special elements
 
-### 2. Audio Processing & Beat Detection
+### 3. Audio Processing & Beat Detection
 
 - **Real-time Audio Analysis**:
   - Web Audio API integration for frequency analysis
@@ -43,7 +53,6 @@
 - **Beat Detection Methods**:
   - Algorithmic beat detection based on frequency energy levels
   - Manual beat triggering via click or spacebar
-  - Automatic fallback beats with adjustable intervals
   - Visual beat indicator in bottom-right corner
 
 - **Display Timing Control**:
@@ -51,7 +60,17 @@
   - Default display time of 0.3 seconds
   - Prevents rapid transitions when beats are too close together
 
-### 3. Three-Phase Experience
+### 4. Four-Phase Experience
+
+- **Start Screen**: 
+  - "VIBE CODING SALON #01" title with salon drop logo
+  - Neon glow effects and flicker animation
+  - START EXPERIENCE button to begin
+
+- **Intro Phase**: 
+  - Historical typer animation about Konrad Zuse
+  - Historical computer images from the 1930s-1940s
+  - Smooth transition to credits sequence
 
 - **Phase 1: Credits Sequence**
   - Dynamic display of credits in various layouts
@@ -59,7 +78,7 @@
   - Text animations and effects
 
 - **Phase 2: Main Title**
-  - Large title display with "ENTER THE VIBE" text
+  - Large title display with "VIBE CODING SALON #01" text
   - Animated entrance of each word
   - Special effects for each title word
 
@@ -73,13 +92,12 @@
   - Thank you message and restart button
   - Animated entrance of end elements
 
-### 4. Interactive Controls
+### 5. Interactive Controls
 
 - **Beat Detection Controls**:
   - Peak threshold adjustment (sensitivity)
   - Noise floor adjustment (minimum level)
   - Frequency range selection and customization
-  - Auto beats toggle with interval adjustment
   - Display time slider (0.1s to 2s)
 
 - **Playback Controls**:
@@ -92,7 +110,7 @@
   - Adapts to different screen sizes
   - Mobile-friendly interface with appropriate scaling
 
-### 5. Audio Visualization
+### 6. Audio Visualization
 
 - **Real-time Spectrum Analyzer**:
   - Full-screen frequency visualization
@@ -111,24 +129,51 @@
 
 ```
 enter-the-vibe/
-├── docs/
-│   ├── credits-list.md       # Raw list of all credits
-│   ├── enter-the-vibe.md     # Project documentation
-│   ├── enter-the-void.md     # Reference documentation
-│   ├── app-overview.md       # This overview document
-├── public/
-│   ├── data/
-│   │   └── credits.json      # Credits data structure
-│   ├── sounds/
-│   │   ├── Enter-the-Void.mp3 # Main soundtrack
-│   │   ├── glitch-sound.mp3   # Effect sound
-│   │   └── transition-sound.mp3 # Transition sound
-│   ├── text-layout/          # Reference design images
-├── src/
-│   ├── index.html            # Main HTML structure
-│   ├── script.js             # Main JavaScript code
-│   └── style.css             # CSS styling
+├── public/                   # Static assets served by Vite
+│   ├── salon/               # Salon branding assets
+│   │   └── salondrop.svg    # Salon logo
+│   ├── zuse/                # Historical computer images
+│   │   ├── wp622e3589_05_06.jpg
+│   │   ├── wp5597592a_05_06.jpg
+│   │   └── wpdc2de409_05_06.jpg
+│   ├── sounds/              # Audio files
+│   │   ├── Enter-the-Void.mp3
+│   │   ├── glitch-sound.mp3
+│   │   └── transition-sound.mp3
+│   └── enter-the-vibe-preview.png
+├── src/                     # Source code
+│   ├── script.js            # Main application logic
+│   ├── style.css            # Styling and animations
+│   ├── index.html           # HTML template
+│   ├── HeroPanel.js         # UI controls component
+│   └── HeroPanel.jsx        # React version of controls
+├── data/                    # Configuration files
+│   ├── app-config.json      # Application settings
+│   └── credits.json         # Credits data structure
+├── docs/                    # Documentation
+│   ├── app-overview.md      # This overview document
+│   ├── sequence-structure.md # Sequence flow documentation
+│   ├── enter-the-void.md    # Reference documentation
+│   └── README.md            # Data directory info
+├── dist/                    # Built files (generated)
+├── node_modules/            # Dependencies (generated)
+├── package.json             # Project dependencies and scripts
+├── package-lock.json        # Dependency lock file
+├── vite.config.js           # Vite configuration
+├── index.html               # Main HTML entry point
+└── README.md                # Project documentation
 ```
+
+### Technology Stack
+
+- **Build Tool**: Vite - Fast development server and optimized production builds
+- **Frontend**: Vanilla JavaScript (ES6+), HTML5, CSS3
+- **Audio Processing**: Web Audio API for real-time audio analysis and beat detection
+- **Animation**: GSAP (GreenSock Animation Platform) for smooth animations
+- **Typography**: Anton font from Fontshare for bold, cinematic styling
+- **UI Components**: HeroUI React components for control panels
+- **Package Manager**: npm for dependency management
+- **Development**: Hot module replacement and fast refresh with Vite
 
 ### Code Architecture
 
@@ -137,13 +182,16 @@ enter-the-vibe/
   - Beat indicator and controls panel
   - Phase containers for different visual states
   - Credits containers for dynamic content
+  - Intro phase with typer animation
 
 - **JavaScript Components**:
   - Audio processing and beat detection system
   - Credits sequence generation and management
   - Dynamic layout creation and animation
+  - Typer animation for intro sequence
   - Settings management with localStorage persistence
   - Event handling for user interactions
+  - Font loading optimization
 
 - **CSS Design**:
   - Phase-specific styling for different visual states
@@ -151,6 +199,7 @@ enter-the-vibe/
   - Responsive design with clamp() and viewport units
   - Dynamic typography system
   - Control panel styling
+  - Desktop-optimized intro sequence layout
 
 ## Technical Implementation
 
@@ -164,7 +213,7 @@ The application uses a sophisticated beat detection algorithm:
 4. A dynamic threshold is calculated based on recent peak values
 5. Beats are detected when energy exceeds threshold by a configurable amount
 6. A minimum time between beats prevents false positives
-7. Fallback beats provide rhythm when audio analysis is unreliable
+7. Manual beat triggering provides precise control when needed
 
 ### Credits Sequence Generation
 
@@ -191,8 +240,8 @@ User settings are managed persistently:
 
 1. **Starting the Experience**:
    - Click the "START EXPERIENCE" button on the start screen
-   - Audio will begin playing automatically
-   - Credits sequence will start with Phase 1
+   - Watch the historical intro sequence about Konrad Zuse and early computing
+   - The intro automatically transitions to the credits sequence after completion
 
 2. **Adjusting Beat Detection**:
    - Use Peak Threshold slider to adjust sensitivity
@@ -207,9 +256,8 @@ User settings are managed persistently:
 
 4. **Manual Control**:
    - Click beat indicator or press spacebar for manual beats
-   - Double-click beat indicator to toggle auto beats
    - Use Skip button to jump directly to Phase 3
-   - Use Restart button to start over
+   - Use Restart button to start over from the beginning
 
 5. **Hiding Controls**:
    - Click "Hide Controls" to minimize the control panel
