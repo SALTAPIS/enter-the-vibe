@@ -50,18 +50,63 @@ async function loadAppConfig() {
         return appConfig;
     } catch (error) {
         console.error("Error loading app configuration:", error);
-        return null;
+        
+        // Try alternative paths for app config
+        const alternativePaths = [
+            '/data/app-config.json',
+            './public/data/app-config.json',
+            '/public/data/app-config.json',
+            'data/app-config.json'
+        ];
+        
+        for (const path of alternativePaths) {
+            try {
+                console.log(`Trying alternative app config path: ${path}`);
+                const altResponse = await fetch(path);
+                if (altResponse.ok) {
+                    appConfig = await altResponse.json();
+                    console.log(`Successfully loaded app config from: ${path}`);
+                    return appConfig;
+                }
+            } catch (altError) {
+                console.log(`Failed to load app config from ${path}:`, altError.message);
+            }
+        }
+        
+        // Use default config if all paths fail
+        console.warn("Using default app configuration");
+        appConfig = {
+            display: {
+                timing: {
+                    minDisplayTime: 300
+                },
+                fonts: {
+                    primary: "font-anton"
+                }
+            },
+            audio: {
+                beatDetection: {
+                    peakThreshold: { default: 0.05 },
+                    noiseFloor: { default: 70 }
+                }
+            }
+        };
+        return appConfig;
     }
 }
 
 // Load credits from JSON file
 async function loadCredits() {
     try {
+        console.log("Loading credits from:", window.location.origin + '/data/credits.json');
         const response = await fetch('./data/credits.json');
+        console.log("Credits fetch response:", response.status, response.statusText);
+        
         if (!response.ok) {
             throw new Error(`Failed to load credits: ${response.status} ${response.statusText}`);
         }
         const creditsData = await response.json();
+        console.log("Credits data loaded successfully:", Object.keys(creditsData));
         
         // Combine all chronological credits into one array in the correct order
         allCredits = [
@@ -87,10 +132,82 @@ async function loadCredits() {
         buildAndStartCreditsSequence(creditsData);
     } catch (error) {
         console.error("Error loading credits:", error);
-        // Fallback to simple credits if loading fails
-        allCredits = [
-            { name: "ERROR LOADING CREDITS", description: "Please check console", category: "error" }
+        console.error("Current URL:", window.location.href);
+        console.error("Trying to load from:", window.location.origin + '/data/credits.json');
+        
+        // Try alternative paths for different deployment scenarios
+        const alternativePaths = [
+            '/data/credits.json',
+            './public/data/credits.json',
+            '/public/data/credits.json',
+            'data/credits.json'
         ];
+        
+        let creditsLoaded = false;
+        
+        for (const path of alternativePaths) {
+            try {
+                console.log(`Trying alternative path: ${path}`);
+                const altResponse = await fetch(path);
+                if (altResponse.ok) {
+                    const creditsData = await altResponse.json();
+                    console.log(`Successfully loaded credits from: ${path}`);
+                    
+                    // Process the credits data
+                    allCredits = [
+                        ...(creditsData.early_computing || []),
+                        ...(creditsData.semiconductors_era || []),
+                        ...(creditsData.ai_pioneers || []),
+                        ...(creditsData.networking_era || []),
+                        ...(creditsData.personal_computing || []),
+                        ...(creditsData.internet_era || []),
+                        ...(creditsData.social_media_era || []),
+                        ...(creditsData.digital_artists || []),
+                        ...(creditsData.cyberpunk_writers || []),
+                        ...(creditsData.electronic_music || []),
+                        ...(creditsData.hackers || []),
+                        ...(creditsData.global_pioneers || []),
+                        ...(creditsData.blockchain_era || []),
+                        ...(creditsData.special || [])
+                    ];
+                    
+                    console.log(`Loaded ${allCredits.length} credits from alternative path`);
+                    buildAndStartCreditsSequence(creditsData);
+                    creditsLoaded = true;
+                    break;
+                }
+            } catch (altError) {
+                console.log(`Failed to load from ${path}:`, altError.message);
+            }
+        }
+        
+        if (!creditsLoaded) {
+            // Final fallback to hardcoded credits
+            console.warn("All credit loading attempts failed, using hardcoded fallback");
+            allCredits = [
+                { name: "KONRAD ZUSE", description: "Z1 Computer Creator", category: "pioneer" },
+                { name: "ALAN TURING", description: "Computing Theory", category: "pioneer" },
+                { name: "ADA LOVELACE", description: "First Programmer", category: "pioneer" },
+                { name: "JOHN VON NEUMANN", description: "Computer Architecture", category: "pioneer" },
+                { name: "GRACE HOPPER", description: "Compiler Pioneer", category: "pioneer" },
+                { name: "COMPUTING HISTORY", description: "1936 - Present", category: "title" }
+            ];
+            
+            // Create minimal credits data structure
+            const fallbackCreditsData = {
+                early_computing: allCredits.slice(0, 5),
+                layouts: {
+                    title: [{ name: "COMPUTING PIONEERS", layout: "title" }],
+                    hierarchical: [],
+                    bilingual: [],
+                    name_grids: [],
+                    fullscreen_logos: []
+                },
+                special: [{ name: "THANK YOU", layout: "title" }]
+            };
+            
+            buildAndStartCreditsSequence(fallbackCreditsData);
+        }
     }
 }
 
