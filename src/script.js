@@ -180,6 +180,28 @@ async function init() {
 // Start initialization when DOM is loaded
 document.addEventListener('DOMContentLoaded', init);
 
+// -------------- FONT LOADING CHECK --------------
+async function ensureFontsLoaded() {
+    console.log("Checking font loading...");
+    
+    try {
+        // Check if the browser supports font loading API
+        if ('fonts' in document) {
+            // Wait for Anton font to load
+            await document.fonts.load("400 16px Anton");
+            console.log("Anton font loaded successfully");
+        } else {
+            // Fallback: wait a bit for fonts to load
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            console.log("Font loading API not supported, using fallback delay");
+        }
+    } catch (error) {
+        console.warn("Font loading check failed:", error);
+        // Continue anyway after a short delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+    }
+}
+
 // -------------- TYPER ANIMATION INTRO --------------
 function startTyperAnimation() {
     console.log("Starting typer animation intro");
@@ -234,8 +256,11 @@ function startTyperAnimation() {
 }
 
 // Function to transition from intro to Phase 1 (credits)
-function transitionToPhase1() {
+async function transitionToPhase1() {
     console.log("Transitioning from intro to Phase 1");
+    
+    // Ensure fonts are loaded before starting credits
+    await ensureFontsLoaded();
     
     const introPhase = document.getElementById('intro-phase');
     const phase1 = document.getElementById('phase1');
@@ -1674,8 +1699,9 @@ function resetPeakDetection() {
         }
     }
     
-    // Add color (80% white, 20% other colors)
-    nameEl.style.color = getRandomColor();
+    // Always use white color and Anton font for names
+    nameEl.style.color = colorPalette.white;
+    nameEl.style.fontFamily = "'Anton', sans-serif";
     
     // Add to wrapper
     creditWrapper.appendChild(nameEl);
@@ -2106,6 +2132,9 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
         
         // Use white color for all grid/row items
         el.style.color = "#FFFFFF";
+        
+        // Always use Anton font for names
+        nameContainer.style.fontFamily = "'Anton', sans-serif";
         
         // Add description if available
         if (credit.description) {

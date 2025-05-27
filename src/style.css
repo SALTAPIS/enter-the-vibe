@@ -199,6 +199,20 @@ body {
     letter-spacing: 2px;
 }
 
+/* Ensure Anton font is applied to all credit elements */
+.credit,
+.credit *,
+.name-first,
+.name-last,
+.start-title,
+.title-word {
+    font-family: 'Anton', 'Arial Black', sans-serif !important;
+    font-display: swap;
+}
+
+/* Specific font loading optimization */
+@font-display: swap;
+
 .font-ocr-a {
     font-family: 'OCR A', monospace;
     letter-spacing: 1px;
