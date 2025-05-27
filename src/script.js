@@ -220,13 +220,13 @@ function startTyperAnimation() {
     
     // The text to type
     //const textToType = "In 1936, 26-year-old Konrad Zuse built the world's first programmable computer - the Z1 - in his parents' living room in Berlin Kreuzberg. And then this happened ...";
-  const textToType = "In 1936, 26-year-old Konrad Zuse built the Z1 in his parents living room in Berlin. By 1941, his Z3 became the first programmable computer ... and then this happened";
+  const textToType = "In 1936, 26-year-old Konrad Zuse built the Z1 in his parents living room in Berlin. By 1941, his Z3 became the world's first programmable computer ... and then this happened";
     // Clear existing content
     typerText.textContent = '';
     
     let currentIndex = 0;
     const typingSpeed = 50; // milliseconds per character
-    const pauseAtEnd = 2000; // pause at the end before transition
+    const pauseAtEnd = 1500; // pause at the end before transition
     
     // Create typing interval
     const typingInterval = setInterval(() => {
@@ -245,15 +245,15 @@ function startTyperAnimation() {
             // Typing complete
             clearInterval(typingInterval);
             
-            // Hide cursor after a moment
+            // Hide cursor after a moment and transition immediately (3 seconds earlier)
             setTimeout(() => {
                 typerCursor.style.opacity = '0';
                 
-                // Wait a bit more then transition to phase 1
+                // Transition immediately to phase 1
                 setTimeout(() => {
                     transitionToPhase1();
                 }, pauseAtEnd);
-            }, 1000);
+            }, 200);
         }
     }, typingSpeed);
 }
