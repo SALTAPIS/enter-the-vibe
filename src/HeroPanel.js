@@ -28,10 +28,6 @@ const HeroPanel = ({
   setFreqRangeStart,
   freqRangeEnd,
   setFreqRangeEnd,
-  autoBeats,
-  setAutoBeats,
-  beatInterval,
-  setBeatInterval,
   displayTime,
   setDisplayTime,
   beatEnergy,
@@ -48,11 +44,6 @@ const HeroPanel = ({
   // Create state for simplified view
   const [isSimplifiedView, setIsSimplifiedView] = useState(false);
   const [isActive, setIsActive] = useState(peakDetected || false);
-  
-  // Update the view mode when autoBeats changes
-  useEffect(() => {
-    setIsSimplifiedView(autoBeats);
-  }, [autoBeats]);
   
   // Update active state when peakDetected changes
   useEffect(() => {
@@ -286,31 +277,6 @@ const HeroPanel = ({
           )}
           
           <Divider />
-          
-          {/* Auto Beats Controls */}
-          <HStack>
-            <Text fontSize="sm">Auto Beats:</Text>
-            <Box flex="1" />
-            <Switch
-              isChecked={autoBeats}
-              onChange={(e) => setAutoBeats(e.target.checked)}
-              colorScheme="blue"
-            />
-          </HStack>
-          
-          {autoBeats && (
-            <Box>
-              <Text fontSize="sm">Interval: {beatInterval}ms</Text>
-              <Slider
-                min={100}
-                max={1000}
-                step={50}
-                value={beatInterval}
-                onChange={setBeatInterval}
-                colorScheme="blue"
-              />
-            </Box>
-          )}
           
           <Box>
             <Text fontSize="sm">Display Time: {(displayTime/1000).toFixed(1)}s</Text>

@@ -215,9 +215,12 @@ function startTyperAnimation() {
         return;
     }
     
-    // The text to type
-    const textToType = "In 1936, 26-year-old Konrad Zuse began building his mechanical computer Z1 in his parents' living room at Wrangelstraße 38 in Berlin-Kreuzberg, leading to the Z3 in 1941—the world's first fully programmable digital computer --- and then this happened";
+    // Initialize audio and visualization when intro starts
+    initializeAudioForIntro();
     
+    // The text to type
+    //const textToType = "In 1936, 26-year-old Konrad Zuse built the world's first programmable computer - the Z1 - in his parents' living room in Berlin Kreuzberg. And then this happened ...";
+  const textToType = "In 1936, 26-year-old Konrad Zuse built the Z1 in his parents living room in Berlin. By 1941, his Z3 became the first programmable computer ... and then this happened";
     // Clear existing content
     typerText.textContent = '';
     
@@ -255,6 +258,56 @@ function startTyperAnimation() {
     }, typingSpeed);
 }
 
+// Function to initialize audio when intro sequence starts
+function initializeAudioForIntro() {
+    console.log("Initializing audio for intro sequence");
+    
+    // Show bottom controls when intro starts
+    if (typeof window.showBottomControls === 'function') {
+        window.showBottomControls();
+    }
+    
+    // Initialize audio context and visualization
+    if (mainSound) {
+        // Make sure audio is ready to play
+        mainSound.volume = 1.0;
+        mainSound.currentTime = 0;
+        
+        // Add event listener for when audio ends
+        mainSound.removeEventListener('ended', showEndScene); // Remove any existing listener first
+        mainSound.addEventListener('ended', showEndScene);
+        console.log("Added 'ended' event listener to mainSound");
+        
+        // Play the sound
+        mainSound.play().then(() => {
+            console.log("Main sound started playing during intro");
+            setupAudioVisualization(mainSound);
+            
+            // Update bottom controls play state
+            if (typeof window.updateBottomControlsPlayState === 'function') {
+                window.updateBottomControlsPlayState(true);
+            }
+        }).catch(err => {
+            console.error("Error playing main sound during intro:", err);
+        });
+        
+        // Add audio event listeners for bottom controls
+        mainSound.addEventListener('pause', () => {
+            if (typeof window.updateBottomControlsPlayState === 'function') {
+                window.updateBottomControlsPlayState(false);
+            }
+        });
+        
+        mainSound.addEventListener('ended', () => {
+            if (typeof window.updateBottomControlsPlayState === 'function') {
+                window.updateBottomControlsPlayState(false);
+            }
+        });
+    } else {
+        console.error("Main sound element not found!");
+    }
+}
+
 // Function to transition from intro to Phase 1 (credits)
 async function transitionToPhase1() {
     console.log("Transitioning from intro to Phase 1");
@@ -276,52 +329,8 @@ async function transitionToPhase1() {
             phase1.classList.remove('hidden');
             gsap.set(phase1, { opacity: 1 });
             
-            // Show bottom controls when credits start
-            if (typeof window.showBottomControls === 'function') {
-                window.showBottomControls();
-            }
-            
-            // Initialize audio context and visualization
-            if (mainSound) {
-                // Make sure audio is ready to play
-                mainSound.volume = 1.0;
-                mainSound.currentTime = 0;
-                
-                // Add event listener for when audio ends
-                mainSound.removeEventListener('ended', showEndScene); // Remove any existing listener first
-                mainSound.addEventListener('ended', showEndScene);
-                console.log("Added 'ended' event listener to mainSound");
-                
-                // Play the sound
-                mainSound.play().then(() => {
-                    console.log("Main sound started playing");
-                    setupAudioVisualization(mainSound);
-                    
-                    // Update bottom controls play state
-                    if (typeof window.updateBottomControlsPlayState === 'function') {
-                        window.updateBottomControlsPlayState(true);
-                    }
-                }).catch(err => {
-                    console.error("Error playing main sound:", err);
-                });
-                
-                // Add audio event listeners for bottom controls
-                mainSound.addEventListener('pause', () => {
-                    if (typeof window.updateBottomControlsPlayState === 'function') {
-                        window.updateBottomControlsPlayState(false);
-                    }
-                });
-                
-                mainSound.addEventListener('ended', () => {
-                    if (typeof window.updateBottomControlsPlayState === 'function') {
-                        window.updateBottomControlsPlayState(false);
-                    }
-                });
-            } else {
-                console.error("Main sound element not found!");
-            }
-            
-            // Start the credits sequence
+            // Audio and bottom controls are already initialized during intro
+            // Just start the credits sequence
             startPhase1();
         }
     });
@@ -861,10 +870,7 @@ let freqRangeStart = 0; // Default start (lower frequency)
 let freqRangeEnd = 20; // Default end (higher frequency)
 let freqRangeHighlight = null; // Element to highlight the frequency range
 
-// Auto beat settings
-let autoBeatsEnabled = false; // Flag for automatic beats
-let autoBeatInterval = 500; // Interval for automatic beats in ms
-let autoBeatTimer = null; // Timer reference for automatic beats
+// Auto beat functionality has been removed
 let displayTime = 500; // How long to display beat visuals in ms
 
 // Credits settings
@@ -1210,11 +1216,11 @@ function restartAnimation() {
             phase.classList.add('hidden');
         });
         
-        // Show phase 1 immediately
-        const phase1 = document.getElementById('phase1');
-        if (phase1) {
-            phase1.classList.remove('hidden');
-            gsap.set(phase1, { opacity: 1 });
+        // Show intro phase to restart from the beginning
+        const introPhase = document.getElementById('intro-phase');
+        if (introPhase) {
+            introPhase.classList.remove('hidden');
+            gsap.set(introPhase, { opacity: 1 });
         }
         
         // Reset beat counter and detection
@@ -1279,50 +1285,10 @@ function restartAnimation() {
             console.error("Error creating new audio context:", err);
         }
         
-        // Initialize audio and visualization
-        if (mainSound) {
-            // Make sure audio is ready to play
-            mainSound.volume = 1.0;
-            mainSound.currentTime = 0;
-            
-            // Add event listener for when audio ends
-            mainSound.addEventListener('ended', showEndScene);
-            
-            // Play the sound
-            mainSound.play().then(() => {
-                console.log("Main sound started playing after restart");
-                if (audioContext) {
-                    setupAudioVisualization(mainSound);
-                }
-                
-                // Update bottom controls play state
-                if (typeof window.updateBottomControlsPlayState === 'function') {
-                    window.updateBottomControlsPlayState(true);
-                }
-            }).catch(err => {
-                console.error("Error playing main sound after restart:", err);
-            });
-            
-            // Add audio event listeners for bottom controls
-            mainSound.addEventListener('pause', () => {
-                if (typeof window.updateBottomControlsPlayState === 'function') {
-                    window.updateBottomControlsPlayState(false);
-                }
-            });
-            
-            mainSound.addEventListener('ended', () => {
-                if (typeof window.updateBottomControlsPlayState === 'function') {
-                    window.updateBottomControlsPlayState(false);
-                }
-            });
-        } else {
-            console.error("Main sound element not found after restart!");
-        }
+        // Start the typer animation (which will initialize audio)
+        startTyperAnimation();
         
-        // Start the experience directly
-        startPhase1();
-        
-        console.log("Animation restarted and immediately started");
+        console.log("Animation restarted from intro sequence");
     }
 }
 

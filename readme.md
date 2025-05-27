@@ -119,7 +119,7 @@ enter-the-vibe/
 
 ### Manual Controls
 - **Spacebar or Click**: Trigger manual beats
-- **Auto Beats**: Toggle automatic beat generation
+
 - **Skip**: Jump directly to Phase 3 (Digital Landscape)
 - **Restart**: Reset the entire experience
 

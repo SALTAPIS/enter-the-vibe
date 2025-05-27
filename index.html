@@ -163,10 +163,6 @@
           setFreqRangeStart,
           freqRangeEnd,
           setFreqRangeEnd,
-          autoBeats,
-          setAutoBeats,
-          beatInterval,
-          setBeatInterval,
           displayTime,
           setDisplayTime,
           beatEnergy,
@@ -183,11 +179,6 @@
           // Create state for simplified view
           const [isSimplifiedView, setIsSimplifiedView] = React.useState(false);
           const [isActive, setIsActive] = React.useState(peakDetected || false);
-          
-          // Update the view mode when autoBeats changes
-          React.useEffect(() => {
-            setIsSimplifiedView(autoBeats);
-          }, [autoBeats]);
           
           // Update active state when peakDetected changes
           React.useEffect(() => {
@@ -352,13 +343,7 @@
                       />
                     </Box>
                     
-                    <Flex align="center" justify="space-between" mt="4px" mb="4px">
-                      <Text>Auto Beats:</Text>
-                      <Switch 
-                        isChecked={autoBeats}
-                        onChange={(e) => setAutoBeats(e.target.checked)}
-                      />
-                    </Flex>
+
                     
                     <HStack spacing={2} mt={2}>
                       <Button onClick={onRestart} size="sm" width="100%" colorScheme="blue">
