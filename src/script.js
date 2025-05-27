@@ -395,6 +395,12 @@ function initializeAudioForIntro() {
         mainSound.addEventListener('ended', showEndScene);
         console.log("Added 'ended' event listener to mainSound");
         
+        // Setup bottom controls audio listeners for the current audio element
+        if (typeof window.setupBottomControlsAudioListeners === 'function') {
+            window.setupBottomControlsAudioListeners(mainSound);
+            console.log("Setup bottom controls audio listeners");
+        }
+        
         // Play the sound
         mainSound.play().then(() => {
             console.log("Main sound started playing during intro");
@@ -408,7 +414,7 @@ function initializeAudioForIntro() {
             console.error("Error playing main sound during intro:", err);
         });
         
-        // Add audio event listeners for bottom controls
+        // Add audio event listeners for bottom controls state updates
         mainSound.addEventListener('pause', () => {
             if (typeof window.updateBottomControlsPlayState === 'function') {
                 window.updateBottomControlsPlayState(false);
