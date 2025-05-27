@@ -1801,13 +1801,16 @@ function resetPeakDetection() {
             descEl.classList.add('credit-description');
         descEl.textContent = limitDescriptionWords(credit.description);
         
-        // Use description font size from appConfig if available
+        // Use description font size from appConfig if available - 1.5x bigger
         if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts.single) {
             descEl.style.fontSize = appConfig.display.fonts.layouts.single.description;
         } else {
-            // Fallback to hardcoded value
-            descEl.style.fontSize = 'clamp(1.2rem, 3vw, 2.5rem)';
+            // Fallback to hardcoded value - made 1.5x bigger
+            descEl.style.fontSize = 'clamp(1.8rem, 4.5vw, 3.75rem)';
         }
+        
+        // Always use OCR font for descriptions
+        descEl.style.fontFamily = "'OCR A Std', 'Courier New', monospace";
         
         // Add description to wrapper
         creditWrapper.appendChild(descEl);
@@ -2177,24 +2180,24 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             firstNameEl.classList.add('name-first');
             firstNameEl.textContent = nameParts[0];
             
-            // Use nameFirst font size from appConfig if available
+            // Use nameFirst font size from appConfig if available - 1.5x bigger
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 firstNameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameFirst;
             } else {
-                // Fallback to hardcoded value - made bigger
-                firstNameEl.style.fontSize = 'clamp(3.5rem, 8vw, 6rem)';
+                // Fallback to hardcoded value - made 1.5x bigger
+                firstNameEl.style.fontSize = 'clamp(5.25rem, 12vw, 9rem)';
             }
             
             const lastNameEl = document.createElement('div');
             lastNameEl.classList.add('name-last');
             lastNameEl.textContent = nameParts[1];
             
-            // Use nameLast font size from appConfig if available
+            // Use nameLast font size from appConfig if available - 1.5x bigger
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 lastNameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameLast;
             } else {
-                // Fallback to hardcoded value - made bigger
-                lastNameEl.style.fontSize = 'clamp(3.5rem, 8vw, 6rem)';
+                // Fallback to hardcoded value - made 1.5x bigger
+                lastNameEl.style.fontSize = 'clamp(5.25rem, 12vw, 9rem)';
             }
             
             nameContainer.appendChild(firstNameEl);
@@ -2204,12 +2207,12 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             const nameEl = document.createElement('div');
             nameEl.textContent = credit.name;
             
-            // Use nameFirst font size from appConfig if available (for single line)
+            // Use nameFirst font size from appConfig if available (for single line) - 1.5x bigger
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 nameEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].nameFirst;
             } else {
-                // Fallback to hardcoded value - made bigger
-                nameEl.style.fontSize = 'clamp(3.5rem, 8vw, 6rem)';
+                // Fallback to hardcoded value - made 1.5x bigger
+                nameEl.style.fontSize = 'clamp(5.25rem, 12vw, 9rem)';
             }
             
             nameEl.style.fontWeight = 'bold';
@@ -2231,14 +2234,16 @@ function showGridLayout(timeline, creditsInput, layout = "grid") {
             descEl.classList.add('credit-description');
             descEl.textContent = limitDescriptionWords(credit.description);
             
-            // Use description font size from appConfig if available
+            // Use description font size from appConfig if available - 1.5x bigger
             if (appConfig && appConfig.display && appConfig.display.fonts && appConfig.display.fonts.layouts && appConfig.display.fonts.layouts[layoutType]) {
                 descEl.style.fontSize = appConfig.display.fonts.layouts[layoutType].description;
             } else {
-                // Fallback to hardcoded value - made bigger
-                descEl.style.fontSize = 'clamp(1.2rem, 2.5vw, 2rem)';
+                // Fallback to hardcoded value - made 1.5x bigger
+                descEl.style.fontSize = 'clamp(1.8rem, 3.75vw, 3rem)';
             }
             
+            // Always use OCR font for descriptions
+            descEl.style.fontFamily = "'OCR A Std', 'Courier New', monospace";
             descEl.style.marginTop = '15px';
             descEl.style.opacity = '0.9';
             
