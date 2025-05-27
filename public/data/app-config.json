@@ -91,7 +91,7 @@
   "audio": {
     "beatDetection": {
       "peakThreshold": {
-        "default": 0.05,
+        "default": 0.03,
         "min": 0.01,
         "max": 0.20,
         "step": 0.01

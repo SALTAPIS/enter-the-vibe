@@ -971,8 +971,8 @@ let frequencyData;
 
 // Global variables for visualization 
 let peakCutoff = 100; // Default threshold for detecting peaks
-let peakThreshold = 0.05; // Multiplier for peakCutoff (user adjustable)
-let noiseFloor = 60; // Noise gate threshold (user adjustable)
+let peakThreshold = 0.03; // Multiplier for peakCutoff (user adjustable)
+let noiseFloor = 70; // Noise gate threshold (user adjustable)
 let peakCount = 0; // Count of detected peaks
 let lastPeakTime = 0; // Time of last detected peak
 let peakDetected = false; // Flag for active peak state
@@ -983,12 +983,12 @@ let cutoffDecay = 0.95; // Decay rate for dynamic threshold
 let peakHoldTime = 250; // Minimum time between peaks in ms
 
 // Frequency range for analysis
-let freqRangeStart = 0; // Default start (lower frequency)
-let freqRangeEnd = 20; // Default end (higher frequency)
+let freqRangeStart = 10; // Default start (lower frequency) - Mids preset
+let freqRangeEnd = 60; // Default end (higher frequency) - Mids preset
 let freqRangeHighlight = null; // Element to highlight the frequency range
 
 // Auto beat functionality has been removed
-let displayTime = 500; // How long to display beat visuals in ms
+let displayTime = 300; // How long to display beat visuals in ms
 
 // Credits settings
 let credits = []; // Loaded from JSON
@@ -1189,11 +1189,11 @@ function loadSettings() {
             const settings = JSON.parse(savedSettings);
             
             // Apply saved settings (removed fallback beat references)
-            peakThreshold = settings.peakThreshold || 0.05;
-            noiseFloor = settings.noiseFloor || 70;
-            freqRangeStart = settings.freqRangeStart || 10;
-            freqRangeEnd = settings.freqRangeEnd || 60;
-            minScreenDisplayTime = settings.minScreenDisplayTime || 300;
+                    peakThreshold = settings.peakThreshold || 0.03;
+        noiseFloor = settings.noiseFloor || 70;
+        freqRangeStart = settings.freqRangeStart || 10;
+        freqRangeEnd = settings.freqRangeEnd || 60;
+        minScreenDisplayTime = settings.minScreenDisplayTime || 300;
             
             console.log('Settings loaded from localStorage');
         }
@@ -1247,11 +1247,11 @@ function updateUIFromSettings() {
 
 // Reset to default settings
 function resetToDefaultSettings(saveAfterReset = true) {
-    peakThreshold = 0.05;
-    noiseFloor = 70; // Use noiseFloor consistently
-    freqRangeStart = 10;
-    freqRangeEnd = 60;
-    minScreenDisplayTime = 300; // Reset display time to 0.3 seconds
+            peakThreshold = 0.03;
+        noiseFloor = 70; // Use noiseFloor consistently
+        freqRangeStart = 10;
+        freqRangeEnd = 60;
+        minScreenDisplayTime = 300; // Reset display time to 0.3 seconds
     
     resetPeakDetection();
     
