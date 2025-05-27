@@ -30,10 +30,10 @@
         // Try to load HeroUI from multiple paths
         function loadHeroUI() {
             const paths = [
-                './src/heroui-init.js',
                 './heroui-init.js',
                 '/heroui-init.js',
-                './public/heroui-init.js'
+                './public/heroui-init.js',
+                './src/heroui-init.js'
             ];
             
             function tryLoadScript(index) {
@@ -141,12 +141,9 @@
     <audio id="main-sound" preload="auto">
         <source src="./sounds/Enter-the-Void.mp3" type="audio/mpeg">
     </audio>
-    <audio id="glitch-sound" preload="auto">
-        <source src="./sounds/glitch-sound.mp3" type="audio/mpeg">
-    </audio>
-    <audio id="transition-sound" preload="auto">
-        <source src="./sounds/transition-sound.mp3" type="audio/mpeg">
-    </audio>
+    <!-- Optional sound effects - will be loaded dynamically if available -->
+    <audio id="glitch-sound" preload="none"></audio>
+    <audio id="transition-sound" preload="none"></audio>
     
     <!-- Frequency Range Highlight -->
     <div id="freq-range-highlight" class="freq-range-highlight"></div>

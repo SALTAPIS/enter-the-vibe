@@ -32,6 +32,19 @@
     - `/heroui-init.js` (absolute path)
     - `./public/heroui-init.js` (fallback)
 
+### 5. Babel Transformer Warning
+- **Warning**: "You are using the in-browser Babel transformer. Be sure to precompile your scripts for production"
+- **Impact**: Performance warning only, doesn't break functionality
+- **Note**: This is expected for the current setup using inline JSX in HTML
+
+### 6. Missing Sound Files
+- **Problem**: 404 errors for `glitch-sound.mp3` and `transition-sound.mp3`
+- **Solution**: 
+  - Changed audio elements to `preload="none"` for optional sound effects
+  - Removed hardcoded source paths for missing files
+  - Script already has proper error handling for missing audio elements
+  - Only `Enter-the-Void.mp3` is required for core functionality
+
 ## Deployment Steps
 
 ### For Vite Build (Recommended)
