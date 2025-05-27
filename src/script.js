@@ -2467,7 +2467,6 @@ function startPhase1() {
                 const colors = ['#FF4081', '#536DFE', '#8BC34A', '#FFC107', '#E040FB', '#00BCD4'];
                 return colors[Math.floor(Math.random() * colors.length)];
             },
-            textShadow: "0 0 30px rgba(255,255,255,0.9)",
             ease: "sine.inOut",
             stagger: {
                 each: 0.1,
@@ -2570,7 +2569,6 @@ function showEndScene() {
     endTitle.style.fontSize = 'clamp(3rem, 10vw, 7rem)';
     endTitle.style.fontFamily = "'Anton', sans-serif";
     endTitle.style.color = '#33FF33';
-    endTitle.style.textShadow = '0 0 10px rgba(51, 255, 51, 0.8)';
     endTitle.style.marginBottom = '1rem';
     endTitle.style.letterSpacing = '5px';
     endTitle.classList.add('electric');
@@ -2594,7 +2592,6 @@ function showEndScene() {
     restartButton.style.border = '2px solid #33FF33';
     restartButton.style.cursor = 'pointer';
     restartButton.style.transition = 'all 0.3s ease';
-    restartButton.style.textShadow = '0 0 10px rgba(51, 255, 51, 0.8)';
     restartButton.style.boxShadow = '0 0 10px rgba(51, 255, 51, 0.8)';
     
     // Add hover effect for the button
