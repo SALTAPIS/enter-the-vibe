@@ -20,6 +20,18 @@
 - **Problem**: If all JSON loading fails, app would break
 - **Solution**: Added hardcoded pioneer credits as final fallback
 
+### 4. HeroUI Library Loading Issues
+- **Problem**: `window.HeroUI` undefined on live server, causing React component errors
+- **Solution**: 
+  - Added multiple fallback paths for loading HeroUI script
+  - Copied `heroui-init.js` to `public/` directory for proper serving
+  - Added error handling in HeroPanel component for missing HeroUI
+  - Fallback paths tried in order:
+    - `./src/heroui-init.js` (development)
+    - `./heroui-init.js` (production root)
+    - `/heroui-init.js` (absolute path)
+    - `./public/heroui-init.js` (fallback)
+
 ## Deployment Steps
 
 ### For Vite Build (Recommended)

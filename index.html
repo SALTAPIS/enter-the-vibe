@@ -25,8 +25,40 @@
     <!-- Include Babel for JSX transpilation -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Import custom HeroUI components -->
-    <script src="./src/heroui-init.js"></script>
+    <!-- Import custom HeroUI components with fallback paths -->
+    <script>
+        // Try to load HeroUI from multiple paths
+        function loadHeroUI() {
+            const paths = [
+                './src/heroui-init.js',
+                './heroui-init.js',
+                '/heroui-init.js',
+                './public/heroui-init.js'
+            ];
+            
+            function tryLoadScript(index) {
+                if (index >= paths.length) {
+                    console.error('Failed to load HeroUI from all paths');
+                    return;
+                }
+                
+                const script = document.createElement('script');
+                script.src = paths[index];
+                script.onload = function() {
+                    console.log(`HeroUI loaded successfully from: ${paths[index]}`);
+                };
+                script.onerror = function() {
+                    console.log(`Failed to load HeroUI from: ${paths[index]}, trying next...`);
+                    tryLoadScript(index + 1);
+                };
+                document.head.appendChild(script);
+            }
+            
+            tryLoadScript(0);
+        }
+        
+        loadHeroUI();
+    </script>
     
     <script>
       document.addEventListener('DOMContentLoaded', function() {
@@ -185,7 +217,24 @@
             setIsActive(peakDetected);
           }, [peakDetected]);
           
-          // Get HeroUI components - we know they're available because they're loaded in heroui-init.js
+          // Get HeroUI components with fallback
+          if (!window.HeroUI) {
+            console.error('HeroUI not available, HeroPanel will not render');
+            return React.createElement('div', {
+              style: {
+                position: 'fixed',
+                top: '20px',
+                right: '20px',
+                padding: '10px',
+                backgroundColor: 'rgba(255, 0, 0, 0.8)',
+                color: 'white',
+                borderRadius: '4px',
+                fontSize: '12px',
+                zIndex: 10000
+              }
+            }, 'HeroUI Failed to Load');
+          }
+          
           const { 
             Box, Card, CardHeader, CardBody, CardFooter, 
             Badge, Button, Flex, HStack, VStack, 
