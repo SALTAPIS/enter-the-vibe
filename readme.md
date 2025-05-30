@@ -2,7 +2,7 @@
 
 An interactive audio-visual experience that displays a dynamic credits sequence synchronized with audio beats. The application creates a cinematic experience similar to movie credits, with names and titles appearing in various layouts that transition in sync with audio. The design is inspired by the film "Enter the Void" with neon aesthetics and smooth animations.
 
-![Enter the Vibe Preview](public/enter-the-vibe-preview.png)
+![Enter the Vibe Preview](public/enter-the-vibe-preview2.png)
 
 ## 🛠️ Technology Stack
 
